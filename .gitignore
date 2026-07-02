@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+.output/
+.nitro/
+.vinxi/
+dist/
+.vercel/
+
+# TanStack Router generated
+src/routeTree.gen.ts
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Testing
+coverage/
+
+# Drizzle
+drizzle/.snapshots/

@@ -1,0 +1,30 @@
+printf "\n===============================\n"
+printf "🔍 Running typecheck\n"
+printf "===============================\n"
+
+pnpm typecheck || exit 1
+
+printf "\n===============================\n"
+printf "🧪 Running tests\n"
+printf "===============================\n"
+
+pnpm test || exit 1
+
+# Compare against the branch this one tracks (no hardcoded branch name).
+# If there's no upstream yet (first push), build to be safe.
+UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)
+
+if [ -n "$UPSTREAM" ] && git diff --quiet "$UPSTREAM"...HEAD -- src; then
+  printf "\n===============================\n"
+  printf "⏭️  Skipping build (no src changes)\n"
+  printf "===============================\n"
+else
+  printf "\n===============================\n"
+  printf "🔍 Check build errors\n"
+  printf "===============================\n"
+  pnpm run build || exit 1
+fi
+
+printf "\n===============================\n"
+printf "✅ All pre-push checks are good\n"
+printf "===============================\n"
