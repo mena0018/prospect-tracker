@@ -1,4 +1,11 @@
 printf "\n===============================\n"
+printf "🎨 Checking lint & format\n"
+printf "===============================\n"
+
+pnpm lint:ci || exit 1
+pnpm format:check || exit 1
+
+printf "\n===============================\n"
 printf "🔍 Running typecheck\n"
 printf "===============================\n"
 
