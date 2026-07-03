@@ -1,0 +1,9 @@
+printf "\n===============================\n"
+printf "🔍 Linting & formatting staged files\n"
+printf "===============================\n"
+
+pnpm exec lint-staged || exit 1
+
+printf "\n===============================\n"
+printf "✅ All pre-commit checks are good\n"
+printf "===============================\n"

@@ -1,0 +1,19 @@
+{
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Runs Prettier, then ESLint
+  "editor.codeActionsOnSave": ["source.formatDocument", "source.fixAll.eslint"],
+  "eslint.useFlatConfig": true,
+
+  // TypeScript — use workspace version
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+
+  // Conventional Commits extension
+  "conventionalCommits.promptCI": false,
+  "conventionalCommits.promptBody": false,
+  "conventionalCommits.promptFooter": false
+}
