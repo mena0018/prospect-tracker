@@ -42,7 +42,6 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
-      // UI copy is in French; apostrophes in JSX text are fine.
       'react/no-unescaped-entities': 'off',
     },
   },
