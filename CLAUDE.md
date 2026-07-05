@@ -119,7 +119,31 @@ pnpm test           # Vitest run
 ## Contributions & Git
 
 - **Conventional commits** (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`, `ci:`, `test:`…).
-  Short imperative subject; optional body for the _why_.
+  **Subject line only — no body.** Short imperative subject; put the _why_ in the PR
+  description, not the commit.
+- **Every commit MUST include a [gitmoji](https://gitmoji.dev/) after the colon**, in **text
+  format** (`:emoji-name:`) — not the Unicode character.
+
+  Format: `type(scope): :emoji: <description>`
+
+  ```
+  feat(cart): :sparkles: add quantity selector to cart line
+  fix(auth): :bug: handle expired session token
+  fix(deps): :lock: upgrade vulnerable packages
+  chore(deps): :wrench: use caret ranges in pnpm overrides
+  build(deps): :arrow_up: upgrade next to 16.2.6
+  refactor(roster): :recycle: extract roster member validation
+  perf(product): :zap: cache shopify product queries
+  docs: :memo: update module architecture diagram
+  test(cart): :white_check_mark: add unit tests for cart codec
+  ```
+
+  Cheat-sheet: `:sparkles:` feature · `:bug:` bug fix · `:lock:` security fix ·
+  `:arrow_up:`/`:arrow_down:` up/downgrade deps · `:recycle:` refactor · `:wrench:`
+  config/tooling · `:memo:` docs · `:white_check_mark:` tests · `:zap:` perf · `:art:`
+  style/formatting · `:rocket:` deploy/release · `:fire:` remove dead code ·
+  `:adhesive_bandage:` simple fix (not a real bug). Full list: https://gitmoji.dev/
+
 - **Never add a `Co-Authored-By: Claude` trailer or any "Generated with Claude Code" mention**
   in commits or PR bodies. No agent co-signature.
 - Commit/push only when explicitly asked.
