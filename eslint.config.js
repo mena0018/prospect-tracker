@@ -8,7 +8,15 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['node_modules', '.output', '.nitro', '.vercel', 'dist', 'src/routeTree.gen.ts'],
+    ignores: [
+      'node_modules',
+      '.output',
+      '.nitro',
+      '.vercel',
+      'dist',
+      'src/routeTree.gen.ts',
+      'drizzle/meta',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
