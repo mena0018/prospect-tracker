@@ -5,3 +5,9 @@ node_modules
 dist
 pnpm-lock.yaml
 src/routeTree.gen.ts
+
+drizzle/meta
+
+.agents
+.mcp.json
+skills-lock.json

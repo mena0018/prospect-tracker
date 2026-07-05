@@ -62,13 +62,23 @@ communities. (The MRR target below is conditioned on this channel.)
 - Default table view (TanStack Table) + kanban "By stage" toggle
 - Columns: last-contact date, recruiter, ESN, need, day-rate/salary, end client, stage, role,
   onsite (days/week on site, 0–5), location, required experience, phone, offer link
-- Stages: Saved / Contacted / CV Sent / Interview / Offer / Rejected / Ghosted
+- Stages: **user-configurable per account** (seeded defaults: Saved / Contacted / CV Sent /
+  Interview / Offer / Rejected / Ghosted). Each stage can be renamed, recolored, reordered and
+  archived — see "Customize" below.
 - Pin an opportunity to the top of the list
 - Click-to-sort headers, global search, pagination
-- Day-rate colored green/red against a market threshold (configurable constant, default €450)
+- Day-rate colored green/red against a **reference day-rate the user configures** (default €450)
 - Quick manual entry (form) — this is the MVP's "import"
 - 4 action-oriented KPIs banner: to follow up today, active opportunities, ongoing interviews,
   response rate
+
+**Customize ("Personnaliser")**
+
+- Edit the pipeline **stages** per account: rename, pick a color, reorder, archive, add new
+  stages, and set a **per-stage follow-up delay** (days before an opportunity is "to follow up").
+- Edit the **job types** and **experience levels** used in the opportunity form.
+- Set the **reference day-rate (TJM)** used for green/red coloring.
+- Changes apply live.
 
 **Follow-ups**
 
@@ -138,4 +148,6 @@ intentions.)_
 ## Stack
 
 Summary: TanStack Start (SSR) + Supabase (Auth + Postgres) + Drizzle + TanStack Query/Table,
-Resend, Stripe, PostHog, deployed on Vercel. Technical details and data model: see `CLAUDE.md`.
+Resend, Stripe, PostHog, deployed on Vercel. Technical details: see `CLAUDE.md`. Data model:
+see [`docs/DATA-MODEL.md`](DATA-MODEL.md) and the decision record in
+[`docs/decisions/`](decisions/).

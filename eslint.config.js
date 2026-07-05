@@ -8,7 +8,15 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['node_modules', '.output', '.nitro', '.vercel', 'dist', 'src/routeTree.gen.ts'],
+    ignores: [
+      'node_modules',
+      '.output',
+      '.nitro',
+      '.vercel',
+      'dist',
+      'src/routeTree.gen.ts',
+      'drizzle/meta',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -42,7 +50,6 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
-      // UI copy is in French; apostrophes in JSX text are fine.
       'react/no-unescaped-entities': 'off',
     },
   },

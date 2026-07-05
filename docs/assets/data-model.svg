@@ -1,0 +1,75 @@
+<svg width="680" height="640" viewBox="0 0 680 640" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>ProspectTracker — data model (5 tables)</title>
+  <desc>The users table is central. Three per-user configuration tables (stages, job_types, experience_levels) and the opportunities table reference it. opportunities references stage_id (RESTRICT), job_type_id (SET NULL) and experience_id (SET NULL).</desc>
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8" fill="none" stroke="#8b8b8b" stroke-width="1.4"/>
+    </marker>
+    <marker id="arrOrange" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8" fill="none" stroke="#b45309" stroke-width="1.4"/>
+    </marker>
+    <marker id="arrTeal" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8" fill="none" stroke="#0f766e" stroke-width="1.4"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="680" height="640" fill="#ffffff"/>
+
+  <rect x="270" y="44" width="150" height="118" rx="8" fill="#eef1ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="345" y="64" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#3730a3">users</text>
+  <line x1="278" y1="72" x2="412" y2="72" stroke="#c7cbf5"/>
+  <text x="282" y="88" font-family="monospace" font-size="10.5" fill="#4b4b6a">id (uuid) = auth.users.id</text>
+  <text x="282" y="104" font-family="monospace" font-size="10.5" fill="#4b4b6a">email · full_name · job_title</text>
+  <text x="282" y="120" font-family="monospace" font-size="10.5" fill="#4b4b6a">avatar_url · tjm_reference</text>
+  <text x="282" y="136" font-family="monospace" font-size="10.5" fill="#4b4b6a">plan (enum free|pro)</text>
+  <text x="282" y="152" font-family="monospace" font-size="10.5" fill="#9a9ab5">timestamps</text>
+
+  <rect x="40" y="230" width="176" height="96" rx="8" fill="#f4f7ff" stroke="#93a4ef" stroke-width="1.3"/>
+  <text x="128" y="250" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#3730a3">stages</text>
+  <line x1="48" y1="258" x2="208" y2="258" stroke="#d5dcf8"/>
+  <text x="52" y="274" font-family="monospace" font-size="10" fill="#4b4b6a">id · user_id (FK)</text>
+  <text x="52" y="289" font-family="monospace" font-size="10" fill="#4b4b6a">name · color (#hex)</text>
+  <text x="52" y="304" font-family="monospace" font-size="10" fill="#4b4b6a">position · is_archived</text>
+  <text x="52" y="319" font-family="monospace" font-size="10" fill="#c2410c">reminder_delay_days</text>
+
+  <rect x="252" y="240" width="176" height="76" rx="8" fill="#f4f7ff" stroke="#93a4ef" stroke-width="1.3"/>
+  <text x="340" y="260" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#3730a3">job_types</text>
+  <line x1="260" y1="268" x2="420" y2="268" stroke="#d5dcf8"/>
+  <text x="264" y="284" font-family="monospace" font-size="10" fill="#4b4b6a">id · user_id (FK)</text>
+  <text x="264" y="299" font-family="monospace" font-size="10" fill="#4b4b6a">name · position</text>
+  <text x="264" y="312" font-family="monospace" font-size="9.5" fill="#9a9ab5">seed 6</text>
+
+  <rect x="464" y="240" width="176" height="76" rx="8" fill="#f4f7ff" stroke="#93a4ef" stroke-width="1.3"/>
+  <text x="552" y="260" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#3730a3">experience_levels</text>
+  <line x1="472" y1="268" x2="632" y2="268" stroke="#d5dcf8"/>
+  <text x="476" y="284" font-family="monospace" font-size="10" fill="#4b4b6a">id · user_id (FK)</text>
+  <text x="476" y="299" font-family="monospace" font-size="10" fill="#4b4b6a">name · position</text>
+  <text x="476" y="312" font-family="monospace" font-size="9.5" fill="#9a9ab5">seed 3</text>
+
+  <rect x="196" y="410" width="288" height="190" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="340" y="431" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#065f46">opportunities</text>
+  <line x1="204" y1="439" x2="476" y2="439" stroke="#a7f3d0"/>
+  <text x="210" y="455" font-family="monospace" font-size="10" fill="#334155">id · user_id (FK, cascade)</text>
+  <text x="210" y="471" font-family="monospace" font-size="10" fill="#b45309">stage_id (FK, RESTRICT)</text>
+  <text x="210" y="487" font-family="monospace" font-size="10" fill="#0f766e">job_type_id (FK, set null)</text>
+  <text x="210" y="503" font-family="monospace" font-size="10" fill="#0f766e">experience_id (FK, set null)</text>
+  <text x="210" y="519" font-family="monospace" font-size="10" fill="#334155">recruiter* · esn · end_client</text>
+  <text x="210" y="535" font-family="monospace" font-size="10" fill="#334155">need · daily_rate · onsite_days</text>
+  <text x="210" y="551" font-family="monospace" font-size="10" fill="#334155">location · phone · offer_url · notes</text>
+  <text x="210" y="567" font-family="monospace" font-size="10" fill="#7c3aed">last_contact_at · next_reminder_at</text>
+  <text x="210" y="583" font-family="monospace" font-size="10" fill="#334155">is_pinned · is_archived · timestamps</text>
+
+  <path d="M270,120 C210,120 128,170 128,228" fill="none" stroke="#8b8b8b" stroke-width="1.3" marker-end="url(#arr)"/>
+  <path d="M345,162 L340,238" fill="none" stroke="#8b8b8b" stroke-width="1.3" marker-end="url(#arr)"/>
+  <path d="M420,120 C480,120 552,170 552,238" fill="none" stroke="#8b8b8b" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <path d="M128,326 C128,380 250,400 300,408" fill="none" stroke="#b45309" stroke-width="1.4" marker-end="url(#arrOrange)"/>
+  <path d="M340,316 L340,408" fill="none" stroke="#0f766e" stroke-width="1.4" marker-end="url(#arrTeal)"/>
+  <path d="M552,316 C552,380 430,400 380,408" fill="none" stroke="#0f766e" stroke-width="1.4" marker-end="url(#arrTeal)"/>
+
+  <text x="345" y="196" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#8b8b8b">1 user &#8594; N (cascade)</text>
+
+  <text x="500" y="470" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#b45309">RESTRICT = stage non vide non supprimable</text>
+  <text x="500" y="486" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#0f766e">set null = suppr. config préserve l'opp</text>
+  <text x="500" y="502" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#7c3aed">dates &#8594; calcul « à relancer »</text>
+</svg>
