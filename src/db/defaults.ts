@@ -31,7 +31,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   { name: 'Entretien', color: 'violet', position: 3, isArchived: false },
   { name: 'Offre', color: 'green', position: 4, isArchived: false },
   { name: 'Refusé', color: 'red', position: 5, isArchived: true },
-  { name: 'Ghosté', color: 'orange', position: 6, isArchived: true },
+  { name: 'Ghosté', color: 'orange', position: 6, isArchived: true }
 ] as const
 
 export const DEFAULT_JOB_TYPES: readonly DefaultJobType[] = [
@@ -40,11 +40,11 @@ export const DEFAULT_JOB_TYPES: readonly DefaultJobType[] = [
   { name: 'Back End', position: 2 },
   { name: 'Mobile', position: 3 },
   { name: 'DevOps', position: 4 },
-  { name: 'Data', position: 5 },
+  { name: 'Data', position: 5 }
 ] as const
 
 export const DEFAULT_EXPERIENCE_LEVELS: readonly DefaultExperienceLevel[] = [
   { name: 'Junior', position: 0 },
   { name: 'Confirmé', position: 1 },
-  { name: 'Senior', position: 2 },
+  { name: 'Senior', position: 2 }
 ] as const

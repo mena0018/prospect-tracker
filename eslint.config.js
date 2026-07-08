@@ -15,8 +15,8 @@ export default tseslint.config(
       '.vercel',
       'dist',
       'src/routeTree.gen.ts',
-      'drizzle/meta',
-    ],
+      'drizzle/meta'
+    ]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -26,11 +26,11 @@ export default tseslint.config(
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2022,
-      globals: { ...globals.browser, ...globals.node },
+      globals: { ...globals.browser, ...globals.node }
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    },
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+    }
   },
 
   // React (JSX/TSX only)
@@ -41,7 +41,7 @@ export default tseslint.config(
     plugins: {
       ...react.configs.flat.recommended.plugins,
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      'react-refresh': reactRefresh
     },
     rules: {
       ...react.configs.flat.recommended.rules,
@@ -50,17 +50,17 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
-      'react/no-unescaped-entities': 'off',
-    },
+      'react/no-unescaped-entities': 'off'
+    }
   },
 
   // TanStack Router route files export both `Route` and the route component by design.
   {
     files: ['src/routes/**/*.tsx'],
     rules: {
-      'react-refresh/only-export-components': 'off',
-    },
+      'react-refresh/only-export-components': 'off'
+    }
   },
 
-  prettier,
+  prettier
 )
