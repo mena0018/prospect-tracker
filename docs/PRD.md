@@ -149,5 +149,5 @@ intentions.)_
 
 Summary: TanStack Start (SSR) + Supabase (Auth + Postgres) + Drizzle + TanStack Query/Table,
 Resend, Stripe, PostHog, deployed on Vercel. Technical details: see `CLAUDE.md`. Data model:
-see [`docs/DATA-MODEL.md`](DATA-MODEL.md) and the decision record in
+see [`docs/reference/data-model.md`](reference/data-model.md) and the decision record in
 [`docs/decisions/`](decisions/).
