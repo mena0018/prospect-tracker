@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
@@ -28,73 +29,67 @@ function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [pending, setPending] = useState(false)
-  const [error, setError] = useState<string | null>(
-    search.error === 'oauth' ? 'La connexion Google a échoué. Réessayez.' : null
-  )
 
-  async function handleSubmit(e: React.FormEvent) {
+  const passwordMutation = useMutation({
+    mutationFn: async () => {
+      const fn = mode === 'signin' ? signInWithPassword : signUpWithPassword
+      const { error } = await fn({ data: { email, password } })
+      if (error) throw new Error(error)
+    },
+    onSuccess: () => {
+      router.invalidate()
+      router.navigate({ to: search.redirect ?? APP_ROUTES.dashboard })
+    }
+  })
+
+  const googleMutation = useMutation({
+    mutationFn: async () => {
+      const redirectTo = `${window.location.origin}${API_ROUTES.authCallback}?next=${encodeURIComponent(
+        search.redirect ?? APP_ROUTES.dashboard
+      )}`
+      const { error } = await getSupabaseBrowserClient().auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo }
+      })
+      if (error) throw new Error('Impossible de démarrer la connexion Google.')
+    }
+  })
+
+  const pending = passwordMutation.isPending || googleMutation.isPending
+  const error =
+    passwordMutation.error?.message ??
+    googleMutation.error?.message ??
+    (search.error === 'oauth' ? 'La connexion Google a échoué. Réessayez.' : null)
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setPending(true)
-    setError(null)
-
-    const fn = mode === 'signin' ? signInWithPassword : signUpWithPassword
-    const { error: authError } = await fn({ data: { email, password } })
-
-    if (authError) {
-      setError(authError)
-      setPending(false)
-      return
-    }
-
-    // Refresh so root beforeLoad re-resolves the session set on the response.
-    await router.invalidate()
-    await router.navigate({ to: search.redirect ?? APP_ROUTES.dashboard })
-  }
-
-  async function handleGoogle() {
-    setPending(true)
-    setError(null)
-    const supabase = getSupabaseBrowserClient()
-    const redirectTo = `${window.location.origin}${API_ROUTES.authCallback}?next=${encodeURIComponent(
-      search.redirect ?? APP_ROUTES.dashboard
-    )}`
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo }
-    })
-    if (oauthError) {
-      setError('Impossible de démarrer la connexion Google.')
-      setPending(false)
-    }
+    passwordMutation.mutate()
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
+    <main className="flex min-h-screen items-center justify-center bg-neutral-50 p-4">
+      <div className="w-full max-w-sm rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
+        <div className="mb-6 space-y-1 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
             {mode === 'signin' ? 'Connexion' : 'Créer un compte'}
           </h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            Suivez votre prospection, sans friction.
-          </p>
+          <p className="text-sm text-neutral-500">Suivez votre prospection, sans friction.</p>
         </div>
 
         <button
           type="button"
-          onClick={handleGoogle}
+          onClick={() => googleMutation.mutate()}
           disabled={pending}
-          className="flex w-full items-center justify-center gap-2 rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <GoogleIcon />
           Continuer avec Google
         </button>
 
-        <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-neutral-200" />
           <span className="text-xs text-neutral-400">ou</span>
-          <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+          <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -105,7 +100,7 @@ function LoginPage() {
             placeholder="Adresse email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm transition-colors outline-none focus:border-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-neutral-400"
+            className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10 focus:outline-none"
           />
           <input
             type="password"
@@ -115,29 +110,32 @@ function LoginPage() {
             placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm transition-colors outline-none focus:border-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-neutral-400"
+            className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10 focus:outline-none"
           />
 
-          {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
+          {error ? (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+          ) : null}
 
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-60 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+            className="w-full rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {pending ? '…' : mode === 'signin' ? 'Se connecter' : "S'inscrire"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="mt-6 text-center text-sm text-neutral-500">
           {mode === 'signin' ? 'Pas encore de compte ?' : 'Déjà un compte ?'}{' '}
           <button
             type="button"
             onClick={() => {
               setMode(mode === 'signin' ? 'signup' : 'signin')
-              setError(null)
+              passwordMutation.reset()
+              googleMutation.reset()
             }}
-            className="font-medium text-neutral-900 underline underline-offset-2 dark:text-white"
+            className="font-medium text-neutral-900 underline underline-offset-2 hover:text-neutral-700"
           >
             {mode === 'signin' ? 'Créer un compte' : 'Se connecter'}
           </button>
