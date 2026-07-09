@@ -1,11 +1,19 @@
 import type { ReactNode } from 'react'
 
-import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+  useRouter
+} from '@tanstack/react-router'
 
+import { ErrorState } from '@/components/error-state'
 import { fetchUser, type AuthUser } from '@/server/auth'
 import appCss from '@/styles.css?url'
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async (): Promise<{ user: AuthUser | null }> => {
     const user = await fetchUser()
     return { user }
@@ -21,13 +29,23 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
     ]
   }),
-  component: RootComponent
+  component: RootComponent,
+  errorComponent: RootErrorComponent
 })
 
 function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
+    </RootDocument>
+  )
+}
+
+function RootErrorComponent() {
+  const router = useRouter()
+  return (
+    <RootDocument>
+      <ErrorState onRetry={() => router.invalidate()} />
     </RootDocument>
   )
 }
