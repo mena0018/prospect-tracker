@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cn } from './utils'
+import { asString, cn } from './utils'
 
 describe('cn', () => {
   it('merges class names', () => {
@@ -14,5 +14,19 @@ describe('cn', () => {
   it('handles conditional classes', () => {
     const hidden = false
     expect(cn('base', hidden && 'hidden', 'shown')).toBe('base shown')
+  })
+})
+
+describe('asString', () => {
+  it('returns the value when it is a string', () => {
+    expect(asString('hello')).toBe('hello')
+    expect(asString('')).toBe('')
+  })
+
+  it('returns null for non-strings', () => {
+    expect(asString(42)).toBeNull()
+    expect(asString(null)).toBeNull()
+    expect(asString(undefined)).toBeNull()
+    expect(asString({})).toBeNull()
   })
 })

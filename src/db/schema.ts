@@ -4,17 +4,19 @@ import {
   boolean,
   check,
   date,
+  foreignKey,
   integer,
   pgEnum,
   pgTable,
   smallint,
   text,
   timestamp,
-  uuid,
+  uuid
 } from 'drizzle-orm/pg-core'
+import { authUsers } from 'drizzle-orm/supabase'
 
 // Source of truth for the data model. Rationale & reference:
-// docs/DATA-MODEL.md + docs/decisions/0001-user-configurable-pipeline.md.
+// docs/reference/data-model.md + docs/decisions/0001-user-configurable-pipeline.md.
 
 export const planEnum = pgEnum('plan', ['free', 'pro'])
 
@@ -28,20 +30,30 @@ export const STAGE_COLOR_TOKENS = [
   'red',
   'rose',
   'violet',
-  'pink',
+  'pink'
 ] as const
 
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey(), // = Supabase Auth UUID (auth.users.id): So no defaultRandom().
-  email: text('email').notNull(),
-  fullName: text('full_name'),
-  jobTitle: text('job_title'),
-  avatarUrl: text('avatar_url'),
-  tjmReference: integer('tjm_reference').notNull().default(450),
-  plan: planEnum('plan').notNull().default('free'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-})
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').primaryKey(), // = Supabase Auth UUID (auth.users.id): So no defaultRandom().
+    email: text('email').notNull(),
+    fullName: text('full_name'),
+    jobTitle: text('job_title'),
+    avatarUrl: text('avatar_url'),
+    tjmReference: integer('tjm_reference').notNull().default(450),
+    plan: planEnum('plan').notNull().default('free'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.id],
+      foreignColumns: [authUsers.id],
+      name: 'users_id_auth_fk'
+    }).onDelete('cascade')
+  ]
+)
 
 export const stages = pgTable(
   'stages',
@@ -55,14 +67,14 @@ export const stages = pgTable(
     position: integer('position').notNull(),
     reminderDelayDays: integer('reminder_delay_days').notNull().default(7),
     isArchived: boolean('is_archived').notNull().default(false),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
     check(
       'stages_color_token',
-      sql`${table.color} in (${sql.raw(STAGE_COLOR_TOKENS.map((t) => `'${t}'`).join(','))})`,
-    ),
-  ],
+      sql`${table.color} in (${sql.raw(STAGE_COLOR_TOKENS.map((t) => `'${t}'`).join(','))})`
+    )
+  ]
 )
 
 export const jobTypes = pgTable('job_types', {
@@ -72,7 +84,7 @@ export const jobTypes = pgTable('job_types', {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   position: integer('position').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
 
 export const experienceLevels = pgTable('experience_levels', {
@@ -82,7 +94,7 @@ export const experienceLevels = pgTable('experience_levels', {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   position: integer('position').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
 
 export const opportunities = pgTable('opportunities', {
@@ -95,7 +107,7 @@ export const opportunities = pgTable('opportunities', {
     .references(() => stages.id, { onDelete: 'restrict' }),
   jobTypeId: uuid('job_type_id').references(() => jobTypes.id, { onDelete: 'set null' }),
   experienceId: uuid('experience_id').references(() => experienceLevels.id, {
-    onDelete: 'set null',
+    onDelete: 'set null'
   }),
   recruiter: text('recruiter').notNull(),
   esn: text('esn'),
@@ -112,29 +124,29 @@ export const opportunities = pgTable('opportunities', {
   isPinned: boolean('is_pinned').notNull().default(false),
   isArchived: boolean('is_archived').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
   stages: many(stages),
   jobTypes: many(jobTypes),
   experienceLevels: many(experienceLevels),
-  opportunities: many(opportunities),
+  opportunities: many(opportunities)
 }))
 
 export const stagesRelations = relations(stages, ({ one, many }) => ({
   user: one(users, { fields: [stages.userId], references: [users.id] }),
-  opportunities: many(opportunities),
+  opportunities: many(opportunities)
 }))
 
 export const jobTypesRelations = relations(jobTypes, ({ one, many }) => ({
   user: one(users, { fields: [jobTypes.userId], references: [users.id] }),
-  opportunities: many(opportunities),
+  opportunities: many(opportunities)
 }))
 
 export const experienceLevelsRelations = relations(experienceLevels, ({ one, many }) => ({
   user: one(users, { fields: [experienceLevels.userId], references: [users.id] }),
-  opportunities: many(opportunities),
+  opportunities: many(opportunities)
 }))
 
 export const opportunitiesRelations = relations(opportunities, ({ one }) => ({
@@ -143,8 +155,8 @@ export const opportunitiesRelations = relations(opportunities, ({ one }) => ({
   jobType: one(jobTypes, { fields: [opportunities.jobTypeId], references: [jobTypes.id] }),
   experience: one(experienceLevels, {
     fields: [opportunities.experienceId],
-    references: [experienceLevels.id],
-  }),
+    references: [experienceLevels.id]
+  })
 }))
 
 export type User = typeof users.$inferSelect

@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: {
-    tsconfigPaths: true,
+    tsconfigPaths: true
   },
 
   plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
@@ -14,6 +14,6 @@ export default defineConfig({
   // Deployment preset: Vercel auto-injects NITRO_PRESET=vercel at build time.
   // We set it explicitly for reproducible local/CI builds.
   nitro: {
-    preset: 'vercel',
-  },
+    preset: 'vercel'
+  }
 })

@@ -82,4 +82,4 @@ deploy, and renaming/recoloring/archiving a value per user is impossible.
   small per-user config sets).
 - The original DEV-17 ticket and the PRD data-model section are now outdated and
   must be updated to reflect this model.
-- The full model reference lives in [`docs/DATA-MODEL.md`](../DATA-MODEL.md).
+- The full model reference lives in [`docs/reference/data-model.md`](../reference/data-model.md).

@@ -60,9 +60,16 @@ re-implement auth** — it references the Supabase UUID as its key.
 - **Components: PascalCase** inside the file (`export function UserCard()`).
 - Utility functions: camelCase.
 - Code comments in English (see the language rule above).
+- **Few comments.** Write only the non-obvious (security constraint, workaround,
+  counter-intuitive decision, subtle ordering). No narration that restates the code or a
+  function name. Anything needing real explanation (rationale, architecture, trade-offs) goes
+  in `docs/` (`docs/decisions/` for ADRs), not inline. When in doubt, leave it out.
 - Env vars in `.env` (never hardcoded, never committed).
 - **Zod validation** (`.validator`) on every `createServerFn` before touching the DB.
 - Strict typing, no `any`, `noUncheckedIndexedAccess` on. Use precise types.
+- **No superfluous `export`.** Export a symbol only if it crosses a file boundary (actually
+  imported elsewhere); keep file-local symbols unexported. Don't annotate a return type the
+  compiler already infers — unless that annotation _is_ a shared contract reused elsewhere.
 - Import alias `@/*` → `src/*` (always use existing aliases).
 - Avoid unnecessary dependencies — prefer existing code / stdlib first.
 - Keep changes focused — don't refactor unrelated files.
@@ -70,7 +77,7 @@ re-implement auth** — it references the Supabase UUID as its key.
 
 ### Lint & format (ESLint + Prettier)
 
-- **Prettier** (`.prettierrc.json`): single quotes, no semicolons, `trailingComma: all`,
+- **Prettier** (`.prettierrc.json`): single quotes, no semicolons, `trailingComma: none`,
   2-space indent, width 100, JSX double quotes, arrow parens always.
 - **ESLint** (`eslint.config.js`, flat config): `@eslint/js` + `typescript-eslint`
   (recommended) + `react-hooks` + `react-refresh`, with `eslint-config-prettier` last to
