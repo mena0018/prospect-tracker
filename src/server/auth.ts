@@ -66,53 +66,58 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
 
   const authUser = { id: user.id, email: user.email }
 
-  const dbUser = await db.transaction(async (tx) => {
-    const existing = await tx.query.users.findFirst({
-      where: (u, { eq }) => eq(u.id, authUser.id)
-    })
-    if (existing) return existing
-
-    const [inserted] = await tx
-      .insert(users)
-      .values({
-        id: authUser.id,
-        email: authUser.email,
-        fullName: asString(user.user_metadata?.full_name),
-        avatarUrl: asString(user.user_metadata?.avatar_url)
+  try {
+    const dbUser = await db.transaction(async (tx) => {
+      const existing = await tx.query.users.findFirst({
+        where: (u, { eq }) => eq(u.id, authUser.id)
       })
-      .returning()
+      if (existing) return existing
 
-    if (!inserted) throw new Error('Failed to provision user')
+      const [inserted] = await tx
+        .insert(users)
+        .values({
+          id: authUser.id,
+          email: authUser.email,
+          fullName: asString(user.user_metadata?.full_name),
+          avatarUrl: asString(user.user_metadata?.avatar_url)
+        })
+        .returning()
 
-    await tx.insert(stages).values(
-      DEFAULT_STAGES.map((s) => ({
-        userId: inserted.id,
-        name: s.name,
-        color: s.color,
-        position: s.position,
-        isArchived: s.isArchived
-      }))
-    )
-    await tx.insert(jobTypes).values(
-      DEFAULT_JOB_TYPES.map((j) => ({
-        userId: inserted.id,
-        name: j.name,
-        position: j.position
-      }))
-    )
-    await tx.insert(experienceLevels).values(
-      DEFAULT_EXPERIENCE_LEVELS.map((e) => ({
-        userId: inserted.id,
-        name: e.name,
-        position: e.position
-      }))
-    )
+      if (!inserted) throw new Error('Failed to provision user')
 
-    return inserted
-  })
+      await tx.insert(stages).values(
+        DEFAULT_STAGES.map((s) => ({
+          userId: inserted.id,
+          name: s.name,
+          color: s.color,
+          position: s.position,
+          isArchived: s.isArchived
+        }))
+      )
+      await tx.insert(jobTypes).values(
+        DEFAULT_JOB_TYPES.map((j) => ({
+          userId: inserted.id,
+          name: j.name,
+          position: j.position
+        }))
+      )
+      await tx.insert(experienceLevels).values(
+        DEFAULT_EXPERIENCE_LEVELS.map((e) => ({
+          userId: inserted.id,
+          name: e.name,
+          position: e.position
+        }))
+      )
 
-  // Set only after the DB succeeds, so a failed provisioning is retried.
-  await supabase.auth.updateUser({ data: { provisioned: true } })
+      return inserted
+    })
 
-  return dbUser
+    // Set only after the DB succeeds, so a failed provisioning is retried.
+    await supabase.auth.updateUser({ data: { provisioned: true } })
+
+    return dbUser
+  } catch (err) {
+    console.error('provisionUser failed for', authUser.id, err)
+    throw err
+  }
 })

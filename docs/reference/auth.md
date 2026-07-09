@@ -11,6 +11,17 @@ does **not** re-implement auth — it references that UUID as its primary key (s
 [User identity](../../CLAUDE.md) and [`data-model.md`](data-model.md)). Sessions are carried in
 HTTP cookies, kept in sync between a server client and a browser client.
 
+> **Deletes cascade; edits don't sync.** `public.users.id` has a FK to
+> `auth.users.id` with `ON DELETE CASCADE` (migration `0002`). So:
+>
+> - **Deleting a user**: deleting the `auth.users` row (Supabase dashboard / Auth
+>   admin) automatically removes the `public.users` row, which in turn cascades to
+>   its app data (`stages`, `job_types`, `experience_levels`, `opportunities`).
+>   Nothing manual to do.
+> - **Editing identity fields** (email, name, …): **not** synced — the app only
+>   writes `public.users` at provisioning and never mirrors later edits made
+>   directly in the Supabase dashboard. Update both sides by hand if needed.
+
 ## Two Supabase clients
 
 | Client  | File                         | Runs                                                  | Uses                                       |
