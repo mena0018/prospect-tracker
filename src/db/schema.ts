@@ -4,6 +4,7 @@ import {
   boolean,
   check,
   date,
+  foreignKey,
   integer,
   pgEnum,
   pgTable,
@@ -12,6 +13,7 @@ import {
   timestamp,
   uuid
 } from 'drizzle-orm/pg-core'
+import { authUsers } from 'drizzle-orm/supabase'
 
 // Source of truth for the data model. Rationale & reference:
 // docs/reference/data-model.md + docs/decisions/0001-user-configurable-pipeline.md.
@@ -31,17 +33,27 @@ export const STAGE_COLOR_TOKENS = [
   'pink'
 ] as const
 
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey(), // = Supabase Auth UUID (auth.users.id): So no defaultRandom().
-  email: text('email').notNull(),
-  fullName: text('full_name'),
-  jobTitle: text('job_title'),
-  avatarUrl: text('avatar_url'),
-  tjmReference: integer('tjm_reference').notNull().default(450),
-  plan: planEnum('plan').notNull().default('free'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-})
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').primaryKey(), // = Supabase Auth UUID (auth.users.id): So no defaultRandom().
+    email: text('email').notNull(),
+    fullName: text('full_name'),
+    jobTitle: text('job_title'),
+    avatarUrl: text('avatar_url'),
+    tjmReference: integer('tjm_reference').notNull().default(450),
+    plan: planEnum('plan').notNull().default('free'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.id],
+      foreignColumns: [authUsers.id],
+      name: 'users_id_auth_fk'
+    }).onDelete('cascade')
+  ]
+)
 
 export const stages = pgTable(
   'stages',
