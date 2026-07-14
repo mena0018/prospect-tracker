@@ -34,3 +34,6 @@ coverage/
 
 # Drizzle
 drizzle/.snapshots/
+
+# Agent tooling (local, per-developer — installed via `skills add`)
+.claude/skills/
