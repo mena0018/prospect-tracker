@@ -74,6 +74,7 @@ pnpm test           # Vitest
 ## Documentation
 
 - Product requirements: [`docs/PRD.md`](docs/PRD.md)
-- Data model: [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md)
+- Data model: [`docs/reference/data-model.md`](docs/reference/data-model.md)
+- Auth & SSR: [`docs/reference/auth.md`](docs/reference/auth.md)
 - Architecture decisions: [`docs/decisions/`](docs/decisions/)
 - Contributor guide & conventions: [`CLAUDE.md`](CLAUDE.md)

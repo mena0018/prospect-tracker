@@ -82,8 +82,9 @@ re-implement auth** — it references the Supabase UUID as its key.
 - **ESLint** (`eslint.config.js`, flat config): `@eslint/js` + `typescript-eslint`
   (recommended) + `react-hooks` + `react-refresh`, with `eslint-config-prettier` last to
   disable style rules that would fight Prettier.
-- `react-refresh/only-export-components` is disabled for `src/routes/**` (route files export
-  both `Route` and the component by design).
+- `react-refresh/only-export-components` is disabled globally (route files export both
+  `Route` and the component by design; feature/component files often export a small constant
+  alongside the component).
 - `src/routeTree.gen.ts` and build dirs are ignored by both.
 
 ## Tooling
