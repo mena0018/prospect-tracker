@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#6366f1">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect x="360" y="230" width="480" height="70" rx="14" fill="#ffffff"/>
+    <rect x="360" y="330" width="480" height="52" rx="12" fill="#ffffff" opacity="0.85"/>
+    <rect x="360" y="410" width="480" height="52" rx="12" fill="#ffffff" opacity="0.7"/>
+    <rect x="360" y="490" width="480" height="52" rx="12" fill="#ffffff" opacity="0.55"/>
+    <circle cx="330" cy="265" r="26" fill="#ffffff"/>
+    <text x="600" y="620" font-family="system-ui,sans-serif" font-size="40" font-weight="700" fill="#ffffff" text-anchor="middle">ProspectTracker</text>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{height:9px;width:9px}
+  ::-webkit-scrollbar-thumb{background:#c4c4cc55;border-radius:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;overflow:hidden;background:var(--bg);color:var(--text);--accent: {{ accent }};--accent-soft: {{ accentSoft }};--cell-pad: {{ cellPad }};--cell-fs: {{ cellFs }};--bg: {{ bg }};--surface: {{ surface }};--surface-2: {{ surface2 }};--text: {{ text }};--text-muted: {{ textMuted }};--text-soft: {{ textSoft }};--border: {{ border }};--border-soft: {{ borderSoft }};--aside-bg: {{ asideBg }};--aside-border: {{ asideBorder }};font-family: {{ fontFamily }}">
+
+  <!-- SIDEBAR -->
+  <aside style="width:{{ asideW }};flex:none;background:var(--aside-bg);border-right:1px solid var(--aside-border);display:flex;flex-direction:column;overflow-x:hidden;transition:width .22s ease">
+    <div style="width:246px;flex:1;display:flex;flex-direction:column;padding:18px 16px;min-height:0">
+      <div style="display:flex;align-items:center;gap:11px;padding:6px 6px 20px">
+        <div style="width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;letter-spacing:-.5px">PT</div>
+        <div style="display:flex;flex-direction:column;line-height:1.15">
+          <span style="font-weight:600;font-size:14.5px;letter-spacing:-.2px;color:var(--text)">ProspectTracker</span>
+          <span style="font-size:11px;color:var(--text-muted)">Suivi de prospection</span>
+        </div>
+      </div>
+
+      <nav style="display:flex;flex-direction:column;gap:3px">
+        <a href="#" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:13.5px;text-decoration:none">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+          Tracker
+        </a>
+        <a href="#" onClick="{{ openCust }}" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;color:var(--text-soft);font-weight:500;font-size:13.5px;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="20" y2="8"/><circle cx="16" cy="8" r="2"/><line x1="4" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="20" y2="16"/><circle cx="8" cy="16" r="2"/></svg>
+          Personnaliser
+        </a>
+      </nav>
+
+      <div style="flex:1;overflow-y:auto;min-height:0;margin-top:22px">
+        <div style="padding:0 11px">
+          <div style="font-size:10.5px;font-weight:600;letter-spacing:.6px;color:var(--text-muted);text-transform:uppercase;margin-bottom:11px">Pipeline</div>
+          <sc-for list="{{ stageLegend }}" as="s" hint-placeholder-count="7">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:12.5px;color:var(--text-soft)">
+              <span style="display:flex;align-items:center;gap:8px"><span style="{{ s.dot }}"></span>{{ s.label }}</span>
+              <span style="font-variant-numeric:tabular-nums;color:var(--text-muted);font-weight:500">{{ s.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="padding:0 11px;margin-top:26px">
+          <div style="font-size:10.5px;font-weight:600;letter-spacing:.6px;color:var(--text-muted);text-transform:uppercase;margin-bottom:11px">Relances</div>
+          <div style="background:var(--accent-soft);border:1px solid {{ relanceCardBorder }};border-radius:13px;padding:13px 13px 12px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex:none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
+              </div>
+              <div style="line-height:1.15;min-width:0">
+                <div style="display:flex;align-items:baseline;gap:5px">
+                  <span style="font-size:19px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.3px">{{ relanceCount }}</span>
+                  <span style="font-size:12px;color:var(--text-soft)">à relancer</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted)">{{ relanceMotivation }}</div>
+              </div>
+            </div>
+            <div style="margin-top:13px">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-soft);margin-bottom:6px">
+                <span>Objectif de la semaine</span>
+                <span style="font-weight:600;color:var(--text);font-variant-numeric:tabular-nums">{{ weeklyDone }}/{{ weeklyGoal }}</span>
+              </div>
+              <div style="height:6px;border-radius:999px;background:{{ trackBg }};overflow:hidden">
+                <div style="height:100%;width:{{ weeklyPctW }};background:var(--accent);border-radius:999px;transition:width .35s ease"></div>
+              </div>
+            </div>
+            <button onClick="{{ startRelances }}" style="margin-top:13px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 0;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.06)">
+              Lancer les relances
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:none">
+        <a href="#" style="display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;color:var(--text-soft);font-size:12.5px;font-weight:500;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2 15 22l-4-9-9-4 20-7Z"/></svg>
+          Inviter un ami
+        </a>
+        <div style="border-top:1px solid var(--border-soft);margin:7px 4px"></div>
+        <a href="#" style="display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:8px;color:var(--text-muted);font-size:12.5px;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.6 2.4c-.8.5-1.2 1-1.2 1.9M12 17h.01"/></svg>
+          Aide
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:8px;color:var(--text-muted);font-size:12.5px;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM3.2 9h3.5v11.5H3.2V9Zm5.5 0h3.36v1.57h.05c.47-.85 1.6-1.75 3.3-1.75 3.53 0 4.18 2.2 4.18 5.06v6.62H16.3v-5.87c0-1.4-.03-3.2-2-3.2-2 0-2.3 1.53-2.3 3.1v5.97H8.7V9Z"/></svg>
+          Mon LinkedIn
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:8px;color:var(--text-muted);font-size:12.5px;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-6.5A8 8 0 1 1 21 12Z"/></svg>
+          Donner un feedback
+        </a>
+        <div ref="{{ setProfileRef }}" style="position:relative;margin-top:8px">
+          <div onClick="{{ toggleProfile }}" style="padding:12px 11px 4px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:8px" style-hover="background:var(--surface-2)">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);color:var(--text-soft);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex:none">AL</div>
+            <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0;flex:1">
+              <span style="font-size:13px;font-weight:600;color:var(--text)">Alex L.</span>
+              <span style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dev Freelance</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M6 9l6-6 6 6"/></svg>
+          </div>
+          <sc-if value="{{ profileOpen }}">
+            <div style="position:absolute;bottom:100%;left:0;right:0;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.16);overflow:hidden;z-index:60">
+              <div style="padding:12px 13px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-soft)">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--surface-2);color:var(--text-soft);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex:none">AL</div>
+                <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0">
+                  <span style="font-size:12.5px;font-weight:600;color:var(--text)">Alex L.</span>
+                  <span style="font-size:11px;color:var(--text-muted)">Dev Freelance</span>
+                </div>
+              </div>
+              <div style="padding:6px">
+                <a href="#" style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;color:var(--text-soft);font-size:12.5px;font-weight:500;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
+                  Compte
+                </a>
+                <a href="#" style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;color:var(--text-soft);font-size:12.5px;font-weight:500;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
+                  Notifications
+                </a>
+              </div>
+              <div style="padding:6px;border-top:1px solid var(--border-soft)">
+                <a href="#" style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;color:var(--text-soft);font-size:12.5px;font-weight:500;text-decoration:none" style-hover="background:var(--surface-2);color:var(--text)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                  Se déconnecter
+                </a>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden">
+    <!-- Header -->
+    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 26px;border-bottom:1px solid var(--border);background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:13px;min-width:0">
+        <button onClick="{{ toggleSidebar }}" title="Replier / déplier la barre latérale" style="flex:none;width:36px;height:36px;border:1px solid var(--border);background:var(--surface);border-radius:9px;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><line x1="9.5" y1="4.5" x2="9.5" y2="19.5"/></svg>
+        </button>
+        <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0">
+          <h1 style="margin:0;font-size:19px;font-weight:600;letter-spacing:-.3px;color:var(--text)">Tracker</h1>
+          <span style="font-size:12.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ headerSub }}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;flex:none">
+        <a href="#" style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;font-weight:500;color:var(--text-soft);text-decoration:none;cursor:pointer" style-hover="background:var(--surface-2);color:var(--text)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.3 1 2.5h6c0-1.2.3-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+          Idée
+        </a>
+
+        <button onClick="{{ toggleTheme }}" title="Changer de thème" style="width:38px;height:38px;border:1px solid var(--border);background:var(--surface);border-radius:9px;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)">
+          <span style="{{ moonShow }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8Z"/></svg></span>
+          <span style="{{ sunShow }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></span>
+        </button>
+
+        <button onClick="{{ openAdd }}" style="display:flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 15px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)" style-hover="filter:brightness(1.06)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvelle opportunité
+        </button>
+      </div>
+    </header>
+
+    <!-- Scroll area -->
+    <div style="flex:1;overflow-y:auto;padding:22px 26px 34px">
+
+      <!-- KPI band -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px">
+        <div style="{{ cardAlert }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-soft)">À relancer aujourd’hui</span>
+            <span style="{{ iconAlert }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
+            </span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">
+            <span style="{{ valueAlert }}">{{ relanceCount }}</span>
+            <span style="font-size:12px;color:var(--text-muted)">à traiter</span>
+          </div>
+        </div>
+
+        <div style="{{ cardNeutral }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-soft)">Sans réponse +7j</span>
+            <span style="{{ iconNeutral }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            </span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">
+            <span style="{{ valueNeutral }}">{{ staleCount }}</span>
+            <span style="font-size:12px;color:var(--text-muted)">à relancer</span>
+          </div>
+        </div>
+
+        <div style="{{ cardNeutral }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-soft)">Entretiens à venir</span>
+            <span style="{{ iconNeutral }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
+            </span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">
+            <span style="{{ valueNeutral }}">{{ entretienCount }}</span>
+            <span style="font-size:12px;color:var(--text-muted)">à préparer</span>
+          </div>
+        </div>
+
+        <div style="{{ cardNeutral }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-soft)">Taux de réponse</span>
+            <span style="{{ iconNeutral }}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="7.5" cy="7.5" r="2.2"/><circle cx="16.5" cy="16.5" r="2.2"/><line x1="17" y1="7" x2="7" y2="17"/></svg>
+            </span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">
+            <span style="{{ valueNeutral }}">{{ taux }}%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:6px;font-size:12px;font-weight:600;color:{{ tauxColor }}">
+            <span>{{ tauxArrow }}</span>{{ tauxDeltaLabel }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <!-- toolbar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;border-bottom:1px solid var(--border-soft);flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;line-height:1.25">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-.2px;color:var(--text)">Opportunités</span>
+            </div>
+            <div style="display:flex;background:var(--surface-2);border-radius:9px;padding:3px">
+              <button onClick="{{ showActives }}" style="{{ activesBtn }}">Actives<span style="{{ activesCountStyle }}">{{ activesCount }}</span></button>
+              <button onClick="{{ showArchived }}" style="{{ archivedBtn }}">Archivées<span style="{{ archivedCountStyle }}">{{ archivedCount }}</span></button>
+            </div>
+            <div style="display:flex;background:var(--surface-2);border-radius:9px;padding:3px">
+              <button onClick="{{ showTous }}" style="{{ tousBtn }}">Tous</button>
+              <button onClick="{{ showEtape }}" style="{{ etapeBtn }}">Par étape</button>
+            </div>
+            <sc-if value="{{ dueOnly }}">
+              <div style="display:flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:9px;padding:6px 8px 6px 11px;font-size:12.5px;font-weight:600">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
+                À relancer
+                <button onClick="{{ clearDue }}" title="Retirer le filtre" style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border:none;background:transparent;color:var(--accent);cursor:pointer;padding:0;border-radius:5px" style-hover="background:rgba(99,102,241,.18)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+                </button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;align-items:center;gap:9px">
+            <div style="display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:8px 11px;width:230px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke-linecap="round"/></svg>
+              <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Rechercher un prospect…" style="border:none;background:transparent;outline:none;font-family:inherit;font-size:13px;width:100%;color:var(--text)"/>
+            </div>
+            <button style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 13px;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer" style-hover="background:var(--surface-2)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>
+              Filtrer
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLE view -->
+        <div style="{{ tableWrap }}">
+          <div style="overflow-x:auto">
+            <div style="width:100%;--gt:30px 128px minmax(148px,1.4fr) minmax(90px,0.9fr) minmax(120px,1.1fr) 78px 132px minmax(110px,1fr)">
+              <div style="display:grid;grid-template-columns:var(--gt);align-items:center;background:var(--surface-2);border-bottom:1px solid var(--border)">
+                <div style="padding:10px 8px 10px 16px"></div>
+                <sc-for list="{{ headers }}" as="h" hint-placeholder-count="7">
+                  <div data-key="{{ h.key }}" onClick="{{ h.onClick }}" style="{{ h.thStyle }}">
+                    <span style="display:inline-flex;align-items:center;gap:5px">{{ h.label }}<span style="display:inline-flex;flex-direction:column;gap:2px;line-height:0">
+                      <svg width="8" height="5" viewBox="0 0 8 5" style="{{ h.upStyle }}"><path d="M4 0l4 5H0z" fill="currentColor"/></svg>
+                      <svg width="8" height="5" viewBox="0 0 8 5" style="{{ h.downStyle }}"><path d="M4 5L0 0h8z" fill="currentColor"/></svg>
+                    </span></span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ pageRows }}" as="r" hint-placeholder-count="8">
+                <div data-id="{{ r.id }}" style="{{ r.rowStyle }}" onMouseEnter="{{ onRowEnter }}" onMouseLeave="{{ onRowLeave }}" onClick="{{ onRowClick }}">
+                  <div style="padding:0 8px 0 16px;display:flex;align-items:center;justify-content:center">
+                    <button data-id="{{ r.id }}" onClick="{{ onTogglePinStop }}" title="Épingler" style="background:none;border:none;cursor:pointer;padding:4px;display:inline-flex;line-height:0">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ r.pinFill }}" stroke="{{ r.pinStroke }}" stroke-width="1.8"><circle cx="12" cy="8" r="4.2"/><line x1="12" y1="12.2" x2="12" y2="20" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;white-space:nowrap">
+                    <span style="{{ r.dateStyle }}">{{ r.lastContactFmt }}</span>
+                  </div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;font-size:var(--cell-fs);font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.recruteur }}</div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;font-size:var(--cell-fs);color:var(--text-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.esn }}</div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;font-size:var(--cell-fs);color:var(--text-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.clientFinal }}</div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;justify-content:flex-end;white-space:nowrap"><span style="{{ r.tjmStyle }}">{{ r.tjmLabel }}</span></div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;white-space:nowrap"><span style="{{ r.badgeStyle }}"><span style="{{ r.dotStyle }}"></span>{{ r.etape }}</span></div>
+                  <div style="padding:var(--cell-pad);display:flex;align-items:center;font-size:var(--cell-fs);color:var(--text-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.localisation }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- pagination -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 18px;border-top:1px solid var(--border-soft);flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--text-soft)">
+              <span>{{ pageInfo }}</span>
+              <span style="display:flex;align-items:center;gap:7px">Par page
+                <select value="{{ perPage }}" onChange="{{ onPerPage }}" style="font-family:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:4px 6px;background:var(--surface);color:var(--text);cursor:pointer">
+                  <option value="8">8</option><option value="10">10</option><option value="15">15</option>
+                </select>
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <button onClick="{{ firstPage }}" style="{{ navBtn }}">«</button>
+              <button onClick="{{ prevPage }}" style="{{ navBtn }}">‹</button>
+              <span style="font-size:12.5px;color:var(--text-soft);font-variant-numeric:tabular-nums;padding:0 6px">{{ pageOfLabel }}</span>
+              <button onClick="{{ nextPage }}" style="{{ navBtn }}">›</button>
+              <button onClick="{{ lastPage }}" style="{{ navBtn }}">»</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANBAN view -->
+        <div style="{{ boardWrap }}">
+          <div style="display:flex;gap:14px;padding:18px;overflow-x:auto">
+            <sc-for list="{{ board }}" as="col" hint-placeholder-count="7">
+              <div style="flex:none;width:230px;background:var(--surface-2);border:1px solid var(--border-soft);border-radius:11px;padding:11px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="{{ col.badgeStyle }}"><span style="{{ col.dotStyle }}"></span>{{ col.stage }}</span>
+                  <span style="font-size:12px;color:var(--text-muted);font-weight:600">{{ col.count }}</span>
+                </div>
+                <sc-for list="{{ col.items }}" as="c" hint-placeholder-count="2">
+                  <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 11px;display:flex;flex-direction:column;gap:5px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                      <span style="font-size:13px;font-weight:600;color:var(--text)">{{ c.recruteur }}</span>
+                      <span style="{{ c.tjmStyle }}">{{ c.tjmLabel }}</span>
+                    </div>
+                    <span style="font-size:12px;color:var(--text-soft)">{{ c.esn }} · {{ c.clientFinal }}</span>
+                    <div style="display:flex;align-items:center;gap:7px;margin-top:1px">
+                      <span style="font-size:11.5px;color:var(--text-muted)">{{ c.poste }}</span>
+                      <sc-if value="{{ c.due }}"><span style="{{ c.relanceBadge }}">{{ c.relanceLabel }}</span></sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ drawerOpen }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(15,15,17,.32);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:80"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-16px 0 40px rgba(0,0,0,.18);z-index:90;display:flex;flex-direction:column">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft)">
+        <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-size:16px;font-weight:600;color:var(--text)">{{ drawer.recruteur }}</span>
+          <span style="font-size:12.5px;color:var(--text-muted)">{{ drawer.esn }}</span>
+        </div>
+        <button onClick="{{ closeDrawer }}" style="flex:none;width:32px;height:32px;border:1px solid var(--border);background:var(--surface);border-radius:8px;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+        </button>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="{{ drawer.badgeStyle }}"><span style="{{ drawer.dotStyle }}"></span>{{ drawer.etape }}</span>
+          <span style="{{ drawer.tjmStyle }}">{{ drawer.tjmLabel }}</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 16px">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Dernier contact</span>
+            <span style="{{ drawer.dateStyle }}">{{ drawer.lastContactFmt }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Besoin</span>
+            <span style="font-size:13.5px;color:var(--text)">{{ drawer.besoin }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Client final</span>
+            <span style="font-size:13.5px;color:var(--text)">{{ drawer.clientFinal }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Poste</span>
+            <span style="font-size:13.5px;color:var(--text)">{{ drawer.poste }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Présentiel</span>
+            <span style="{{ drawer.presentielStyle }};align-self:flex-start">{{ drawer.presentielLabel }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Localisation</span>
+            <span style="font-size:13.5px;color:var(--text)">{{ drawer.localisation }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Expérience</span>
+            <span style="font-size:13.5px;color:var(--text)">{{ drawer.experience }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Téléphone</span>
+            <span style="font-size:13px;color:var(--text);font-family:'Geist Mono',monospace">{{ drawer.telephone }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;grid-column:1 / -1">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Lien vers l'offre</span>
+            <sc-if value="{{ drawer.lien }}" hint-placeholder-val="{{ true }}">
+              <a href="{{ drawer.lien }}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:500;color:var(--accent);text-decoration:none;width:fit-content">
+                Voir l'offre<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </a>
+            </sc-if>
+            <sc-if value="{{ drawer.noLien }}"><span style="font-size:13.5px;color:var(--text-muted)">—</span></sc-if>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Notes</span>
+          <textarea placeholder="Ajouter une note…" style="width:100%;min-height:90px;resize:vertical;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13px;padding:10px 12px;box-sizing:border-box"></textarea>
+        </div>
+      </div>
+
+      <div style="flex:none;display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid var(--border-soft)">
+        <button style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 0;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.06)">Éditer</button>
+        <button style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 0;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer" style-hover="background:var(--surface-2)">Archiver</button>
+        <button style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 0;font-family:inherit;font-size:13px;font-weight:500;color:{{ mutedRedVar }};cursor:pointer" style-hover="background:var(--surface-2)">Supprimer</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ addOpen }}">
+    <div onClick="{{ closeAdd }}" style="position:fixed;inset:0;background:rgba(15,15,17,.32);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:80"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:452px;max-width:94vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-16px 0 40px rgba(0,0,0,.18);z-index:90;display:flex;flex-direction:column">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft)">
+        <div style="display:flex;align-items:center;gap:11px;min-width:0">
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex:none">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span style="font-size:16px;font-weight:600;color:var(--text)">Nouvelle opportunité</span>
+            <span style="font-size:12.5px;color:var(--text-muted)">Ajoute un prospect à ton pipeline</span>
+          </div>
+        </div>
+        <button onClick="{{ closeAdd }}" style="flex:none;width:32px;height:32px;border:1px solid var(--border);background:var(--surface);border-radius:8px;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+        </button>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:15px 16px;align-content:start">
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Recruteur<span style="color:var(--accent)"> *</span></label>
+          <input name="recruteur" value="{{ form.recruteur }}" onInput="{{ onField }}" placeholder="Nom du recruteur" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">ESN</label>
+          <input name="esn" value="{{ form.esn }}" onInput="{{ onField }}" placeholder="Ex. Alten" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Client final</label>
+          <input name="clientFinal" value="{{ form.clientFinal }}" onInput="{{ onField }}" placeholder="Ex. Orange" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Besoin</label>
+          <input name="besoin" value="{{ form.besoin }}" onInput="{{ onField }}" placeholder="Ex. React Senior, Node/AWS…" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Poste</label>
+          <select name="poste" value="{{ form.poste }}" onChange="{{ onField }}" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none;cursor:pointer" style-focus="border-color:var(--accent)">
+            <sc-for list="{{ posteOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.v }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Étape</label>
+          <select name="etape" value="{{ form.etape }}" onChange="{{ onField }}" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none;cursor:pointer" style-focus="border-color:var(--accent)">
+            <sc-for list="{{ stageOptions }}" as="o" hint-placeholder-count="7"><option value="{{ o.v }}">{{ o.v }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">TJM (€)</label>
+          <input name="tjm" value="{{ form.tjm }}" onInput="{{ onField }}" type="number" inputmode="numeric" placeholder="450" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Présentiel</label>
+          <select name="presentiel" value="{{ form.presentiel }}" onChange="{{ onField }}" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none;cursor:pointer" style-focus="border-color:var(--accent)">
+            <option value="0">Full remote</option><option value="1">1 j/sem</option><option value="2">2 j/sem</option><option value="3">3 j/sem</option><option value="4">4 j/sem</option><option value="5">5 j/sem</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Expérience</label>
+          <select name="experience" value="{{ form.experience }}" onChange="{{ onField }}" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none;cursor:pointer" style-focus="border-color:var(--accent)">
+            <option value="Junior">Junior</option><option value="Confirmé">Confirmé</option><option value="Senior">Senior</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Localisation</label>
+          <input name="localisation" value="{{ form.localisation }}" onInput="{{ onField }}" placeholder="Ex. Lille" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Dernier contact</label>
+          <input name="lastContact" value="{{ form.lastContact }}" onInput="{{ onField }}" type="date" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:8px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Relance prévue</label>
+          <input name="relanceLe" value="{{ form.relanceLe }}" onInput="{{ onField }}" type="date" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:8px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Téléphone</label>
+          <input name="telephone" value="{{ form.telephone }}" onInput="{{ onField }}" placeholder="+33 6 12 34 56 78" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:'Geist Mono',monospace;font-size:13px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted)">Lien vers l'offre</label>
+          <input name="lien" value="{{ form.lien }}" onInput="{{ onField }}" placeholder="https://…" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;padding:9px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+        </div>
+      </div>
+
+      <div style="flex:none;display:flex;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--border-soft)">
+        <button onClick="{{ submitAdd }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 0;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.06)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter l'opportunité
+        </button>
+        <button onClick="{{ closeAdd }}" style="flex:none;padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--text-soft);cursor:pointer" style-hover="background:var(--surface-2)">Annuler</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ custOpen }}">
+    <div onClick="{{ closeCust }}" style="position:fixed;inset:0;background:rgba(15,15,17,.32);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:80"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:468px;max-width:94vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:-16px 0 40px rgba(0,0,0,.18);z-index:90;display:flex;flex-direction:column">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft)">
+        <div style="display:flex;align-items:center;gap:11px;min-width:0">
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="20" y2="8"/><circle cx="16" cy="8" r="2"/><line x1="4" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="20" y2="16"/><circle cx="8" cy="16" r="2"/></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span style="font-size:16px;font-weight:600;color:var(--text)">Personnaliser</span>
+            <span style="font-size:12.5px;color:var(--text-muted)">Adapte ton pipeline et tes postes</span>
+          </div>
+        </div>
+        <button onClick="{{ closeCust }}" style="flex:none;width:32px;height:32px;border:1px solid var(--border);background:var(--surface);border-radius:8px;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+        </button>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:26px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">TJM de référence</span>
+            <span style="font-size:11.5px;color:var(--text-muted)">Seuil de coloration</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:13px;border:1px solid var(--border);border-radius:11px;background:var(--surface)">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="position:relative;flex:none;width:140px">
+                <input value="{{ tjmRef }}" onInput="{{ onTjmRef }}" type="number" inputmode="numeric" style="width:100%;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;padding:9px 30px 9px 12px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+                <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13.5px;color:var(--text-muted);pointer-events:none">€</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.4">
+                <span style="color:{{ tjmUpColor }};font-weight:600">≥ réf. → au-dessus (vert)</span>
+                <span style="color:{{ tjmDownColor }};font-weight:600">&lt; réf. → en dessous (rouge)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">Étapes du pipeline</span>
+            <span style="font-size:11.5px;color:var(--text-muted)">Renomme, recolore ou archive</span>
+          </div>
+          <sc-for list="{{ custStages }}" as="st" hint-placeholder-count="7">
+            <div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--border);border-radius:11px;background:var(--surface)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="{{ st.dotStyle }}"></span>
+                <input data-index="{{ st.index }}" value="{{ st.name }}" onInput="{{ onStageName }}" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;font-weight:500;padding:7px 10px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+                <button data-index="{{ st.index }}" onClick="{{ onStageArchive }}" style="{{ st.archiveBtnStyle }}" style-hover="background:var(--surface-2)">{{ st.archiveLabel }}</button>
+                <button data-index="{{ st.index }}" onClick="{{ onStageDelete }}" title="Supprimer" style="flex:none;width:30px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:8px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2);color:{{ mutedRedVar }}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                </button>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding-left:1px">
+                <sc-for list="{{ st.swatches }}" as="sw" hint-placeholder-count="8">
+                  <button data-index="{{ sw.index }}" data-color="{{ sw.color }}" onClick="{{ onStageColor }}" style="{{ sw.style }}"></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <button onClick="{{ addStage }}" style="display:flex;align-items:center;justify-content:center;gap:7px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;padding:10px 0;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-soft);cursor:pointer" style-hover="background:var(--surface-2);border-color:var(--accent);color:var(--accent)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une étape
+          </button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">Types de poste</span>
+            <span style="font-size:11.5px;color:var(--text-muted)">Utilisés dans le formulaire</span>
+          </div>
+          <sc-for list="{{ custPostes }}" as="p" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:10px">
+              <input data-index="{{ p.index }}" value="{{ p.name }}" onInput="{{ onPosteName }}" style="flex:1;min-width:0;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-family:inherit;font-size:13.5px;font-weight:500;padding:8px 11px;box-sizing:border-box;outline:none" style-focus="border-color:var(--accent)"/>
+              <button data-index="{{ p.index }}" onClick="{{ onPosteDelete }}" title="Supprimer" style="flex:none;width:32px;height:32px;border:1px solid var(--border);background:var(--surface);border-radius:8px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--surface-2);color:{{ mutedRedVar }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+              </button>
+            </div>
+          </sc-for>
+          <button onClick="{{ addPoste }}" style="display:flex;align-items:center;justify-content:center;gap:7px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;padding:10px 0;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-soft);cursor:pointer" style-hover="background:var(--surface-2);border-color:var(--accent);color:var(--accent)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un poste
+          </button>
+        </div>
+      </div>
+
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;border-top:1px solid var(--border-soft)">
+        <span style="font-size:11.5px;color:var(--text-muted)">Les modifications s'appliquent en direct</span>
+        <button onClick="{{ closeCust }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.06)">Terminé</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#6366f1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#6366f1&quot;,&quot;#7c3aed&quot;,&quot;#4f46e5&quot;,&quot;#2563eb&quot;],&quot;section&quot;:&quot;Apparence&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Clair&quot;,&quot;options&quot;:[&quot;Clair&quot;,&quot;Sombre&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Apparence&quot;},&quot;sidebarStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Blanche&quot;,&quot;options&quot;:[&quot;Blanche&quot;,&quot;Grise&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Apparence&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Confortable&quot;,&quot;options&quot;:[&quot;Confortable&quot;,&quot;Compact&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Table&quot;},&quot;zebra&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Table&quot;}}">
+class Component extends DCLogic {
+  state = { sortKey:'default', sortDir:'desc', search:'', page:1, perPage:8, view:'tous', pins:{1:true}, collapsed:false, themeOverride:null, statusTab:'actives', profileOpen:false, hoverRowId:null, selectedId:null, addOpen:false, form:null, rows:null, stages:null, postes:null, custOpen:false, dueOnly:false };
+  profileRef = { current: null };
+
+  componentDidMount(){
+    this._onDocMouseDown = (e) => {
+      if(this.state.profileOpen && this.profileRef.current && !this.profileRef.current.contains(e.target)){
+        this.setState({profileOpen:false});
+      }
+    };
+    document.addEventListener('mousedown', this._onDocMouseDown);
+  }
+  componentWillUnmount(){
+    document.removeEventListener('mousedown', this._onDocMouseDown);
+  }
+
+  TODAY = '2026-07-01';
+  MARKET = 450;
+  PREV_TAUX = 33;
+  DEFAULT_STAGES = [
+    {name:'Sauvegardé',cl:'#475569',cd:'#94a3b8',archived:false},
+    {name:'Contacté',cl:'#2563eb',cd:'#60a5fa',archived:false},
+    {name:'CV Envoyé',cl:'#b45309',cd:'#fbbf24',archived:false},
+    {name:'Entretien',cl:'#0f766e',cd:'#2dd4bf',archived:false},
+    {name:'Offre',cl:'#15803d',cd:'#4ade80',archived:false},
+    {name:'Refusé',cl:'#dc2626',cd:'#f87171',archived:true},
+    {name:'Ghosté',cl:'#a1a1aa',cd:'#a1a1aa',archived:true}
+  ];
+  DEFAULT_POSTES = ['FullStack','Front End','Back End','Mobile','DevOps','Data'];
+  BASE_DATA = [
+    {id:1,lastContact:'2026-06-22',recruteur:'Thomas Mercier',esn:'Alten',besoin:'React Senior',tjm:480,clientFinal:'Société Générale',etape:'CV Envoyé',poste:'FullStack',presentiel:4,localisation:'Lille',experience:'Senior',telephone:'+33 6 12 12 12 12',lien:'',relanceLe:'2026-07-01'},
+    {id:2,lastContact:'2026-06-15',recruteur:'Sophie Blanc',esn:'Capgemini',besoin:'Next.js/Node',tjm:460,clientFinal:'Boulanger',etape:'Refusé',poste:'FullStack',presentiel:3,localisation:'Lesquin',experience:'Senior',telephone:'+33 7 49 13 99 64',lien:'',relanceLe:''},
+    {id:3,lastContact:'2026-06-10',recruteur:'Julien Moreau',esn:'Sopra',besoin:'Angular→React',tjm:440,clientFinal:'SNCF',etape:'Ghosté',poste:'Front End',presentiel:2,localisation:'Lille',experience:'Senior',telephone:'+33 6 12 12 12 12',lien:'',relanceLe:''},
+    {id:4,lastContact:'2026-05-06',recruteur:'Clara Petit',esn:'Wavestone',besoin:'Dev Fullstack TS',tjm:500,clientFinal:'France Télévisions',etape:'CV Envoyé',poste:'FullStack',presentiel:4,localisation:'Issy-les-Moulineaux',experience:'Senior',telephone:'+33 6 24 66 09 20',lien:'https://app.collective.work/',relanceLe:'2026-06-30'},
+    {id:5,lastContact:'2026-06-28',recruteur:'Antoine Girard',esn:'Devoteam',besoin:'Node/AWS',tjm:520,clientFinal:'Orange',etape:'Entretien',poste:'Back End',presentiel:2,localisation:'Paris',experience:'Senior',telephone:'+33 6 88 21 45 90',lien:'',relanceLe:'2026-07-02'},
+    {id:6,lastContact:'2026-06-25',recruteur:'Léa Fontaine',esn:'Inetum',besoin:'Vue.js',tjm:420,clientFinal:'La Poste',etape:'Contacté',poste:'Front End',presentiel:3,localisation:'Roubaix',experience:'Confirmé',telephone:'+33 7 61 30 22 18',lien:'',relanceLe:'2026-07-01'},
+    {id:7,lastContact:'2026-06-30',recruteur:'Maxime Dubois',esn:'Accenture',besoin:'React Native',tjm:500,clientFinal:'Decathlon',etape:'Entretien',poste:'Mobile',presentiel:2,localisation:"Villeneuve-d'Ascq",experience:'Senior',telephone:'+33 6 55 44 33 22',lien:'',relanceLe:'2026-07-03'},
+    {id:8,lastContact:'2026-06-18',recruteur:'Camille Roy',esn:'CGI',besoin:'TypeScript/Nest',tjm:470,clientFinal:'BNP Paribas',etape:'CV Envoyé',poste:'FullStack',presentiel:4,localisation:'Paris',experience:'Senior',telephone:'+33 6 77 88 99 00',lien:'',relanceLe:'2026-06-29'},
+    {id:9,lastContact:'2026-06-27',recruteur:'Hugo Lambert',esn:'Onepoint',besoin:'React/GraphQL',tjm:490,clientFinal:'EDF',etape:'Offre',poste:'FullStack',presentiel:3,localisation:'Lille',experience:'Senior',telephone:'+33 6 10 20 30 40',lien:'',relanceLe:'2026-07-04'},
+    {id:10,lastContact:'2026-06-20',recruteur:'Manon Girard',esn:'Talan',besoin:'Angular',tjm:430,clientFinal:'Auchan',etape:'Contacté',poste:'Front End',presentiel:2,localisation:"Villeneuve-d'Ascq",experience:'Confirmé',telephone:'+33 7 12 34 56 78',lien:'',relanceLe:'2026-07-01'},
+    {id:11,lastContact:'2026-06-12',recruteur:'Nicolas Faure',esn:'Sogeti',besoin:'Java/React',tjm:450,clientFinal:'AXA',etape:'Refusé',poste:'FullStack',presentiel:5,localisation:'Paris',experience:'Senior',telephone:'+33 6 99 88 77 66',lien:'',relanceLe:''},
+    {id:12,lastContact:'2026-06-05',recruteur:'Émilie Rousseau',esn:'Astek',besoin:'Front React',tjm:410,clientFinal:'Renault',etape:'Sauvegardé',poste:'Front End',presentiel:3,localisation:'Boulogne-Billancourt',experience:'Confirmé',telephone:'+33 6 33 22 11 00',lien:'',relanceLe:''},
+    {id:13,lastContact:'2026-06-29',recruteur:'Lucas Bernard',esn:'Alten',besoin:'Fullstack Next',tjm:510,clientFinal:'Michelin',etape:'CV Envoyé',poste:'FullStack',presentiel:0,localisation:'Remote',experience:'Senior',telephone:'+33 6 45 67 89 01',lien:'',relanceLe:'2026-07-06'},
+    {id:14,lastContact:'2026-04-28',recruteur:'Sarah Cohen',esn:'Capgemini',besoin:'React Senior',tjm:480,clientFinal:'Carrefour',etape:'Ghosté',poste:'FullStack',presentiel:3,localisation:'Massy',experience:'Senior',telephone:'+33 6 21 43 65 87',lien:'',relanceLe:''},
+    {id:15,lastContact:'2026-06-24',recruteur:'Paul Giraud',esn:'Neoxia',besoin:'Node/React',tjm:460,clientFinal:'Société Générale',etape:'Entretien',poste:'FullStack',presentiel:2,localisation:'Paris',experience:'Senior',telephone:'+33 6 78 90 12 34',lien:'',relanceLe:'2026-06-28'}
+  ];
+
+  get DATA(){ return this.state.rows || this.BASE_DATA; }
+  _rows(s){ return s.rows || this.BASE_DATA; }
+  get stages(){ return this.state.stages || this.DEFAULT_STAGES; }
+  get postes(){ return this.state.postes || this.DEFAULT_POSTES; }
+  get stageNames(){ return this.stages.map(s=>s.name); }
+  stageByName(n){ return this.stages.find(s=>s.name===n); }
+  stageColor(n){ const st=this.stageByName(n); return st ? (this._dark?st.cd:st.cl) : (this._dark?'#a1a1aa':'#71717a'); }
+  get blankForm(){ return { recruteur:'', esn:'', clientFinal:'', besoin:'', poste:this.postes[0]||'', tjm:'', etape:(this.stages[0]||{}).name||'', presentiel:'3', localisation:'', experience:'Senior', telephone:'', lien:'', lastContact:this.TODAY, relanceLe:'' }; }
+  openAdd = ()=> this.setState({addOpen:true, form:{...this.blankForm}});
+  closeAdd = ()=> this.setState({addOpen:false});
+  onField = (e)=>{ const {name,value}=e.target; this.setState(s=>({form:{...(s.form||this.blankForm),[name]:value}})); };
+  submitAdd = ()=>{ const f=this.state.form||this.blankForm; if(!(f.recruteur||'').trim()) return; const row={ id:Date.now(), lastContact:f.lastContact||this.TODAY, recruteur:f.recruteur.trim(), esn:(f.esn||'').trim(), besoin:(f.besoin||'').trim(), tjm:+f.tjm||0, clientFinal:(f.clientFinal||'').trim(), etape:f.etape, poste:f.poste, presentiel:+f.presentiel||0, localisation:(f.localisation||'').trim(), experience:f.experience, telephone:(f.telephone||'').trim(), lien:(f.lien||'').trim(), relanceLe:f.relanceLe||'' }; this.setState(s=>({rows:[row, ...this._rows(s)], addOpen:false, form:{...this.blankForm}, statusTab:this.isActive(row.etape)?'actives':'archived', view:'tous', page:1, search:''})); };
+
+  openCust = (e)=>{ if(e&&e.preventDefault) e.preventDefault(); this.setState({custOpen:true}); };
+  closeCust = ()=> this.setState({custOpen:false});
+  onStageName = (e)=>{ const i=+e.target.dataset.index, v=e.target.value; this.setState(s=>{ const list=s.stages||this.DEFAULT_STAGES; const oldName=list[i].name; const stages=list.map((st,idx)=>idx===i?{...st,name:v}:st); const rows=this._rows(s).map(r=>r.etape===oldName?{...r,etape:v}:r); return {stages,rows}; }); };
+  onStageColor = (e)=>{ const i=+e.currentTarget.dataset.index, c=e.currentTarget.dataset.color; this.setState(s=>{ const list=s.stages||this.DEFAULT_STAGES; const stages=list.map((st,idx)=>idx===i?{...st,cl:c,cd:c}:st); return {stages}; }); };
+  onStageArchive = (e)=>{ const i=+e.currentTarget.dataset.index; this.setState(s=>{ const list=s.stages||this.DEFAULT_STAGES; const stages=list.map((st,idx)=>idx===i?{...st,archived:!st.archived}:st); return {stages}; }); };
+  onStageDelete = (e)=>{ const i=+e.currentTarget.dataset.index; this.setState(s=>{ const list=s.stages||this.DEFAULT_STAGES; if(list.length<=1) return null; const removed=list[i]; const stages=list.filter((_,idx)=>idx!==i); const fb=stages[0].name; const rows=this._rows(s).map(r=>r.etape===removed.name?{...r,etape:fb}:r); return {stages,rows}; }); };
+  addStage = ()=> this.setState(s=>{ const list=s.stages||this.DEFAULT_STAGES; return {stages:[...list,{name:'Nouvelle étape',cl:'#7c3aed',cd:'#a78bfa',archived:false}]}; });
+  onPosteName = (e)=>{ const i=+e.target.dataset.index, v=e.target.value; this.setState(s=>{ const list=s.postes||this.DEFAULT_POSTES; const old=list[i]; const postes=list.map((p,idx)=>idx===i?v:p); const rows=this._rows(s).map(r=>r.poste===old?{...r,poste:v}:r); return {postes,rows}; }); };
+  onPosteDelete = (e)=>{ const i=+e.currentTarget.dataset.index; this.setState(s=>{ const list=s.postes||this.DEFAULT_POSTES; if(list.length<=1) return null; const postes=list.filter((_,idx)=>idx!==i); return {postes}; }); };
+  addPoste = ()=> this.setState(s=>{ const list=s.postes||this.DEFAULT_POSTES; return {postes:[...list,'Nouveau poste']}; });
+  onTjmRef = (e)=>{ const v=e.target.value; this.setState({tjmRef: v===''? '' : (+v||0)}); };
+
+  isActive(n){ const st=this.stageByName(n); return st ? !st.archived : true; }
+  isDue(r){ return !!r.relanceLe && this.isActive(r.etape) && r.relanceLe <= this.TODAY; }
+  fmt(d){ if(!d) return '—'; const p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  daysSince(d){ return Math.floor((new Date(this.TODAY) - new Date(d)) / 86400000); }
+
+  onSort = (e)=>{ const k=e.currentTarget.dataset.key; this.setState(s=>({ sortKey:k, sortDir: s.sortKey===k && s.sortDir==='asc'?'desc':'asc', page:1 })); };
+  onSearch = (e)=>{ this.setState({search:e.target.value, page:1}); };
+  onPerPage = (e)=>{ this.setState({perPage:+e.target.value, page:1}); };
+  onTogglePin = (e)=>{ const id=+e.currentTarget.dataset.id; this.setState(s=>({pins:{...s.pins,[id]:!s.pins[id]}})); };
+  onTogglePinStop = (e)=>{ e.stopPropagation(); this.onTogglePin(e); };
+  onRowClick = (e)=>{ this.setState({selectedId: +e.currentTarget.dataset.id}); };
+  closeDrawer = ()=> this.setState({selectedId:null});
+  showTous = ()=> this.setState({view:'tous'});
+  showEtape = ()=> this.setState({view:'etape', dueOnly:false});
+  startRelances = ()=> this.setState({view:'tous', statusTab:'actives', dueOnly:true, sortKey:'default', sortDir:'desc', page:1, search:''});
+  clearDue = ()=> this.setState({dueOnly:false, page:1});
+  showActives = ()=> this.setState({statusTab:'actives', page:1});
+  showArchived = ()=> this.setState({statusTab:'archived', dueOnly:false, page:1});
+  toggleSidebar = ()=> this.setState(s=>({collapsed:!s.collapsed}));
+  toggleTheme = ()=> this.setState(s=>({themeOverride: (s.themeOverride ?? (this.props.theme ?? 'Clair'))==='Sombre'?'Clair':'Sombre'}));
+  toggleProfile = ()=> this.setState(s=>({profileOpen:!s.profileOpen}));
+  setProfileRef = (el)=>{ this.profileRef.current = el; };
+  onRowEnter = (e)=>{ this.setState({hoverRowId: +e.currentTarget.dataset.id}); };
+  onRowLeave = ()=>{ this.setState({hoverRowId: null}); };
+  setPage = (p)=> this.setState(s=>({page: Math.max(1, Math.min(p, this._pc||1))}));
+
+  badge(stage){ return {display:'inline-flex',alignItems:'center',gap:'7px',padding:'3px 9px',borderRadius:'999px',fontSize:'12px',fontWeight:500,background:'var(--surface-2)',color:'var(--text-soft)',whiteSpace:'nowrap'}; }
+  dot(stage){ return {width:'6px',height:'6px',borderRadius:'50%',background:this.stageColor(stage),flex:'none'}; }
+  get tjmRef(){ return this.state.tjmRef ?? this.MARKET; }
+  tjmStyle(v){ const ref=this.tjmRef; return {fontWeight:600,fontVariantNumeric:'tabular-nums',fontSize:'13px',color: v>=ref ? this._tjmUp : this._tjmDown}; }
+
+  enrich(r){
+    const due = this.isDue(r);
+    const retard = !!r.relanceLe && this.isActive(r.etape) && r.relanceLe < this.TODAY;
+    return { ...r, due, retard,
+      lastContactFmt:this.fmt(r.lastContact),
+      dateStyle:{fontSize:'var(--cell-fs)',fontWeight:600,color: due ? this._mutedRed : 'var(--text)'},
+      tjmLabel:r.tjm+' €', tjmStyle:this.tjmStyle(r.tjm),
+      presentielLabel: r.presentiel===0 ? 'Full remote' : r.presentiel+'j/sem',
+      presentielStyle:{display:'inline-block',padding:'2px 8px',borderRadius:'6px',fontSize:'12px',fontWeight:500,background: r.presentiel===0?(this._dark?'#1e1b4b':'#eef2ff'):'var(--surface-2)',color: r.presentiel===0?(this._dark?'#a5b4fc':'#4338ca'):'var(--text-soft)'},
+      badgeStyle:this.badge(r.etape), dotStyle:this.dot(r.etape),
+      relanceLabel: retard ? 'En retard · '+this.fmt(r.relanceLe) : 'À relancer',
+      relanceBadge:{fontSize:'10.5px',fontWeight:600,color:this._mutedRed,background:'transparent',padding:'0',whiteSpace:'nowrap'},
+      pinFill: this.state.pins[r.id] ? 'var(--accent)' : 'none',
+      pinStroke: this.state.pins[r.id] ? 'var(--accent)' : (this._dark?'#52525b':'#c4c4cc'),
+      lien:r.lien||'', noLien: !r.lien };
+  }
+
+  renderVals(){
+    const {search,sortKey,sortDir,page,perPage,view,pins,collapsed,themeOverride,statusTab,profileOpen,hoverRowId,selectedId,addOpen,custOpen}=this.state;
+    const form = this.state.form ?? this.blankForm;
+    const accent=this.props.accent ?? '#6366f1';
+    const density=this.props.density ?? 'Confortable';
+    const sidebarStyle=this.props.sidebarStyle ?? 'Blanche';
+    const fontFamily = "'Geist',system-ui,sans-serif";
+    const zebra=this.props.zebra ?? false;
+    const theme=themeOverride ?? (this.props.theme ?? 'Clair');
+    const isDark = theme==='Sombre';
+    this._dark = isDark;
+    this._mutedRed = isDark ? '#f87171' : '#b3382f';
+    this._mutedAmber = isDark ? '#eab86b' : '#b5842c';
+    this._tjmUp = isDark ? '#86d9a3' : '#4d7c5f';
+    this._tjmDown = isDark ? '#f2a19a' : '#b3524a';
+
+    const T = isDark
+      ? {bg:'#0e0e10',surface:'#18181b',surface2:'#232327',text:'#f4f4f5',textMuted:'#71717a',textSoft:'#a1a1aa',border:'#2a2a2e',borderSoft:'#232327'}
+      : {bg:'#f5f5f6',surface:'#ffffff',surface2:'#f6f6f7',text:'#18181b',textMuted:'#a1a1aa',textSoft:'#52525b',border:'#ececef',borderSoft:'#f1f1f3'};
+    const asideBg = sidebarStyle==='Grise' ? T.bg : T.surface;
+    const asideBorder = sidebarStyle==='Grise' ? (isDark?'#3f3f46':'#d4d4d8') : T.border;
+
+    // KPIs (from full dataset)
+    const relanceCount=this.DATA.filter(r=>this.isDue(r)).length;
+    const activeCount=this.DATA.filter(r=>this.isActive(r.etape)).length;
+    const entretienCount=this.DATA.filter(r=>r.etape==='Entretien').length;
+    const staleCount=this.DATA.filter(r=>this.isActive(r.etape) && !['Entretien','Offre'].includes(r.etape) && this.daysSince(r.lastContact)>7).length;
+    const weeklyGoal=15;
+    const weeklyDone=this.DATA.filter(r=>this.daysSince(r.lastContact)<=7).length;
+    const weeklyPct=Math.min(100,Math.round(weeklyDone/weeklyGoal*100));
+    const trackBg=isDark?'rgba(255,255,255,.12)':'rgba(0,0,0,.06)';
+    const relanceMotivation = relanceCount===0 ? 'Tout est à jour, beau travail.' : (relanceCount===1 ? 'Une relance rapide, une porte ouverte.' : 'Relance vite : c’est là que ça se joue.');
+    const contacted=this.DATA.filter(r=>r.etape!=='Sauvegardé').length;
+    const replied=this.DATA.filter(r=>['Entretien','Offre','Refusé'].includes(r.etape)).length;
+    const taux=Math.round(replied/contacted*100);
+    const red=isDark?'#f87171':'#dc2626';
+    const card=(alert)=>({background:'var(--surface)',border:'1px solid '+(alert?(isDark?'#7f1d1d':'#fecaca'):'var(--border)'),borderRadius:14,padding:'16px 17px',boxShadow:isDark?'none':'0 1px 2px rgba(0,0,0,.03)'});
+    const cardAlert=card(true), cardNeutral=card(false);
+    const iconAlert={width:'26px',height:'26px',borderRadius:'8px',background:red+(isDark?'2e':'1e'),color:red,display:'flex',alignItems:'center',justifyContent:'center'};
+    const iconNeutral={width:'26px',height:'26px',borderRadius:'8px',background:'var(--surface-2)',color:'var(--text-muted)',display:'flex',alignItems:'center',justifyContent:'center'};
+    const valueAlert={fontSize:'27px',fontWeight:600,letterSpacing:'-.5px',lineHeight:1,fontVariantNumeric:'tabular-nums',color:red};
+    const valueNeutral={fontSize:'27px',fontWeight:600,letterSpacing:'-.5px',lineHeight:1,fontVariantNumeric:'tabular-nums',color:'var(--text)'};
+    const tauxDelta=taux-this.PREV_TAUX;
+    const tauxColor= tauxDelta>=0 ? this._tjmUp : this._tjmDown;
+    const tauxArrow= tauxDelta>=0 ? '↑' : '↓';
+    const tauxDeltaLabel=(tauxDelta>=0?'+':'')+tauxDelta+' pts vs mois dernier';
+
+    // relance list (sidebar + notif), sorted by urgency (oldest due first)
+    const relanceList=this.DATA.filter(r=>this.isDue(r)).sort((a,b)=>a.relanceLe.localeCompare(b.relanceLe)).map(r=>{
+      const overdue = r.relanceLe < this.TODAY;
+      const c = overdue ? this._mutedAmber : this._mutedRed;
+      return { recruteur:r.recruteur, esn:r.esn, dateFmt:this.fmt(r.relanceLe),
+        dotStyle:{width:'6px',height:'6px',borderRadius:'50%',background:c,flex:'none'},
+        tagLabel: overdue ? 'retard' : 'auj.',
+        tagStyle:{flex:'none',fontSize:'10.5px',fontWeight:600,color:'var(--text-muted)',letterSpacing:'.2px'} };
+    });
+
+    // headers
+    const cols=[['lastContact','Dernier contact'],['recruteur','Recruteur'],['esn','ESN'],['clientFinal','Client final'],['tjm','TJM'],['etape','Étape'],['localisation','Localisation']];
+    const faintChevron = isDark ? 'rgba(255,255,255,.26)' : 'rgba(0,0,0,.22)';
+    const headers=cols.map(([key,label])=>{
+      const active = sortKey===key;
+      return {key,label,onClick:this.onSort,
+        upStyle:{color: active && sortDir==='asc' ? 'var(--accent)' : faintChevron, display:'block'},
+        downStyle:{color: active && sortDir==='desc' ? 'var(--accent)' : faintChevron, display:'block'},
+        thStyle:{padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:key==='tjm'?'flex-end':'flex-start',fontSize:'11px',fontWeight:600,letterSpacing:'.4px',textTransform:'uppercase',color: active?'var(--text-soft)':'var(--text-muted)',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}};
+    });
+
+    // status scope
+    const activesCount=this.DATA.filter(r=>this.isActive(r.etape)).length;
+    const archivedCount=this.DATA.length-activesCount;
+    let scoped=this.DATA.filter(r=> statusTab==='actives' ? this.isActive(r.etape) : !this.isActive(r.etape));
+
+    // filter
+    const dueOnly = this.state.dueOnly && statusTab==='actives';
+    const q=search.trim().toLowerCase();
+    let list=scoped.filter(r=> !q || [r.recruteur,r.esn,r.besoin,r.clientFinal,r.poste,r.localisation,r.etape,r.experience].join(' ').toLowerCase().includes(q));
+    if(dueOnly) list=list.filter(r=>this.isDue(r));
+
+    // sort
+    const dir=sortDir==='asc'?1:-1;
+    list=list.slice().sort((a,b)=>{
+      if(sortKey==='default'){ if(a.due!==b.due){} const ad=this.isDue(a),bd=this.isDue(b); if(ad!==bd) return ad?-1:1; return b.lastContact.localeCompare(a.lastContact); }
+      let av,bv;
+      if(sortKey==='tjm'||sortKey==='presentiel'){av=a[sortKey];bv=b[sortKey];}
+      else if(sortKey==='etape'){av=this.stageNames.indexOf(a.etape);bv=this.stageNames.indexOf(b.etape);}
+      else {av=(a[sortKey]||'').toString().toLowerCase();bv=(b[sortKey]||'').toString().toLowerCase();}
+      return av<bv?-dir:av>bv?dir:0;
+    });
+    // pinned float to top (stable)
+    list=list.slice().sort((a,b)=>(pins[b.id]?1:0)-(pins[a.id]?1:0));
+
+    const enriched=list.map(r=>this.enrich(r));
+    const total=enriched.length;
+    const pc=Math.max(1,Math.ceil(total/perPage));
+    this._pc=pc;
+    const pg=Math.min(page,pc);
+    const start=(pg-1)*perPage;
+    const pinBg=isDark?(accent+'22'):(accent+'14');
+    const hoverBg=isDark?(accent+'26'):(accent+'1f');
+    const pageRows=enriched.slice(start,start+perPage).map((r,i)=>({
+      ...r,
+      rowStyle:{display:'grid', gridTemplateColumns:'var(--gt)', alignItems:'stretch', backgroundColor: hoverRowId===r.id ? hoverBg : (pins[r.id] ? pinBg : (zebra && i%2 ? T.surface2 : T.surface)), borderBottom:'1px solid var(--border-soft)', cursor:'pointer'}
+    }));
+
+    // board (kanban) grouped from scoped+filtered enriched
+    const board=this.stages.map(st=>{
+      const stage=st.name;
+      const items=enriched.filter(r=>r.etape===stage);
+      return {stage,count:items.length,items,badgeStyle:this.badge(stage),dotStyle:this.dot(stage)};
+    });
+
+    // legend counts
+    const stageLegend=this.stages.map(st=>({label:st.name,count:this.DATA.filter(r=>r.etape===st.name).length,dot:{width:'8px',height:'8px',borderRadius:'50%',background:this.stageColor(st.name),flex:'none'}}));
+
+    // customization panel data
+    const PALETTE=['#64748b','#2563eb','#0f766e','#15803d','#b45309','#dc2626','#7c3aed','#db2777'];
+    const custStages=this.stages.map((st,i)=>{
+      const color=isDark?st.cd:st.cl;
+      return { name:st.name, index:i, archived:st.archived,
+        dotStyle:{width:'11px',height:'11px',borderRadius:'50%',background:color,flex:'none',boxShadow:'0 0 0 3px '+color+'22'},
+        archiveLabel: st.archived?'Archivée':'Active',
+        archiveBtnStyle:{fontFamily:'inherit',fontSize:'11px',fontWeight:600,padding:'4px 9px',borderRadius:'999px',border:'1px solid var(--border)',cursor:'pointer',whiteSpace:'nowrap',background: st.archived?'var(--surface-2)':'transparent',color: st.archived?'var(--text-soft)':'var(--text-muted)'},
+        swatches: PALETTE.map(c=>({color:c,index:i,style:{width:'20px',height:'20px',borderRadius:'50%',background:c,border:'none',cursor:'pointer',flex:'none',padding:0,boxShadow:(color.toLowerCase()===c.toLowerCase())?'0 0 0 2px var(--surface),0 0 0 4px '+c:'none'}})) };
+    });
+    const custPostes=this.postes.map((p,i)=>({name:p,index:i}));
+    const stageOptions=this.stages.map(st=>({v:st.name}));
+    const posteOptions=this.postes.map(p=>({v:p}));
+
+    // drawer (selected row full detail)
+    const selectedRaw = selectedId!=null ? this.DATA.find(d=>d.id===selectedId) : null;
+    const drawer = selectedRaw ? this.enrich(selectedRaw) : null;
+
+    const tSeg={fontFamily:'inherit',fontSize:'13px',fontWeight:600,padding:'6px 13px',borderRadius:'7px',border:'none',cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'6px'};
+    const seg=(on)=>({...tSeg, background:on?'var(--surface)':'transparent', color:on?'var(--text)':'var(--text-muted)', boxShadow:on?'0 1px 2px rgba(0,0,0,.08)':'none'});
+    const segCount=(on)=>({fontSize:'11px',fontWeight:600,padding:'0 6px',borderRadius:'999px',background:on?'var(--surface-2)':'transparent',color:'var(--text-muted)',fontVariantNumeric:'tabular-nums'});
+    const navBtn={fontFamily:'inherit',fontSize:'14px',minWidth:'30px',height:'30px',border:'1px solid var(--border)',borderRadius:'7px',background:'var(--surface)',color:'var(--text-soft)',cursor:'pointer'};
+
+    return {
+      accent, accentSoft: accent+(isDark?'26':'1f'),
+      ...T,
+      cellPad: density==='Compact'?'8px 14px':'12px 14px',
+      cellFs: density==='Compact'?'12.5px':'13px',
+      asideW: collapsed ? '0px' : '246px',
+      headerSub: activeCount+' opportunité'+(activeCount>1?'s':'')+' active'+(activeCount>1?'s':''),
+      headers, pageRows, board, stageLegend, relanceList,
+      cardAlert, cardNeutral, iconAlert, iconNeutral, valueAlert, valueNeutral,
+      staleCount, entretienCount, taux, tauxColor, tauxArrow, tauxDeltaLabel,
+      mutedRedVar: this._mutedRed,
+      drawer: drawer || {}, drawerOpen: !!drawer, closeDrawer:this.closeDrawer,
+      onRowClick:this.onRowClick, onTogglePinStop:this.onTogglePinStop,
+      addOpen, form, onField:this.onField, openAdd:this.openAdd, closeAdd:this.closeAdd, submitAdd:this.submitAdd,
+      stageOptions, posteOptions,
+      custOpen, openCust:this.openCust, closeCust:this.closeCust, custStages, custPostes,
+      onStageName:this.onStageName, onStageColor:this.onStageColor, onStageArchive:this.onStageArchive, onStageDelete:this.onStageDelete, addStage:this.addStage,
+      onPosteName:this.onPosteName, onPosteDelete:this.onPosteDelete, addPoste:this.addPoste,
+      tjmRef: this.state.tjmRef ?? this.MARKET, tjmUpColor:this._tjmUp, tjmDownColor:this._tjmDown, onTjmRef:this.onTjmRef,
+      relanceCount, hasRelances: relanceCount>0, noRelances: relanceCount===0,
+      weeklyDone, weeklyGoal, weeklyPctW: weeklyPct+'%', trackBg, relanceMotivation,
+      relanceCardBorder: accent+(isDark?'33':'26'), startRelances:this.startRelances,
+      relanceBadgeBg: red, relanceBadgeFg:'#fff',
+      asideBg, asideBorder, fontFamily,
+      search, perPage, profileOpen, toggleProfile:this.toggleProfile, setProfileRef:this.setProfileRef,
+      moonShow:{display: isDark?'none':'inline-flex'}, sunShow:{display: isDark?'inline-flex':'none'},
+      tableWrap:{display: view==='tous' ? 'block':'none'},
+      boardWrap:{display: view==='etape' ? 'block':'none'},
+      dueOnly, clearDue:this.clearDue,
+      tousBtn:seg(view==='tous'), etapeBtn:seg(view==='etape'),
+      activesBtn:seg(statusTab==='actives'), archivedBtn:seg(statusTab==='archived'),
+      activesCount, archivedCount,
+      activesCountStyle:segCount(statusTab==='actives'), archivedCountStyle:segCount(statusTab==='archived'),
+      showTous:this.showTous, showEtape:this.showEtape, showActives:this.showActives, showArchived:this.showArchived,
+      toggleSidebar:this.toggleSidebar, toggleTheme:this.toggleTheme, onRowEnter:this.onRowEnter, onRowLeave:this.onRowLeave,
+      onSearch:this.onSearch, onPerPage:this.onPerPage, onTogglePin:this.onTogglePin,
+      resultLabel: total+' résultat'+(total>1?'s':'')+(q?' pour «\u00a0'+search+'\u00a0»':''),
+      pageInfo: total===0?'Aucun résultat':('Affichage '+(start+1)+'\u2013'+Math.min(start+perPage,total)+' sur '+total),
+      pageOfLabel: pg+' / '+pc,
+      navBtn,
+      firstPage:()=>this.setPage(1), prevPage:()=>this.setPage(pg-1), nextPage:()=>this.setPage(pg+1), lastPage:()=>this.setPage(pc)
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -6,7 +6,12 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: {
-    tsconfigPaths: true
+    tsconfigPaths: true,
+    dedupe: ['react', 'react-dom']
+  },
+
+  optimizeDeps: {
+    include: ['@tanstack/react-form']
   },
 
   plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],

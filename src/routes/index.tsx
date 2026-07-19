@@ -1,16 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+import { APP_ROUTES } from '@/lib/routes'
+
+// Public landing page not built yet (DEV-24) — send visitors straight to auth.
 export const Route = createFileRoute('/')({
-  component: Home
+  beforeLoad: () => {
+    throw redirect({ to: APP_ROUTES.login })
+  }
 })
-
-function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-4xl font-semibold tracking-tight">ProspectTracker</h1>
-      <p className="text-muted-foreground">
-        Le tracker de prospection orienté action pour freelances dev.
-      </p>
-    </main>
-  )
-}

@@ -1,0 +1,28 @@
+/* Circular View Transitions reveal for the theme toggle.
+The custom clip-path animation drives the reveal, so the default cross-fade is disabled. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Grows a bar from 0 to its inline width. */
+@keyframes grow-from-zero {
+  from {
+    width: 0;
+  }
+}
+
+@utility animate-grow {
+  animation: grow-from-zero 700ms cubic-bezier(0, 0, 0.2, 1);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}

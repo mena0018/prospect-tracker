@@ -1,31 +1,32 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { getCookie } from '@tanstack/react-start/server'
 
-import { API_ROUTES } from '@/lib/routes'
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { AppShell } from '@/components/layout/app-shell'
+import { toDisplayName, toInitials } from '@/lib/utils'
+
+// Read on the server so the sidebar renders in its persisted state on first paint.
+const getSidebarState = createServerFn().handler(() => getCookie('sidebar_state') !== 'false')
 
 export const Route = createFileRoute('/_authed/app')({
+  loader: () => getSidebarState(),
   component: Dashboard
 })
 
 function Dashboard() {
+  const defaultSidebarOpen = Route.useLoaderData()
   const { user } = Route.useRouteContext()
 
-  async function handleLogout() {
-    await getSupabaseBrowserClient().auth.signOut()
-    window.location.href = API_ROUTES.authLogout
-  }
+  const name = toDisplayName(user.fullName)
+  const initials = toInitials(user.fullName)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Tableau de bord</h1>
-      <p className="text-neutral-500 dark:text-neutral-400">Connecté en tant que {user?.email}</p>
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
-      >
-        Se déconnecter
-      </button>
-    </main>
+    <AppShell
+      headerSubtitle="11 opportunités actives"
+      defaultSidebarOpen={defaultSidebarOpen}
+      profile={{ name, subtitle: user.email, initials, avatarUrl: user.avatarUrl }}
+    >
+      <div className="h-full" />
+    </AppShell>
   )
 }

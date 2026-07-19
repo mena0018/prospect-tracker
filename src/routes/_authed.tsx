@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_authed')({
     if (!context.user.provisioned) {
       await provisionUser()
     }
+    return { user: context.user }
   },
   component: AuthedLayout
 })

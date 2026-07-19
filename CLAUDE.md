@@ -28,10 +28,22 @@ Locked decisions (don't revisit without a strong reason):
 ## Repository layout
 
 `src/routes/` (file-based routing: `__root.tsx`, public LP routes, `_authed/*` protected
-dashboard, `api/auth.$.tsx`) · `src/server/` (`createServerFn`) · `src/components/{ui,tracker,
-layout}` · `src/db/{schema.ts,client.ts}` · `src/lib/{supabase,resend,stripe}.ts` ·
-`drizzle/` (migrations). The Drizzle schema in `src/db/schema.ts` is the source of truth for
-the data model.
+dashboard, `api/auth.$.tsx`) · `src/server/` (`createServerFn`) · `src/features/<domain>/`
+(everything domain-specific, components included) · `src/components/{ui,layout,icons,theme}`
+(cross-cutting only) · `src/db/{schema.ts,client.ts}` · `src/lib/{supabase,resend,stripe}.ts`
+· `drizzle/` (migrations). The Drizzle schema in `src/db/schema.ts` is the source of truth
+for the data model.
+
+- **`src/features/<domain>/`** owns a whole domain: `components/` for its UI, plus flat
+  prefixed modules for the rest (`auth-schema.ts`, `auth-utils.ts`, `use-google-oauth.ts`).
+  The prefix keeps editor tabs distinguishable — never bare `schema.ts`.
+- **`src/components/` is cross-cutting only** — reusable by any feature, no domain knowledge
+  (`ui/`, `layout/`, `error-state.tsx`). A component only one feature uses belongs in that
+  feature.
+- **`src/server/` is a bundler boundary**, not a domain: TanStack Start strips
+  `createServerFn` handlers from the client bundle. Keep those files free of anything the
+  client imports (Zod schemas belong in `src/features/`) — a shared const there gets
+  tree-shaken and reordered, which throws a TDZ `ReferenceError` at runtime.
 
 ## User identity (critical)
 
@@ -58,6 +70,8 @@ re-implement auth** — it references the Supabase UUID as its key.
 - **Files: kebab-case** (`user-card.tsx`), one component per file. Lib-imposed exceptions:
   `__root.tsx`, `routeTree.gen.ts`.
 - **Components: PascalCase** inside the file (`export function UserCard()`).
+- **Component props type: always name it `Props`** (file-local), never `UserCardProps` — one
+  component per file makes the prefix redundant.
 - Utility functions: camelCase.
 - Code comments in English (see the language rule above).
 - **Few comments.** Write only the non-obvious (security constraint, workaround,
@@ -74,6 +88,10 @@ re-implement auth** — it references the Supabase UUID as its key.
 - Avoid unnecessary dependencies — prefer existing code / stdlib first.
 - Keep changes focused — don't refactor unrelated files.
 - Cover **mobile** and **dark-theme** states when relevant.
+- **Tailwind: prefer native utilities over arbitrary values.** Use the spacing scale
+  (`pt-5.5`, `size-3.75`, `w-61.5` — 1 unit = 4px) instead of `pt-[22px]`, `size-[15px]`. Keep
+  arbitrary values only where no utility maps (e.g. exact font sizes `text-[12.5px]`, radii
+  `rounded-[9px]`).
 
 ### Lint & format (ESLint + Prettier)
 
@@ -82,8 +100,9 @@ re-implement auth** — it references the Supabase UUID as its key.
 - **ESLint** (`eslint.config.js`, flat config): `@eslint/js` + `typescript-eslint`
   (recommended) + `react-hooks` + `react-refresh`, with `eslint-config-prettier` last to
   disable style rules that would fight Prettier.
-- `react-refresh/only-export-components` is disabled for `src/routes/**` (route files export
-  both `Route` and the component by design).
+- `react-refresh/only-export-components` is disabled globally (route files export both
+  `Route` and the component by design; feature/component files often export a small constant
+  alongside the component).
 - `src/routeTree.gen.ts` and build dirs are ignored by both.
 
 ## Tooling

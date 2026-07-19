@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
 
 import { db } from '@/db/client'
+import { credentialsSchema, signUpSchema } from '@/features/auth/auth-schema'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
@@ -10,6 +10,8 @@ import { asString } from '@/lib/utils'
 export type AuthUser = {
   id: string
   email: string
+  fullName: string | null
+  avatarUrl: string | null
   provisioned: boolean
 }
 
@@ -26,15 +28,12 @@ export const fetchUser = createServerFn({ method: 'GET' }).handler(
     return {
       id: user.id,
       email: user.email,
+      fullName: asString(user.user_metadata?.full_name),
+      avatarUrl: asString(user.user_metadata?.avatar_url),
       provisioned: user.user_metadata?.provisioned === true
     }
   }
 )
-
-const credentialsSchema = z.object({
-  email: z.email(),
-  password: z.string().min(8)
-})
 
 export const signInWithPassword = createServerFn({ method: 'POST' })
   .validator(credentialsSchema)
@@ -45,10 +44,14 @@ export const signInWithPassword = createServerFn({ method: 'POST' })
   })
 
 export const signUpWithPassword = createServerFn({ method: 'POST' })
-  .validator(credentialsSchema)
-  .handler(async ({ data }) => {
+  .validator(signUpSchema)
+  .handler(async ({ data: { email, password, fullName } }) => {
     const supabase = getSupabaseServerClient()
-    const { error } = await supabase.auth.signUp(data)
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } }
+    })
     return { error: error ? error.message : null }
   })
 
