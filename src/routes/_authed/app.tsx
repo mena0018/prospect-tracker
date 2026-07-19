@@ -22,9 +22,9 @@ function Dashboard() {
 
   return (
     <AppShell
-      profile={{ name, subtitle: user.email, initials }}
       headerSubtitle="11 opportunités actives"
       defaultSidebarOpen={defaultSidebarOpen}
+      profile={{ name, subtitle: user.email, initials, avatarUrl: user.avatarUrl }}
     >
       <div className="h-full" />
     </AppShell>

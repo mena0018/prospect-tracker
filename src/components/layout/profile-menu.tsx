@@ -9,11 +9,28 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { API_ROUTES } from '@/lib/routes'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 
-type Props = {
+export type Profile = {
   name: string
   subtitle: string
   initials: string
+  avatarUrl: string | null
+}
+
+type ProfileAvatarProps = {
+  initials: string
+  className: string
+  avatarUrl: string | null
+}
+
+function ProfileAvatar({ avatarUrl, initials, className }: ProfileAvatarProps) {
+  if (avatarUrl) {
+    return <img src={avatarUrl} alt="Avatar" className={cn('object-cover', className)} />
+  }
+  return (
+    <span className={cn('bg-surface-2 text-text-soft font-semibold', className)}>{initials}</span>
+  )
 }
 
 const ITEM_CLASS =
@@ -24,13 +41,15 @@ async function handleLogout() {
   window.location.href = API_ROUTES.authLogout
 }
 
-export function ProfileMenu({ name, subtitle, initials }: Props) {
+export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="hover:bg-surface-2 flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left outline-none">
-        <span className="bg-surface-2 text-text-soft flex size-8 flex-none items-center justify-center rounded-full text-xs font-semibold">
-          {initials}
-        </span>
+        <ProfileAvatar
+          avatarUrl={avatarUrl}
+          initials={initials}
+          className="flex size-8 flex-none items-center justify-center rounded-full text-xs"
+        />
         <span className="flex min-w-0 flex-1 flex-col leading-[1.2]">
           <span className="text-foreground truncate text-sm font-semibold">{name}</span>
           <span className="text-muted-foreground text-2xs truncate">{subtitle}</span>
@@ -44,9 +63,11 @@ export function ProfileMenu({ name, subtitle, initials }: Props) {
         className="w-(--anchor-width) min-w-56 overflow-hidden rounded-xl p-0 shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
       >
         <div className="border-border-soft flex items-center gap-2.5 border-b px-3.25 py-3">
-          <span className="bg-surface-2 text-text-soft text-2xs flex size-7.5 flex-none items-center justify-center rounded-full font-semibold">
-            {initials}
-          </span>
+          <ProfileAvatar
+            avatarUrl={avatarUrl}
+            initials={initials}
+            className="text-2xs flex size-7.5 flex-none items-center justify-center rounded-full"
+          />
           <span className="flex min-w-0 flex-col leading-[1.2]">
             <span className="text-foreground truncate text-xs font-semibold">{name}</span>
             <span className="text-muted-foreground text-2xs truncate">{subtitle}</span>

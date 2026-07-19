@@ -2,7 +2,7 @@ import { ArrowRight, Bell, HelpCircle, ListFilter, MessageCircle, Send } from 'l
 
 import { CustomizeIcon } from '@/components/icons/customize'
 import { LinkedInIcon } from '@/components/icons/linkedin'
-import { ProfileMenu } from '@/components/layout/profile-menu'
+import { ProfileMenu, type Profile } from '@/components/layout/profile-menu'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -34,7 +34,7 @@ const RELANCE = { count: 6, done: 6, goal: 15 }
 const WEEKLY_PCT = Math.min(100, Math.round((RELANCE.done / RELANCE.goal) * 100))
 
 type Props = {
-  profile: { name: string; subtitle: string; initials: string }
+  profile: Profile
 }
 
 export function AppSidebar({ profile }: Props) {
@@ -42,13 +42,11 @@ export function AppSidebar({ profile }: Props) {
     <Sidebar>
       <SidebarHeader className="gap-0 p-0 px-4 pt-4.5">
         <div className="flex items-center gap-2.75 px-1.5 pt-1.5 pb-5">
-          <div className="bg-primary text-primary-foreground flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold tracking-[-0.5px]">
+          <div className="bg-primary text-primary-foreground tracking-title flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold">
             PT
           </div>
           <div className="flex flex-col leading-[1.15]">
-            <span className="text-foreground text-sm font-semibold tracking-[-0.2px]">
-              ProspectTracker
-            </span>
+            <span className="text-foreground tracking-title font-semibold">ProspectTracker</span>
             <span className="text-muted-foreground text-2xs">Suivi de prospection</span>
           </div>
         </div>

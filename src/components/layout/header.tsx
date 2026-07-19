@@ -17,11 +17,11 @@ export function Header({ subtitle }: Props) {
           className="text-text-soft bg-surface hover:bg-surface-2 hover:text-text-soft size-9.5 flex-none rounded-lg [&_svg]:size-4.25"
           title="Replier / déplier la barre latérale"
         />
-        <div className="flex min-w-0 flex-col leading-[1.2]">
-          <h1 className="text-foreground truncate text-lg font-semibold tracking-[-0.3px]">
+        <div className="flex min-w-0 flex-col justify-center gap-1.5">
+          <h1 className="text-foreground tracking-title truncate leading-none font-semibold">
             Tracker
           </h1>
-          <span className="text-muted-foreground mt-0.5 truncate text-xs">{subtitle}</span>
+          <span className="text-muted-foreground truncate text-xs leading-none">{subtitle}</span>
         </div>
       </div>
       <div className="flex flex-none items-center gap-2.25">

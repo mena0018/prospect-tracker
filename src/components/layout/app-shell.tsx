@@ -2,12 +2,13 @@ import { type PropsWithChildren } from 'react'
 
 import { Header } from '@/components/layout/header'
 import { AppSidebar } from '@/components/layout/app-sidebar'
+import { type Profile } from '@/components/layout/profile-menu'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 type Props = PropsWithChildren<{
   headerSubtitle: string
   defaultSidebarOpen: boolean
-  profile: { name: string; subtitle: string; initials: string }
+  profile: Profile
 }>
 
 export function AppShell({ headerSubtitle, defaultSidebarOpen, profile, children }: Props) {
