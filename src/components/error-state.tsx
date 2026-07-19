@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
+import { Button } from '@/components/ui/button'
+
 export function ErrorState({ onRetry }: { onRetry?: () => void }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
@@ -10,13 +12,9 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
       </p>
       <div className="mt-2 flex gap-3">
         {onRetry ? (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-          >
+          <Button type="button" onClick={onRetry}>
             Réessayer
-          </button>
+          </Button>
         ) : null}
         <Link
           to="/"

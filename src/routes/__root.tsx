@@ -10,8 +10,10 @@ import {
 } from '@tanstack/react-router'
 
 import { ErrorState } from '@/components/error-state'
+import { ThemeProvider } from '@/components/theme/theme-provider'
+import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
 import { fetchUser, type AuthUser } from '@/server/auth'
-import appCss from '@/styles.css?url'
+import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async (): Promise<{ user: AuthUser | null }> => {
@@ -52,12 +54,14 @@ function RootErrorComponent() {
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider defaultTheme={DEFAULT_THEME} storageKey={THEME_STORAGE_KEY}>
+          {children}
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>

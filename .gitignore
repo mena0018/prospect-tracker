@@ -11,6 +11,7 @@ dist/
 
 # TanStack Router generated
 src/routeTree.gen.ts
+.tanstack/
 
 # Env
 .env
@@ -37,3 +38,4 @@ drizzle/.snapshots/
 
 # Agent tooling (local, per-developer — installed via `skills add`)
 .claude/skills/
+.claude/launch.json

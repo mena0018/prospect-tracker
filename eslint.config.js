@@ -46,7 +46,6 @@ export default tseslint.config(
     rules: {
       ...react.configs.flat.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
@@ -54,11 +53,11 @@ export default tseslint.config(
     }
   },
 
-  // TanStack Router route files export both `Route` and the route component by design.
+  // Disable setState in useEffect for theme-provider.tsx (shadcn pattern).
   {
-    files: ['src/routes/**/*.tsx'],
+    files: ['src/components/theme/theme-provider.tsx'],
     rules: {
-      'react-refresh/only-export-components': 'off'
+      'react-hooks/set-state-in-effect': 'off'
     }
   },
 
