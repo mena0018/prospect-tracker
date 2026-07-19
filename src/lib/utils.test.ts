@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { asString, cn } from './utils'
+import { asString, cn, toInitials } from './utils'
 
 describe('cn', () => {
   it('merges class names', () => {
@@ -28,5 +28,29 @@ describe('asString', () => {
     expect(asString(null)).toBeNull()
     expect(asString(undefined)).toBeNull()
     expect(asString({})).toBeNull()
+  })
+})
+
+describe('toInitials', () => {
+  it('takes the first letter of the two first words', () => {
+    expect(toInitials('Rabie Menad')).toBe('RM')
+    expect(toInitials('Jean Dupont')).toBe('JD')
+    expect(toInitials('Marie Claire Dubois')).toBe('MC')
+  })
+
+  it('falls back to the two first letters of a single word', () => {
+    expect(toInitials('Cher')).toBe('CH')
+    expect(toInitials('john-doe')).toBe('JO')
+  })
+
+  it('ignores extra whitespace', () => {
+    expect(toInitials('  Marie   Curie  ')).toBe('MC')
+    expect(toInitials('\tAda\nLovelace ')).toBe('AL')
+  })
+
+  it('handles too-short input', () => {
+    expect(toInitials('X')).toBe('X')
+    expect(toInitials('')).toBe('')
+    expect(toInitials('   ')).toBe('')
   })
 })
