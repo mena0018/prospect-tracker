@@ -42,14 +42,14 @@ export function AppSidebar({ profile }: Props) {
     <Sidebar>
       <SidebarHeader className="gap-0 p-0 px-4 pt-4.5">
         <div className="flex items-center gap-2.75 px-1.5 pt-1.5 pb-5">
-          <div className="bg-primary text-primary-foreground flex size-8.5 flex-none items-center justify-center rounded-[9px] text-sm font-semibold tracking-[-0.5px]">
+          <div className="bg-primary text-primary-foreground flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold tracking-[-0.5px]">
             PT
           </div>
           <div className="flex flex-col leading-[1.15]">
-            <span className="text-foreground text-[14.5px] font-semibold tracking-[-0.2px]">
+            <span className="text-foreground text-sm font-semibold tracking-[-0.2px]">
               ProspectTracker
             </span>
-            <span className="text-muted-foreground text-[11px]">Suivi de prospection</span>
+            <span className="text-muted-foreground text-2xs">Suivi de prospection</span>
           </div>
         </div>
       </SidebarHeader>
@@ -78,7 +78,7 @@ export function AppSidebar({ profile }: Props) {
             {PIPELINE_STAGES.map((stage) => (
               <div
                 key={stage.label}
-                className="text-text-soft flex items-center justify-between py-1.25 text-[12.5px]"
+                className="text-text-soft flex items-center justify-between py-1.25 text-xs"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -98,25 +98,23 @@ export function AppSidebar({ profile }: Props) {
         <SidebarGroup className="mt-6.5 shrink-0 px-2.75 py-0">
           <SidebarGroupLabel>Relances</SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="border-primary/15 bg-sidebar-accent rounded-[13px] border px-3.25 pt-3.25 pb-3">
+            <div className="border-primary/15 bg-sidebar-accent rounded-xl border px-3.25 pt-3.25 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="bg-primary text-primary-foreground flex size-8 flex-none items-center justify-center rounded-[9px]">
+                <div className="bg-primary text-primary-foreground flex size-8 flex-none items-center justify-center rounded-lg">
                   <Bell className="size-4" />
                 </div>
                 <div className="min-w-0 leading-tight">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-foreground text-[19px] font-bold tracking-tight tabular-nums">
+                    <span className="text-foreground text-lg font-bold tracking-tight tabular-nums">
                       {RELANCE.count}
                     </span>
                     <span className="text-text-soft text-xs">à relancer</span>
                   </div>
-                  <div className="text-muted-foreground text-[11px]">
-                    Relance vite : c’est là que ça se joue.
-                  </div>
+                  <div className="text-muted-foreground text-2xs">c’est là que ça se joue.</div>
                 </div>
               </div>
               <div className="mt-3.25">
-                <div className="text-text-soft mb-1.5 flex items-center justify-between text-[11px]">
+                <div className="text-text-soft text-2xs mb-1.5 flex items-center justify-between">
                   <span>Objectif de la semaine</span>
                   <span className="text-foreground font-semibold tabular-nums">
                     {RELANCE.done}/{RELANCE.goal}
@@ -131,7 +129,7 @@ export function AppSidebar({ profile }: Props) {
               </div>
               <Button
                 type="button"
-                className="mt-3.25 h-9 w-full gap-1.5 rounded-lg text-[12.5px] font-semibold [&_svg]:size-3.5"
+                className="mt-3.25 h-9 w-full gap-1.5 rounded-lg text-xs font-semibold [&_svg]:size-3.5"
               >
                 Lancer les relances
                 <ArrowRight />
@@ -145,7 +143,7 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-text-soft h-auto gap-2.5 px-2.75 py-2 text-[12.5px] font-medium [&_svg]:size-3.75"
+              className="text-text-soft h-auto gap-2.5 px-2.75 py-2 text-xs font-medium [&_svg]:size-3.75"
               render={<a href={EXTERNAL_LINKS.invite} />}
             >
               <Send />
@@ -157,7 +155,7 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-[12.5px] font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
               render={<a href={EXTERNAL_LINKS.help} />}
             >
               <HelpCircle />
@@ -166,7 +164,7 @@ export function AppSidebar({ profile }: Props) {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-[12.5px] font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
               render={<a href={EXTERNAL_LINKS.linkedin} target="_blank" rel="noreferrer" />}
             >
               <LinkedInIcon />
@@ -175,7 +173,7 @@ export function AppSidebar({ profile }: Props) {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-[12.5px] font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
               render={<a href={EXTERNAL_LINKS.feedback} />}
             >
               <MessageCircle />

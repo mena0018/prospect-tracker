@@ -31,7 +31,7 @@ function LoginPage() {
         />
 
         <div className="relative flex items-center gap-3">
-          <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-[10px] text-sm font-semibold tracking-tight">
+          <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg text-sm font-semibold tracking-tight">
             PT
           </div>
           <span className="text-foreground text-lg font-bold tracking-tight">ProspectTracker</span>
@@ -49,7 +49,7 @@ function LoginPage() {
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-6 py-5 md:px-10">
           <div className="flex items-center gap-2.5 lg:hidden">
-            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-[8px] text-xs font-semibold tracking-tight">
+            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg text-xs font-semibold tracking-tight">
               PT
             </div>
             <span className="text-foreground text-sm font-semibold tracking-tight">

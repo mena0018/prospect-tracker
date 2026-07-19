@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { asString, cn, toInitials } from './utils'
+import { asString, cn, toDisplayName, toInitials } from './utils'
 
 describe('cn', () => {
   it('merges class names', () => {
@@ -31,6 +31,34 @@ describe('asString', () => {
   })
 })
 
+describe('toDisplayName', () => {
+  it('takes the first name and the initial of the second name', () => {
+    expect(toDisplayName('Rabie Menad')).toBe('Rabie. M')
+    expect(toDisplayName('Jean Dupont')).toBe('Jean. D')
+    expect(toDisplayName('Marie Claire Dubois')).toBe('Marie. C')
+  })
+
+  it('falls back to the first name if there is no second name', () => {
+    expect(toDisplayName('Cher')).toBe('Cher.')
+    expect(toDisplayName('john-doe')).toBe('john-doe.')
+  })
+
+  it('ignores extra whitespace', () => {
+    expect(toDisplayName('  Marie   Curie  ')).toBe('Marie. C')
+    expect(toDisplayName('\tAda\nLovelace ')).toBe('Ada. L')
+  })
+
+  it('handles too-short input', () => {
+    expect(toDisplayName('X')).toBe('X.')
+    expect(toDisplayName('   ')).toBe('.')
+  })
+
+  it('falls back to N/C when there is no name', () => {
+    expect(toDisplayName(null)).toBe('N/C')
+    expect(toDisplayName('')).toBe('N/C')
+  })
+})
+
 describe('toInitials', () => {
   it('takes the first letter of the two first words', () => {
     expect(toInitials('Rabie Menad')).toBe('RM')
@@ -50,7 +78,11 @@ describe('toInitials', () => {
 
   it('handles too-short input', () => {
     expect(toInitials('X')).toBe('X')
-    expect(toInitials('')).toBe('')
     expect(toInitials('   ')).toBe('')
+  })
+
+  it('falls back to N/C when there is no name', () => {
+    expect(toInitials(null)).toBe('N/C')
+    expect(toInitials('')).toBe('N/C')
   })
 })

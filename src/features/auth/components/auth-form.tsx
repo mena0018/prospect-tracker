@@ -22,7 +22,7 @@ export function AuthForm() {
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           {isSignin ? 'Bon retour' : 'Créer votre compte'}
         </h1>
-        <p className="text-muted-foreground text-[15px]">
+        <p className="text-muted-foreground">
           {isSignin
             ? 'Reprenez le suivi de votre prospection.'
             : 'Commencez à suivre votre prospection.'}

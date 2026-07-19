@@ -30,22 +30,21 @@ function circularReveal(origin: HTMLElement, toggleTheme: () => void) {
 }
 
 type Props = {
-  size?: 'icon' | 'icon-sm'
   className?: string
 }
 
-export function ThemeToggle({ size = 'icon', className }: Props) {
+export function ThemeToggle({ className }: Props) {
   const { toggleTheme } = useTheme()
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   return (
     <Button
       ref={buttonRef}
-      size={size}
-      className={className}
+      size="icon-md"
       variant="outline"
       title="Changer de thème"
       aria-label="Changer de thème"
+      className={className}
       onClick={() => circularReveal(buttonRef.current!, toggleTheme)}
     >
       <Sun className="scale-0 rotate-90 transition-all dark:scale-100 dark:-rotate-0" />
