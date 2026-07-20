@@ -2,7 +2,7 @@
 
 How authentication works in the app. Reference for DEV-18 and anything that
 touches sessions, cookies, or the `users` row. Implementation lives in
-`src/lib/supabase/` and `src/server/auth.ts`.
+`src/lib/supabase/` and `src/modules/auth/auth-server.ts`.
 
 ## Model
 
@@ -35,7 +35,7 @@ here and must never be `VITE_`-prefixed.
 
 ## Session resolution & provisioning
 
-- **`fetchUser`** (`src/server/auth.ts`) runs in the root `beforeLoad` on every
+- **`fetchUser`** (`src/modules/auth/auth-server.ts`) runs in the root `beforeLoad` on every
   SSR request. Read-only: it verifies the token with `getUser()` and exposes the
   identity — including a `provisioned` flag read from `user_metadata` — via router
   context.

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldAlert, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { signUpFormSchema } from '@/modules/auth/auth-schema'
-import { signUpWithPassword } from '@/server/auth'
+import { signUpWithPassword } from '@/modules/auth/auth-server'
 
 type Props = {
   next: string

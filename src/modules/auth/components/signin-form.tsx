@@ -11,7 +11,7 @@ import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
 import { Button } from '@/components/ui/button'
 import { FieldAlert, FieldGroup } from '@/components/ui/field'
 import { credentialsSchema } from '@/modules/auth/auth-schema'
-import { signInWithPassword } from '@/server/auth'
+import { signInWithPassword } from '@/modules/auth/auth-server'
 
 type Props = {
   next: string

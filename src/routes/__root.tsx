@@ -12,7 +12,7 @@ import {
 import { ErrorState } from '@/components/error-state'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
-import { fetchUser, type AuthUser } from '@/server/auth'
+import { fetchUser, type AuthUser } from '@/modules/auth/auth-server'
 import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
