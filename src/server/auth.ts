@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 
 import { db } from '@/db/client'
-import { credentialsSchema, signUpSchema } from '@/features/auth/auth-schema'
+import { credentialsSchema, signUpSchema } from '@/modules/auth/auth-schema'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
 import { getSupabaseServerClient } from '@/lib/supabase/server'

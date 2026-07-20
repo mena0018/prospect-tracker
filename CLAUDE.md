@@ -28,21 +28,21 @@ Locked decisions (don't revisit without a strong reason):
 ## Repository layout
 
 `src/routes/` (file-based routing: `__root.tsx`, public LP routes, `_authed/*` protected
-dashboard, `api/auth.$.tsx`) · `src/server/` (`createServerFn`) · `src/features/<domain>/`
+dashboard, `api/auth.$.tsx`) · `src/server/` (`createServerFn`) · `src/modules/<domain>/`
 (everything domain-specific, components included) · `src/components/{ui,layout,icons,theme}`
 (cross-cutting only) · `src/db/{schema.ts,client.ts}` · `src/lib/{supabase,resend,stripe}.ts`
 · `drizzle/` (migrations). The Drizzle schema in `src/db/schema.ts` is the source of truth
 for the data model.
 
-- **`src/features/<domain>/`** owns a whole domain: `components/` for its UI, plus flat
-  prefixed modules for the rest (`auth-schema.ts`, `auth-utils.ts`, `use-google-oauth.ts`).
+- **`src/modules/<domain>/`** owns a whole domain: `components/` for its UI, plus flat
+  prefixed files for the rest (`auth-schema.ts`, `auth-utils.ts`, `use-google-oauth.ts`).
   The prefix keeps editor tabs distinguishable — never bare `schema.ts`.
-- **`src/components/` is cross-cutting only** — reusable by any feature, no domain knowledge
-  (`ui/`, `layout/`, `error-state.tsx`). A component only one feature uses belongs in that
-  feature.
+- **`src/components/` is cross-cutting only** — reusable by any module, no domain knowledge
+  (`ui/`, `layout/`, `error-state.tsx`). A component only one module uses belongs in that
+  module.
 - **`src/server/` is a bundler boundary**, not a domain: TanStack Start strips
   `createServerFn` handlers from the client bundle. Keep those files free of anything the
-  client imports (Zod schemas belong in `src/features/`) — a shared const there gets
+  client imports (Zod schemas belong in `src/modules/`) — a shared const there gets
   tree-shaken and reordered, which throws a TDZ `ReferenceError` at runtime.
 
 ## User identity (critical)
