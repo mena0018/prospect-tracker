@@ -7,14 +7,10 @@ Product reference: see `docs/PRD.md`.
 UI copy (tracker labels, buttons, follow-up emails) is in **French** — the target audience is
 French freelancers.
 
-The app and the landing page live in the **same TanStack Start app** (SSR): the LP is public
-routes, the dashboard is protected routes. One repo, one deployment.
-
 ## Stack
 
-TanStack Start (Router + SSR, Nitro runtime) · TanStack Query · TanStack Table · TypeScript
-strict · Tailwind CSS v4 · shadcn/Radix UI · Supabase (Postgres) · Drizzle ORM (+ drizzle-kit)
-· Supabase Auth (`@supabase/ssr`) · Resend · Stripe · PostHog · Vercel.
+Full list in [README.md](README.md). The landing page and the dashboard live in the **same
+TanStack Start app** (SSR): public routes for the LP, `_authed/*` for the dashboard.
 
 Locked decisions (don't revisit without a strong reason):
 
@@ -56,15 +52,10 @@ re-implement auth** — it references the Supabase UUID as its key.
   `on auth.users insert` trigger).
 - All app FKs (`opportunities.user_id`, `reminders`…) point to `users.id`.
 
-## Guest mode & persistence (single source of truth)
+## Guest mode
 
-- **Logged out = ephemeral trial.** Entries live in `localStorage` only. Push account
-  creation early (visible CTA).
-- **One-shot migration on login.** On first dashboard load, if (`localStorage` not empty AND
-  user logged in) → insert entries via a `createServerFn`, then **clear `localStorage`**.
-  Trigger on dashboard load (not in the auth callback) to survive the Google OAuth redirect.
-- **No dedup** at MVP (assumed simplicity).
-- **Logged in = DB is the only source of truth.** No more `localStorage` reads/writes.
+Logged out = `localStorage`-only trial, migrated to the DB once on first dashboard load
+after login. Rules: `docs/reference/guest-mode.md`.
 
 ## Code conventions
 
@@ -77,8 +68,21 @@ re-implement auth** — it references the Supabase UUID as its key.
 - Code comments in English (see the language rule above).
 - **Few comments.** Write only the non-obvious (security constraint, workaround,
   counter-intuitive decision, subtle ordering). No narration that restates the code or a
-  function name. Anything needing real explanation (rationale, architecture, trade-offs) goes
-  in `docs/` (`docs/decisions/` for ADRs), not inline. When in doubt, leave it out.
+  function name. When in doubt, leave it out.
+- **Explanations live in `docs/`, code carries a one-line pointer.** Anything needing real
+  explanation (rationale, architecture, trade-offs, a rule that spans several files) goes in
+  `docs/reference/` (`docs/decisions/` for ADRs). At the code site, leave a single line naming
+  the reason and the file — never paste the explanation inline, and never let a multi-line
+  comment grow where a doc belongs:
+
+  ```ts
+  // Nullable columns need both modifiers — see docs/reference/data-model.md
+  const nullableText = z.string().trim().nullable().optional()
+  ```
+
+  Keep the path complete (clickable in the editor) and skip section anchors — titles change,
+  paths rarely do. Update the doc, not the comment, when the reasoning evolves.
+
 - Env vars in `.env` (never hardcoded, never committed).
 - **Zod validation** (`.validator`) on every `createServerFn` before touching the DB.
 - Strict typing, no `any`, `noUncheckedIndexedAccess` on. Use precise types.
@@ -94,42 +98,23 @@ re-implement auth** — it references the Supabase UUID as its key.
   arbitrary values only where no utility maps (e.g. exact font sizes `text-[12.5px]`, radii
   `rounded-[9px]`).
 
-### Lint & format (ESLint + Prettier)
+### Style
 
-- **Prettier** (`.prettierrc.json`): single quotes, no semicolons, `trailingComma: none`,
-  2-space indent, width 100, JSX double quotes, arrow parens always.
-- **ESLint** (`eslint.config.js`, flat config): `@eslint/js` + `typescript-eslint`
-  (recommended) + `react-hooks` + `react-refresh`, with `eslint-config-prettier` last to
-  disable style rules that would fight Prettier.
-- `react-refresh/only-export-components` is disabled globally (route files export both
-  `Route` and the component by design; feature/component files often export a small constant
-  alongside the component).
-- `src/routeTree.gen.ts` and build dirs are ignored by both.
+Single quotes, no semicolons, `trailingComma: none`, 2-space indent, width 100, JSX double
+quotes, arrow parens always. Config makes the call: `.prettierrc.json`, `eslint.config.js`.
 
-## Tooling
+## Tooling & commands
 
-- **pnpm 10** (`packageManager`), **Node 24** (`.nvmrc`).
-- `husky` + `lint-staged` pre-commit → `eslint --fix` + `prettier --write` on staged files.
-- CI (`.github/workflows/quality-checks.yml`) on PRs to `main`:
-  `install --frozen-lockfile` → `routes:gen` → `lint:ci` → `format:check` → `typecheck` → `test`.
-- `routeTree.gen.ts` is gitignored; regenerate with `pnpm routes:gen` (also `pretypecheck`).
-- Env vars: see `.env.example`.
+pnpm 10, Node 24. Day-to-day scripts in [README.md](README.md); env vars in `.env.example`.
+`husky` + `lint-staged` run `eslint --fix` and `prettier --write` on staged files.
 
-## Commands
+Run the **CI gates** (same as `.github/workflows/quality-checks.yml`) before handing work back:
 
 ```bash
-pnpm dev            # Vite dev server (SSR)
-pnpm build          # Production build (Nitro)
-pnpm start          # Run the built server
-pnpm routes:gen     # Regenerate routeTree.gen.ts (also runs on pretypecheck)
-pnpm typecheck      # tsc --noEmit (routes generated first)
-pnpm lint           # ESLint
-pnpm lint:fix       # ESLint --fix
-pnpm lint:ci        # ESLint --max-warnings 0 (CI gate)
-pnpm format         # Prettier --write
-pnpm format:check   # Prettier --check (CI gate)
-pnpm test           # Vitest run
+pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
 ```
+
+`pnpm routes:gen` regenerates the gitignored `routeTree.gen.ts` (also runs on `pretypecheck`).
 
 ## Critical rules
 
