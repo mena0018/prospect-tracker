@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 import { Link, useSearch } from '@tanstack/react-router'
 
-import { SigninForm } from '@/features/auth/components/signin-form'
-import { SignupForm } from '@/features/auth/components/signup-form'
+import { SigninForm } from '@/modules/auth/components/signin-form'
+import { SignupForm } from '@/modules/auth/components/signup-form'
 import { APP_ROUTES } from '@/lib/routes'
 
 export function AuthForm() {

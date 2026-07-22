@@ -1,7 +1,11 @@
+import type { User } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { getCookies, setCookie, setResponseHeader } from '@tanstack/react-start/server'
 
+import { redirect } from '@tanstack/react-router'
+
 import { env } from '@/lib/env'
+import { APP_ROUTES } from '@/lib/routes'
 
 export function getSupabaseServerClient() {
   return createServerClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
@@ -22,4 +26,15 @@ export function getSupabaseServerClient() {
       }
     }
   })
+}
+
+export async function requireUser(): Promise<User> {
+  const supabase = getSupabaseServerClient()
+  const {
+    data: { user }
+  } = await supabase.auth.getUser()
+
+  if (!user) throw redirect({ to: APP_ROUTES.login })
+
+  return user
 }

@@ -1,8 +1,7 @@
 import type { STAGE_COLOR_TOKENS } from './schema'
 
-// NOT a database seed: nothing is inserted globally. The auth provisioning
-// createServerFn inserts one copy of these per new user (scoped to their
-// user_id) on first login. See docs/decisions/0001-user-configurable-pipeline.md.
+// Not a global seed — copied per user on first login. See
+// docs/decisions/0001-user-configurable-pipeline.md
 
 type StageColorToken = (typeof STAGE_COLOR_TOKENS)[number]
 

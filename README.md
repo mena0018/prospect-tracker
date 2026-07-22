@@ -76,5 +76,7 @@ pnpm test           # Vitest
 - Product requirements: [`docs/PRD.md`](docs/PRD.md)
 - Data model: [`docs/reference/data-model.md`](docs/reference/data-model.md)
 - Auth & SSR: [`docs/reference/auth.md`](docs/reference/auth.md)
+- Data access security: [`docs/reference/data-access-security.md`](docs/reference/data-access-security.md)
+- Guest mode: [`docs/reference/guest-mode.md`](docs/reference/guest-mode.md)
 - Architecture decisions: [`docs/decisions/`](docs/decisions/)
 - Contributor guide & conventions: [`CLAUDE.md`](CLAUDE.md)

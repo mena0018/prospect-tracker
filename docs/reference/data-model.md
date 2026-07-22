@@ -132,6 +132,33 @@ Same pattern as `job_types`. Seeded with 3 defaults on signup.
 | `created_at`       | timestamptz, `now()`                         |                                                          |
 | `updated_at`       | timestamptz, `now()`                         |                                                          |
 
+## Nullable columns in Zod schemas
+
+Nullability maps to **two** Zod modifiers, not one, because `undefined` and `null`
+carry different instructions on a partial update:
+
+| Sent by the client | Means           | Resulting SQL           |
+| ------------------ | --------------- | ----------------------- |
+| key absent         | leave untouched | column not in the `SET` |
+| `null`             | clear the field | `SET esn = NULL`        |
+
+So a nullable column needs both:
+
+```ts
+esn: z.string().trim().nullable().optional()
+//                     ^nullable → { esn: null } clears it
+//                                ^optional → { } leaves it alone
+```
+
+Drop `.optional()` and every update would have to resend `esn`, defeating partial
+updates. Drop `.nullable()` and a filled field could never be emptied again.
+
+A `not null` column gets neither: `recruiter` is required on create, and
+`.partial()` on the update schema adds `.optional()` (skippable) but never
+`.nullable()` (never clearable) — which is exactly the SQL constraint.
+
+See [`opportunities-schema.ts`](../../src/modules/opportunities/opportunities-schema.ts).
+
 ## Foreign-key delete policies
 
 | Relation                          | Policy     | Effect                                                                                                                                       |
@@ -171,3 +198,7 @@ Every application table carries a direct `user_id`, so RLS policies stay trivial
 (`user_id = auth.uid()`). The service-role Drizzle client
 ([`src/db/client.ts`](../src/db/client.ts)) bypasses RLS and is server-only —
 never import it from client code.
+
+RLS therefore guards the public Supabase API, **not** our own server functions;
+those are protected by a `user_id` predicate in every query. See
+[`data-access-security.md`](data-access-security.md) for why both are needed.

@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { APP_ROUTES } from '@/lib/routes'
-import { provisionUser } from '@/server/auth'
+import { provisionUser } from '@/modules/auth/auth-server'
 
 export const Route = createFileRoute('/_authed')({
   beforeLoad: async ({ context, location }) => {

@@ -5,7 +5,12 @@ import { NotFound } from './components/not-found'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: 1, staleTime: 30_000 },
+      mutations: { retry: false }
+    }
+  })
 
   const router = createRouter({
     routeTree,

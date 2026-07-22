@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { AuthForm } from '@/features/auth/components/auth-form'
+import { AuthForm } from '@/modules/auth/components/auth-form'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { APP_ROUTES } from '@/lib/routes'
 

@@ -3,16 +3,16 @@ import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useRouter } from '@tanstack/react-router'
 
-import { EmailField } from '@/features/auth/components/email-field'
-import { toErrorMessage } from '@/features/auth/auth-utils'
-import { OAuthSection } from '@/features/auth/components/oauth-section'
-import { PasswordField } from '@/features/auth/components/password-field'
-import { useGoogleOAuth } from '@/features/auth/use-google-oauth'
+import { EmailField } from '@/modules/auth/components/email-field'
+import { toErrorMessage } from '@/modules/auth/auth-utils'
+import { OAuthSection } from '@/modules/auth/components/oauth-section'
+import { PasswordField } from '@/modules/auth/components/password-field'
+import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
 import { Button } from '@/components/ui/button'
 import { Field, FieldAlert, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { signUpFormSchema } from '@/features/auth/auth-schema'
-import { signUpWithPassword } from '@/server/auth'
+import { signUpFormSchema } from '@/modules/auth/auth-schema'
+import { signUpWithPassword } from '@/modules/auth/auth-server'
 
 type Props = {
   next: string
