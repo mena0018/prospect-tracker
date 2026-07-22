@@ -1,28 +1,57 @@
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
+import { APP_ROUTES } from '@/lib/routes'
+import { cn } from '@/lib/utils'
 
-export function ErrorState({ onRetry }: { onRetry?: () => void }) {
+type Props = Partial<{
+  title: string
+  description: string
+  showHomeLink: boolean
+  variant: 'page' | 'section'
+  onRetry: () => void
+}>
+
+export function ErrorState({
+  title = 'Une erreur est survenue.',
+  description = 'Impossible de charger ces données. Réessayez dans un instant.',
+  variant = 'page',
+  showHomeLink = variant === 'page',
+  onRetry
+}: Props) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
-      <p className="font-mono text-6xl font-bold text-neutral-300 dark:text-neutral-700">!</p>
-      <h1 className="text-2xl font-semibold tracking-tight">Une erreur est survenue</h1>
-      <p className="max-w-sm text-neutral-500 dark:text-neutral-400">
-        Impossible de charger la page. Réessayez dans un instant.
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-4 p-8 text-center',
+        variant === 'page' ? 'min-h-screen' : 'size-full min-h-70'
+      )}
+    >
+      <p
+        className={cn(
+          'text-muted-foreground/40 font-mono font-bold',
+          variant === 'page' ? 'text-6xl' : 'text-4xl'
+        )}
+      >
+        !
       </p>
+      <h2
+        className={cn('font-semibold tracking-tight', variant === 'page' ? 'text-2xl' : 'text-lg')}
+      >
+        {title}
+      </h2>
+      <p className="text-muted-foreground max-w-sm text-sm">{description}</p>
       <div className="mt-2 flex gap-3">
         {onRetry ? (
           <Button type="button" onClick={onRetry}>
             Réessayer
           </Button>
         ) : null}
-        <Link
-          to="/"
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
-        >
-          Retour à l'accueil
-        </Link>
+        {showHomeLink ? (
+          <Button type="button" variant="outline" render={<Link to={APP_ROUTES.home} />}>
+            Retour à l'accueil
+          </Button>
+        ) : null}
       </div>
-    </main>
+    </div>
   )
 }

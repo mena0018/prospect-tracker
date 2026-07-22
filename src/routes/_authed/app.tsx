@@ -1,7 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie } from '@tanstack/react-start/server'
 
+import { ErrorState } from '@/components/error-state'
 import { AppShell } from '@/components/layout/app-shell'
 import { toDisplayName, toInitials } from '@/lib/utils'
 
@@ -10,7 +11,8 @@ const getSidebarState = createServerFn().handler(() => getCookie('sidebar_state'
 
 export const Route = createFileRoute('/_authed/app')({
   loader: () => getSidebarState(),
-  component: Dashboard
+  component: Dashboard,
+  errorComponent: DashboardError
 })
 
 function Dashboard() {
@@ -28,5 +30,16 @@ function Dashboard() {
     >
       <div className="h-full" />
     </AppShell>
+  )
+}
+
+function DashboardError() {
+  const router = useRouter()
+
+  return (
+    <ErrorState
+      description="Impossible de charger votre tableau de bord. Réessayez dans un instant."
+      onRetry={() => router.invalidate()}
+    />
   )
 }

@@ -1,9 +1,11 @@
+import { redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 
 import { db } from '@/db/client'
 import { credentialsSchema, signUpSchema } from '@/modules/auth/auth-schema'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
+import { APP_ROUTES } from '@/lib/routes'
 import { getSupabaseServerClient, requireUser } from '@/lib/supabase/server'
 import { asString } from '@/lib/utils'
 
@@ -58,8 +60,8 @@ export const signUpWithPassword = createServerFn({ method: 'POST' })
 export const provisionUser = createServerFn({ method: 'POST' }).handler(async (): Promise<User> => {
   const user = await requireUser()
 
-  // users.email is NOT NULL, so an account without one can't be provisioned.
-  if (!user.email) throw new Error('Unauthorized')
+  // An account without email can't be provisioned: send them back rather than half-creating a row.
+  if (!user.email) throw redirect({ to: APP_ROUTES.login })
 
   const authUser = { id: user.id, email: user.email }
 

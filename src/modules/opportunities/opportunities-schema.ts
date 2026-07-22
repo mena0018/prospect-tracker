@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-// Nullable columns accept null so a partial update can clear them; optional means
-// "field absent, leave untouched".
+// See docs/reference/data-model.md for the nullable + optional rule
 const nullableText = z.string().trim().nullable().optional()
 
 export const opportunityFieldsSchema = z.object({
@@ -25,7 +24,7 @@ export const opportunityFieldsSchema = z.object({
   onsiteDays: z
     .int('Le nombre de jours doit être un entier.')
     .min(0, 'Valeur négative impossible.')
-    .max(7, 'Maximum 7 jours par semaine.')
+    .max(5, 'Maximum 5 jours par semaine.')
     .nullable()
     .optional(),
   location: nullableText,

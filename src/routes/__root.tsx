@@ -11,6 +11,7 @@ import {
 
 import { ErrorState } from '@/components/error-state'
 import { ThemeProvider } from '@/components/theme/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
 import { fetchUser, type AuthUser } from '@/modules/auth/auth-server'
 import appCss from '@/styles/globals.css?url'
@@ -61,6 +62,7 @@ function RootDocument({ children }: { children: ReactNode }) {
       <body suppressHydrationWarning>
         <ThemeProvider defaultTheme={DEFAULT_THEME} storageKey={THEME_STORAGE_KEY}>
           {children}
+          <Toaster position="top-right" richColors closeButton />
         </ThemeProvider>
         <Scripts />
       </body>
