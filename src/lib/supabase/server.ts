@@ -1,3 +1,4 @@
+import type { User } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { getCookies, setCookie, setResponseHeader } from '@tanstack/react-start/server'
 
@@ -22,4 +23,15 @@ export function getSupabaseServerClient() {
       }
     }
   })
+}
+
+export async function requireUser(): Promise<User> {
+  const supabase = getSupabaseServerClient()
+  const {
+    data: { user }
+  } = await supabase.auth.getUser()
+
+  if (!user) throw new Error('Unauthorized')
+
+  return user
 }

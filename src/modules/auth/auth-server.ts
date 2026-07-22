@@ -4,7 +4,7 @@ import { db } from '@/db/client'
 import { credentialsSchema, signUpSchema } from '@/modules/auth/auth-schema'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
-import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getSupabaseServerClient, requireUser } from '@/lib/supabase/server'
 import { asString } from '@/lib/utils'
 
 export type AuthUser = {
@@ -55,17 +55,11 @@ export const signUpWithPassword = createServerFn({ method: 'POST' })
     return { error: error ? error.message : null }
   })
 
-// Auth is re-checked here because route guards don't protect server functions:
-// they're independently reachable RPC endpoints.
 export const provisionUser = createServerFn({ method: 'POST' }).handler(async (): Promise<User> => {
-  const supabase = getSupabaseServerClient()
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
+  const user = await requireUser()
 
-  if (!user || !user.email) {
-    throw new Error('Unauthorized')
-  }
+  // users.email is NOT NULL, so an account without one can't be provisioned.
+  if (!user.email) throw new Error('Unauthorized')
 
   const authUser = { id: user.id, email: user.email }
 
@@ -116,7 +110,7 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
     })
 
     // Set only after the DB succeeds, so a failed provisioning is retried.
-    await supabase.auth.updateUser({ data: { provisioned: true } })
+    await getSupabaseServerClient().auth.updateUser({ data: { provisioned: true } })
 
     return dbUser
   } catch (err) {
