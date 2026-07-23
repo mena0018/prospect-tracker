@@ -78,5 +78,6 @@ pnpm test           # Vitest
 - Auth & SSR: [`docs/reference/auth.md`](docs/reference/auth.md)
 - Data access security: [`docs/reference/data-access-security.md`](docs/reference/data-access-security.md)
 - Guest mode: [`docs/reference/guest-mode.md`](docs/reference/guest-mode.md)
+- Internationalization (fr/en): [`docs/reference/i18n.md`](docs/reference/i18n.md)
 - Architecture decisions: [`docs/decisions/`](docs/decisions/)
 - Contributor guide & conventions: [`CLAUDE.md`](CLAUDE.md)

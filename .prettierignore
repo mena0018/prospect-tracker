@@ -5,6 +5,10 @@ node_modules
 dist
 pnpm-lock.yaml
 src/routeTree.gen.ts
+src/i18n/paraglide
+project.inlang/.meta.json
+project.inlang/README.md
+project.inlang/cache
 
 drizzle/meta
 

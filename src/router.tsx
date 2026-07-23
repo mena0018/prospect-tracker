@@ -2,6 +2,7 @@ import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { NotFound } from './components/not-found'
+import { deLocalizeUrl, localizeUrl } from './i18n/paraglide/runtime'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -17,7 +18,11 @@ export function getRouter() {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreload: 'intent',
-    defaultNotFoundComponent: () => <NotFound />
+    defaultNotFoundComponent: () => <NotFound />,
+    rewrite: {
+      input: ({ url }) => deLocalizeUrl(url),
+      output: ({ url }) => localizeUrl(url)
+    }
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient })

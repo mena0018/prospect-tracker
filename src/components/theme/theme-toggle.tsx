@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 
 import { useTheme } from '@/components/theme/theme-provider'
 import { Button } from '@/components/ui/button'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 const DURATION = 450
 
@@ -34,16 +35,17 @@ type Props = {
 }
 
 export function ThemeToggle({ className }: Props) {
+  const isMobile = useIsMobile()
   const { toggleTheme } = useTheme()
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   return (
     <Button
       ref={buttonRef}
-      size="icon-md"
       variant="outline"
       title="Changer de thème"
       aria-label="Changer de thème"
+      size={isMobile ? 'icon-sm' : 'icon-md'}
       className={className}
       onClick={() => circularReveal(buttonRef.current!, toggleTheme)}
     >

@@ -15,6 +15,7 @@ export default tseslint.config(
       '.vercel',
       'dist',
       'src/routeTree.gen.ts',
+      'src/i18n/paraglide',
       'drizzle/meta'
     ]
   },
