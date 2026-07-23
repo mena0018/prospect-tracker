@@ -1,8 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { AuthForm } from '@/modules/auth/components/auth-form'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
 import { APP_ROUTES } from '@/lib/routes'
 
@@ -40,10 +41,9 @@ function LoginPage() {
 
         <figure className="relative max-w-sm space-y-5">
           <blockquote className="text-foreground font-heading text-xl leading-relaxed font-medium text-balance">
-            « Avant, mes relances vivaient dans un coin de tête. Maintenant je sais quoi faire, et
-            quand. »
+            {m.auth_quote()}
           </blockquote>
-          <figcaption className="text-text-soft text-sm">Sofia · développeuse freelance</figcaption>
+          <figcaption className="text-text-soft text-sm">{m.auth_quoteAuthor()}</figcaption>
         </figure>
       </aside>
 

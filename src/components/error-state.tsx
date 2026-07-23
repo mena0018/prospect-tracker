@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
+import { m } from '@/i18n/paraglide/messages'
 import { APP_ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
@@ -13,8 +14,8 @@ type Props = Partial<{
 }>
 
 export function ErrorState({
-  title = 'Une erreur est survenue.',
-  description = 'Impossible de charger ces données. Réessayez dans un instant.',
+  title = m.error_title(),
+  description = m.error_description(),
   variant = 'page',
   showHomeLink = variant === 'page',
   onRetry
@@ -43,12 +44,12 @@ export function ErrorState({
       <div className="mt-2 flex gap-3">
         {onRetry ? (
           <Button type="button" onClick={onRetry}>
-            Réessayer
+            {m.common_retry()}
           </Button>
         ) : null}
         {showHomeLink ? (
           <Button type="button" variant="outline" render={<Link to={APP_ROUTES.home} />}>
-            Retour à l'accueil
+            {m.common_backHome()}
           </Button>
         ) : null}
       </div>

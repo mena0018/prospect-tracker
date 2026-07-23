@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
+import { m } from '@/i18n/paraglide/messages'
 import { toErrorMessage } from '@/lib/error'
 
 type Options = Partial<{
@@ -10,9 +11,9 @@ type Options = Partial<{
 
 export function useErrorToast() {
   return useCallback((error: unknown, { title, onRetry }: Options = {}) => {
-    toast.error(title ?? 'Une erreur est survenue.', {
+    toast.error(title ?? m.error_title(), {
       description: toErrorMessage(error),
-      action: onRetry ? { label: 'Réessayer', onClick: onRetry } : undefined
+      action: onRetry ? { label: m.common_retry(), onClick: onRetry } : undefined
     })
   }, [])
 }

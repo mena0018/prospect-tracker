@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { m } from '@/i18n/paraglide/messages'
 import { API_ROUTES } from '@/lib/routes'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -26,7 +27,9 @@ type ProfileAvatarProps = {
 
 function ProfileAvatar({ avatarUrl, initials, className }: ProfileAvatarProps) {
   if (avatarUrl) {
-    return <img src={avatarUrl} alt="Avatar" className={cn('object-cover', className)} />
+    return (
+      <img src={avatarUrl} alt={m.profile_avatarAlt()} className={cn('object-cover', className)} />
+    )
   }
   return (
     <span className={cn('bg-surface-2 text-text-soft font-semibold', className)}>{initials}</span>
@@ -77,11 +80,11 @@ export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
         <div className="flex flex-col gap-0.75 p-1.5">
           <DropdownMenuItem className={ITEM_CLASS}>
             <UserIcon />
-            Compte
+            {m.profile_account()}
           </DropdownMenuItem>
           <DropdownMenuItem className={ITEM_CLASS}>
             <Bell />
-            Notifications
+            {m.profile_notifications()}
           </DropdownMenuItem>
         </div>
 
@@ -90,7 +93,7 @@ export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
         <div className="p-1.5">
           <DropdownMenuItem className={ITEM_CLASS} onClick={handleLogout}>
             <LogOut />
-            Se déconnecter
+            {m.profile_signOut()}
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

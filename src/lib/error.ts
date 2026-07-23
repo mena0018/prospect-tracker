@@ -1,22 +1,28 @@
-export const ERROR_MESSAGES = {
-  NOT_FOUND: "Cet élément n'existe plus. Il a peut-être été supprimé.",
-  FORBIDDEN: "Vous n'avez pas accès à cet élément.",
-  VALIDATION: 'Certaines informations sont invalides. Vérifiez les champs du formulaire.',
-  CONFLICT: 'Cet élément a été modifié entre-temps. Rechargez pour voir la dernière version.',
-  RATE_LIMITED: 'Trop de tentatives. Patientez quelques instants avant de réessayer.',
-  SERVER: 'Une erreur est survenue de notre côté. Réessayez dans un instant.'
+import { m } from '@/i18n/paraglide/messages'
+
+// Codes cross the RPC boundary, not messages: only `error.message` survives it, and a
+// translated string could not be matched back reliably. See docs/reference/i18n.md
+const ERROR_MESSAGES = {
+  NOT_FOUND: m.error_notFound,
+  FORBIDDEN: m.error_forbidden,
+  VALIDATION: m.error_validation,
+  CONFLICT: m.error_conflict,
+  RATE_LIMITED: m.error_rateLimited,
+  SERVER: m.error_server
 } as const
 
 type ErrorCode = keyof typeof ERROR_MESSAGES
 
-const ALLOWED_MESSAGES: readonly string[] = Object.values(ERROR_MESSAGES)
-
-export function appError(code: ErrorCode) {
-  return new Error(ERROR_MESSAGES[code])
+function isErrorCode(value: string): value is ErrorCode {
+  return value in ERROR_MESSAGES
 }
 
-// Replace a message we didn't author (crash, network drop): it could leak internals
+export function appError(code: ErrorCode) {
+  return new Error(code)
+}
+
+// An unknown message (crash, network drop) is replaced: it could leak internals
 export function toErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : null
-  return message && ALLOWED_MESSAGES.includes(message) ? message : ERROR_MESSAGES.SERVER
+  const code = error instanceof Error ? error.message : null
+  return code && isErrorCode(code) ? ERROR_MESSAGES[code]() : ERROR_MESSAGES.SERVER()
 }

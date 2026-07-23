@@ -1,37 +1,48 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
+
+import { m } from '@/i18n/paraglide/messages'
 
 // See docs/reference/data-model.md for the nullable + optional rule
 const nullableText = z.string().trim().nullable().optional()
 
 export const opportunityFieldsSchema = z.object({
-  stageId: z.uuid("L'étape est obligatoire."),
+  stageId: z.uuid({ error: () => m.validation_stageRequired() }),
   jobTypeId: z.uuid().nullable().optional(),
   experienceId: z.uuid().nullable().optional(),
   recruiter: z
     .string()
     .trim()
-    .min(1, 'Indiquez le nom du recruteur.')
-    .max(200, 'Nom trop long (200 max).'),
+    .min(1, { error: () => m.validation_recruiterRequired() })
+    .max(200, { error: () => m.validation_recruiterTooLong() }),
   esn: nullableText,
   endClient: nullableText,
   need: nullableText,
   dailyRate: z
-    .int('Le TJM doit être un nombre entier.')
-    .min(0, 'Le TJM ne peut pas être négatif.')
-    .max(10000, 'TJM trop élevé (10 000 max).')
+    .int({ error: () => m.validation_dailyRateInt() })
+    .min(0, { error: () => m.validation_dailyRateNegative() })
+    .max(10000, { error: () => m.validation_dailyRateTooHigh() })
     .nullable()
     .optional(),
   onsiteDays: z
-    .int('Le nombre de jours doit être un entier.')
-    .min(0, 'Valeur négative impossible.')
-    .max(5, 'Maximum 5 jours par semaine.')
+    .int({ error: () => m.validation_onsiteDaysInt() })
+    .min(0, { error: () => m.validation_onsiteDaysNegative() })
+    .max(5, { error: () => m.validation_onsiteDaysMax() })
     .nullable()
     .optional(),
   location: nullableText,
-  lastContactAt: z.iso.date('Date invalide.').nullable().optional(),
-  nextReminderAt: z.iso.date('Date invalide.').nullable().optional(),
+  lastContactAt: z.iso
+    .date({ error: () => m.validation_dateInvalid() })
+    .nullable()
+    .optional(),
+  nextReminderAt: z.iso
+    .date({ error: () => m.validation_dateInvalid() })
+    .nullable()
+    .optional(),
   phone: nullableText,
-  offerUrl: z.url("Lien de l'offre invalide.").nullable().optional(),
+  offerUrl: z
+    .url({ error: () => m.validation_offerUrlInvalid() })
+    .nullable()
+    .optional(),
   notes: nullableText,
   isPinned: z.boolean().optional(),
   isArchived: z.boolean().optional()

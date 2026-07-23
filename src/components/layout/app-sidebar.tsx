@@ -60,20 +60,20 @@ export function AppSidebar({ profile }: Props) {
             <SidebarMenuItem>
               <SidebarMenuButton isActive render={<a href="#" />}>
                 <ListFilter />
-                Tracker
+                {m.nav_tracker()}
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton render={<a href="#" />}>
                 <CustomizeIcon />
-                Personnaliser
+                {m.nav_customize()}
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
 
         <SidebarGroup className="mt-5.5 min-h-0 shrink-0 px-2.75 py-0">
-          <SidebarGroupLabel>Pipeline</SidebarGroupLabel>
+          <SidebarGroupLabel>{m.nav_pipeline()}</SidebarGroupLabel>
           <SidebarGroupContent className="min-h-0">
             {PIPELINE_STAGES.map((stage) => (
               <div
@@ -96,7 +96,7 @@ export function AppSidebar({ profile }: Props) {
         </SidebarGroup>
 
         <SidebarGroup className="mt-6.5 shrink-0 px-2.75 py-0">
-          <SidebarGroupLabel>Relances</SidebarGroupLabel>
+          <SidebarGroupLabel>{m.nav_followUps()}</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="border-primary/15 bg-sidebar-accent rounded-xl border px-3.25 pt-3.25 pb-3">
               <div className="flex items-center gap-2.5">
@@ -108,14 +108,14 @@ export function AppSidebar({ profile }: Props) {
                     <span className="text-foreground text-lg font-bold tracking-tight tabular-nums">
                       {RELANCE.count}
                     </span>
-                    <span className="text-text-soft text-xs">à relancer</span>
+                    <span className="text-text-soft text-xs">{m.followUp_toContact()}</span>
                   </div>
-                  <div className="text-muted-foreground text-2xs">c’est là que ça se joue.</div>
+                  <div className="text-muted-foreground text-2xs">{m.followUp_tagline()}</div>
                 </div>
               </div>
               <div className="mt-3.25">
                 <div className="text-text-soft text-2xs mb-1.5 flex items-center justify-between">
-                  <span>Objectif de la semaine</span>
+                  <span>{m.followUp_weeklyGoal()}</span>
                   <span className="text-foreground font-semibold tabular-nums">
                     {RELANCE.done}/{RELANCE.goal}
                   </span>
@@ -131,7 +131,7 @@ export function AppSidebar({ profile }: Props) {
                 type="button"
                 className="mt-3.25 h-9 w-full gap-1.5 rounded-lg text-xs font-semibold [&_svg]:size-3.5"
               >
-                Lancer les relances
+                {m.followUp_start()}
                 <ArrowRight />
               </Button>
             </div>
@@ -147,7 +147,7 @@ export function AppSidebar({ profile }: Props) {
               render={<a href={EXTERNAL_LINKS.invite} />}
             >
               <Send />
-              Inviter un ami
+              {m.nav_inviteFriend()}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -159,7 +159,7 @@ export function AppSidebar({ profile }: Props) {
               render={<a href={EXTERNAL_LINKS.help} />}
             >
               <HelpCircle />
-              Aide
+              {m.nav_help()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -168,7 +168,7 @@ export function AppSidebar({ profile }: Props) {
               render={<a href={EXTERNAL_LINKS.linkedin} target="_blank" rel="noreferrer" />}
             >
               <LinkedInIcon />
-              Mon LinkedIn
+              {m.nav_myLinkedin()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -177,7 +177,7 @@ export function AppSidebar({ profile }: Props) {
               render={<a href={EXTERNAL_LINKS.feedback} />}
             >
               <MessageCircle />
-              Donner un feedback
+              {m.nav_giveFeedback()}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
