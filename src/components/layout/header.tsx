@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
 
 type Props = {
@@ -27,6 +28,7 @@ export function Header({ subtitle }: Props) {
         </div>
       </div>
       <div className="flex flex-none items-center gap-2.25">
+        <LocaleSwitcher />
         <ThemeToggle />
         <Button size="md" className="font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
           <Plus />

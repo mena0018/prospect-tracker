@@ -1,4 +1,3 @@
-import { translatedPathnames } from './src/i18n/lib'
 import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -22,8 +21,7 @@ export default defineConfig({
       outdir: './src/i18n/paraglide',
       outputStructure: 'message-modules',
       cookieName: 'PARAGLIDE_LOCALE',
-      strategy: ['url', 'cookie', 'preferredLanguage', 'baseLocale'],
-      urlPatterns: translatedPathnames
+      strategy: ['url', 'cookie', 'preferredLanguage', 'baseLocale']
     }),
 
     // tanstackStart() must come before viteReact()

@@ -3,6 +3,7 @@ import { z } from 'zod/v4'
 
 import { AuthForm } from '@/modules/auth/components/auth-form'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
 import { APP_ROUTES } from '@/lib/routes'
@@ -57,7 +58,8 @@ function LoginPage() {
               {CONFIG.brand}
             </span>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2.25">
+            <LocaleSwitcher />
             <ThemeToggle />
           </div>
         </div>
