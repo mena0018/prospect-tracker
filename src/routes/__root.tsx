@@ -16,6 +16,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
 import { fetchUser, type AuthUser } from '@/modules/auth/auth-server'
 import { getLocale, shouldRedirect } from '@/i18n/paraglide/runtime'
+import { CONFIG } from '@/lib/config'
 import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -34,7 +35,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'ProspectTracker' }
+      { title: CONFIG.brand }
     ],
     links: [
       { rel: 'stylesheet', href: appCss },

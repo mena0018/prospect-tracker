@@ -17,6 +17,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
+import { m } from '@/i18n/paraglide/messages'
+import { CONFIG } from '@/lib/config'
 import { EXTERNAL_LINKS } from '@/lib/routes'
 
 // Placeholder figures — replaced by real pipeline/relance data in DEV-21.
@@ -43,11 +45,11 @@ export function AppSidebar({ profile }: Props) {
       <SidebarHeader className="gap-0 p-0 px-4 pt-4.5">
         <div className="flex items-center gap-2.75 px-1.5 pt-1.5 pb-5">
           <div className="bg-primary text-primary-foreground tracking-title flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold">
-            PT
+            {CONFIG.brandInitials}
           </div>
           <div className="flex flex-col leading-[1.15]">
-            <span className="text-foreground tracking-title font-semibold">ProspectTracker</span>
-            <span className="text-muted-foreground text-2xs">Suivi de prospection</span>
+            <span className="text-foreground tracking-title font-semibold">{CONFIG.brand}</span>
+            <span className="text-muted-foreground text-2xs">{m.common_tagline()}</span>
           </div>
         </div>
       </SidebarHeader>

@@ -1,5 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "common_localeName": "English",
-  "common_switchLocale": "Language"
+  "common_switchLocale": "Language",
+  "common_tagline": "Prospecting tracker"
 }

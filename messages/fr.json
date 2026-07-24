@@ -1,5 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "common_localeName": "Français",
-  "common_switchLocale": "Langue"
+  "common_switchLocale": "Langue",
+  "common_tagline": "Suivi de prospection"
 }

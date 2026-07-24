@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { AuthForm } from '@/modules/auth/components/auth-form'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { CONFIG } from '@/lib/config'
 import { APP_ROUTES } from '@/lib/routes'
 
 const searchSchema = z.object({
@@ -32,9 +33,9 @@ function LoginPage() {
 
         <div className="relative flex items-center gap-3">
           <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg text-sm font-semibold tracking-tight">
-            PT
+            {CONFIG.brandInitials}
           </div>
-          <span className="text-foreground text-lg font-bold tracking-tight">ProspectTracker</span>
+          <span className="text-foreground text-lg font-bold tracking-tight">{CONFIG.brand}</span>
         </div>
 
         <figure className="relative max-w-sm space-y-5">
@@ -50,10 +51,10 @@ function LoginPage() {
         <div className="flex items-center justify-between px-6 py-5 md:px-10">
           <div className="flex items-center gap-2.5 lg:hidden">
             <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg text-xs font-semibold tracking-tight">
-              PT
+              {CONFIG.brandInitials}
             </div>
             <span className="text-foreground text-sm font-semibold tracking-tight">
-              ProspectTracker
+              {CONFIG.brand}
             </span>
           </div>
           <div className="ml-auto">
