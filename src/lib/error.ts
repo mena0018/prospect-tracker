@@ -1,7 +1,6 @@
 import { m } from '@/i18n/paraglide/messages'
 
-// Codes cross the RPC boundary, not messages: only `error.message` survives it, and a
-// translated string could not be matched back reliably. See docs/reference/i18n.md
+// Functions, not calls — calling m.*() here freezes the locale. See docs/reference/i18n.md
 const ERROR_MESSAGES = {
   NOT_FOUND: m.error_notFound,
   FORBIDDEN: m.error_forbidden,
@@ -24,5 +23,7 @@ export function appError(code: ErrorCode) {
 // An unknown message (crash, network drop) is replaced: it could leak internals
 export function toErrorMessage(error: unknown): string {
   const code = error instanceof Error ? error.message : null
-  return code && isErrorCode(code) ? ERROR_MESSAGES[code]() : ERROR_MESSAGES.SERVER()
+  const message = code && isErrorCode(code) ? ERROR_MESSAGES[code] : ERROR_MESSAGES.SERVER
+
+  return message()
 }
