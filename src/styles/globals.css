@@ -9,12 +9,7 @@
 :root {
   --background: oklch(0.97 0.001 286.4);
   --foreground: oklch(0.21 0.006 285.9);
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.973 0.001 286.4);
-  --text-soft: oklch(0.442 0.015 285.8);
   --border-soft: oklch(0.959 0.003 286.3);
-  --aside-bg: oklch(1 0 0);
-  --aside-border: oklch(0.944 0.004 286.3);
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.21 0.006 285.9);
@@ -47,12 +42,7 @@
 .dark {
   --background: oklch(0.165 0.004 285.9);
   --foreground: oklch(0.967 0.001 286.4);
-  --surface: oklch(0.21 0.006 285.9);
-  --surface-2: oklch(0.298 0.008 285.9);
-  --text-soft: oklch(0.712 0.013 286.1);
   --border-soft: oklch(0.258 0.007 285.9);
-  --aside-bg: oklch(0.21 0.006 285.9);
-  --aside-border: oklch(0.287 0.007 285.9);
 
   --card: oklch(0.21 0.006 285.9);
   --card-foreground: oklch(0.967 0.001 286.4);
@@ -87,12 +77,7 @@
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
   --tracking-title: -0.2px;
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-text-soft: var(--text-soft);
   --color-border-soft: var(--border-soft);
-  --color-aside: var(--aside-bg);
-  --color-aside-border: var(--aside-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

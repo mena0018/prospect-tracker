@@ -5,6 +5,7 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
+  redirect,
   Scripts,
   useRouter
 } from '@tanstack/react-router'
@@ -14,10 +15,19 @@ import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
 import { fetchUser, type AuthUser } from '@/modules/auth/auth-server'
+import { getLocale, shouldRedirect } from '@/i18n/paraglide/runtime'
+import { CONFIG } from '@/lib/config'
 import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async (): Promise<{ user: AuthUser | null }> => {
+    if (typeof window !== 'undefined') {
+      const decision = await shouldRedirect({ url: window.location.href })
+      if (decision.redirectUrl) {
+        throw redirect({ href: decision.redirectUrl.href })
+      }
+    }
+
     const user = await fetchUser()
     return { user }
   },
@@ -25,7 +35,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'ProspectTracker' }
+      { title: CONFIG.brand }
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
@@ -55,7 +65,7 @@ function RootErrorComponent() {
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={getLocale()} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

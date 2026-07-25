@@ -2,6 +2,7 @@ import type { AnyFieldApi } from '@tanstack/react-form'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { m } from '@/i18n/paraglide/messages'
 
 type Props = {
   field: AnyFieldApi
@@ -14,7 +15,7 @@ export function EmailField({ field, autoComplete, onSync }: Props) {
 
   return (
     <Field data-invalid={isInvalid}>
-      <FieldLabel htmlFor={field.name}>Adresse email</FieldLabel>
+      <FieldLabel htmlFor={field.name}>{m.auth_emailLabel()}</FieldLabel>
       <Input
         id={field.name}
         name={field.name}
@@ -27,7 +28,7 @@ export function EmailField({ field, autoComplete, onSync }: Props) {
         aria-invalid={isInvalid}
         type="email"
         autoComplete={autoComplete}
-        placeholder="nom@exemple.com"
+        placeholder={m.auth_emailPlaceholder()}
       />
       {isInvalid ? <FieldError errors={field.state.meta.errors} /> : null}
     </Field>

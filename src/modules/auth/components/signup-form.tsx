@@ -11,6 +11,7 @@ import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
 import { Button } from '@/components/ui/button'
 import { Field, FieldAlert, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { m } from '@/i18n/paraglide/messages'
 import { signUpFormSchema } from '@/modules/auth/auth-schema'
 import { signUpWithPassword } from '@/modules/auth/auth-server'
 
@@ -57,7 +58,7 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
 
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Nom complet</FieldLabel>
+                <FieldLabel htmlFor={field.name}>{m.auth_fullNameLabel()}</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -66,7 +67,7 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
                   onChange={(e) => field.handleChange(e.target.value)}
                   aria-invalid={isInvalid}
                   autoComplete="name"
-                  placeholder="Alex Laurent"
+                  placeholder={m.auth_fullNamePlaceholder()}
                 />
                 {isInvalid ? <FieldError errors={field.state.meta.errors} /> : null}
               </Field>
@@ -82,7 +83,7 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
           {(field) => (
             <PasswordField
               field={field}
-              label="Mot de passe"
+              label={m.auth_passwordLabel()}
               autoComplete="new-password"
               shown={showPassword}
               onToggle={() => setShowPassword((shown) => !shown)}
@@ -94,7 +95,7 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
           {(field) => (
             <PasswordField
               field={field}
-              label="Confirmer le mot de passe"
+              label={m.auth_confirmPasswordLabel()}
               autoComplete="new-password"
               shown={showPassword}
             />
@@ -115,7 +116,7 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
               loading={isSubmitting}
               disabled={!canSubmit || googleMutation.isPending}
             >
-              Créer mon compte
+              {m.auth_signupSubmit()}
             </Button>
           )}
         </form.Subscribe>

@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { m } from '@/i18n/paraglide/messages'
 
 type Props = {
   field: AnyFieldApi
@@ -30,7 +31,9 @@ export function PasswordField({
         <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
         {/* TODO: link to the reset route once it exists. */}
         {withForgotLink ? (
-          <span className="text-muted-foreground text-xs font-medium">Mot de passe oublié ?</span>
+          <span className="text-muted-foreground text-xs font-medium">
+            {m.auth_forgotPassword()}
+          </span>
         ) : null}
       </div>
       <div className="relative">
@@ -52,8 +55,8 @@ export function PasswordField({
             variant="ghost"
             size="icon-sm"
             tabIndex={-1}
-            title="Afficher / masquer"
-            aria-label={shown ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            title={m.auth_togglePassword()}
+            aria-label={shown ? m.auth_hidePassword() : m.auth_showPassword()}
             onClick={onToggle}
             className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1.5 -translate-y-1/2"
           >

@@ -10,6 +10,7 @@ import { PasswordField } from '@/modules/auth/components/password-field'
 import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
 import { Button } from '@/components/ui/button'
 import { FieldAlert, FieldGroup } from '@/components/ui/field'
+import { m } from '@/i18n/paraglide/messages'
 import { credentialsSchema } from '@/modules/auth/auth-schema'
 import { signInWithPassword } from '@/modules/auth/auth-server'
 
@@ -58,7 +59,7 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
               withForgotLink
               field={field}
               shown={showPassword}
-              label="Mot de passe"
+              label={m.auth_passwordLabel()}
               autoComplete="current-password"
               onToggle={() => setShowPassword((shown) => !shown)}
             />
@@ -79,7 +80,7 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
               loading={isSubmitting}
               disabled={!canSubmit || googleMutation.isPending}
             >
-              Se connecter
+              {m.auth_signinSubmit()}
             </Button>
           )}
         </form.Subscribe>

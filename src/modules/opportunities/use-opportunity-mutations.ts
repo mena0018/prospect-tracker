@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { useErrorToast } from '@/hooks/use-error-toast'
+import { m } from '@/i18n/paraglide/messages'
 import { QUERY_KEYS } from '@/lib/query-key'
 import type {
   CreateOpportunityInput,
@@ -24,7 +25,7 @@ export function useOpportunityMutations() {
     onSettled: invalidateList,
     onError: (error, data) =>
       showErrorToast(error, {
-        title: "Impossible d'ajouter l'opportunité",
+        title: m.opportunity_createFailed(),
         onRetry: () => create.mutate(data)
       })
   })
@@ -34,7 +35,7 @@ export function useOpportunityMutations() {
     onSettled: invalidateList,
     onError: (error, data) =>
       showErrorToast(error, {
-        title: 'Impossible de modifier l’opportunité',
+        title: m.opportunity_updateFailed(),
         onRetry: () => update.mutate(data)
       })
   })
@@ -44,7 +45,7 @@ export function useOpportunityMutations() {
     onSettled: invalidateList,
     onError: (error, id) =>
       showErrorToast(error, {
-        title: 'Impossible de supprimer l’opportunité',
+        title: m.opportunity_deleteFailed(),
         onRetry: () => remove.mutate(id)
       })
   })

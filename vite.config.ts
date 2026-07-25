@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -14,7 +15,22 @@ export default defineConfig({
     include: ['@tanstack/react-form']
   },
 
-  plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/i18n/paraglide',
+      outputStructure: 'message-modules',
+      cookieName: 'PARAGLIDE_LOCALE',
+      strategy: ['url', 'cookie', 'preferredLanguage', 'baseLocale']
+    }),
+
+    // tanstackStart() must come before viteReact()
+    // the router plugin runs before JSX transformation.
+    tailwindcss(),
+    tanstackStart(),
+    nitro(),
+    viteReact()
+  ],
 
   // Deployment preset: Vercel auto-injects NITRO_PRESET=vercel at build time.
   // We set it explicitly for reproducible local/CI builds.

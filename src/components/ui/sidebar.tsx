@@ -244,7 +244,12 @@ function Sidebar({
   )
 }
 
-function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>) {
+function SidebarTrigger({
+  className,
+  onClick,
+  size = 'icon-sm',
+  ...props
+}: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -252,7 +257,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
-      size="icon-sm"
+      size={size}
       className={cn(className)}
       onClick={(event) => {
         onClick?.(event)
@@ -455,13 +460,13 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button group/menu-button text-text-soft ring-sidebar-ring flex w-full items-center gap-2.75 overflow-hidden rounded-lg px-2.75 py-2.25 text-left text-sm font-medium outline-hidden transition-colors group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-surface-2 hover:text-foreground focus-visible:ring-2 active:bg-surface-2 active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-surface-2 data-open:hover:text-foreground data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground data-active:hover:bg-sidebar-accent data-active:hover:text-sidebar-accent-foreground [&_svg]:size-4.25 [&_svg]:shrink-0 [&>span:last-child]:truncate',
+  "peer/menu-button group/menu-button text-muted-foreground ring-sidebar-ring flex w-full items-center gap-2.75 overflow-hidden rounded-lg px-2.75 py-2.25 text-left text-sm font-medium outline-hidden transition-colors group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-muted hover:text-foreground focus-visible:ring-2 active:bg-muted active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-muted data-open:hover:text-foreground data-active:bg-sidebar-accent data-active:font-semibold data-active:text-sidebar-accent-foreground data-active:hover:bg-sidebar-accent data-active:hover:text-sidebar-accent-foreground [&_svg:not([class*='size-'])]:size-4.25 [&_svg]:shrink-0 [&>span:last-child]:truncate",
   {
     variants: {
       variant: {
-        default: 'hover:bg-surface-2 hover:text-foreground',
+        default: 'hover:bg-muted hover:text-foreground',
         outline:
-          'bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-surface-2 hover:text-foreground hover:shadow-[0_0_0_1px_var(--sidebar-border)]'
+          'bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-muted hover:text-foreground hover:shadow-[0_0_0_1px_var(--sidebar-border)]'
       },
       size: {
         default: 'h-auto',

@@ -17,6 +17,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
+import { m } from '@/i18n/paraglide/messages'
+import { CONFIG } from '@/lib/config'
 import { EXTERNAL_LINKS } from '@/lib/routes'
 
 // Placeholder figures — replaced by real pipeline/relance data in DEV-21.
@@ -43,11 +45,11 @@ export function AppSidebar({ profile }: Props) {
       <SidebarHeader className="gap-0 p-0 px-4 pt-4.5">
         <div className="flex items-center gap-2.75 px-1.5 pt-1.5 pb-5">
           <div className="bg-primary text-primary-foreground tracking-title flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold">
-            PT
+            {CONFIG.brandInitials}
           </div>
           <div className="flex flex-col leading-[1.15]">
-            <span className="text-foreground tracking-title font-semibold">ProspectTracker</span>
-            <span className="text-muted-foreground text-2xs">Suivi de prospection</span>
+            <span className="text-foreground tracking-title font-semibold">{CONFIG.brand}</span>
+            <span className="text-muted-foreground text-2xs">{m.common_tagline()}</span>
           </div>
         </div>
       </SidebarHeader>
@@ -58,25 +60,25 @@ export function AppSidebar({ profile }: Props) {
             <SidebarMenuItem>
               <SidebarMenuButton isActive render={<a href="#" />}>
                 <ListFilter />
-                Tracker
+                {m.nav_tracker()}
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton render={<a href="#" />}>
                 <CustomizeIcon />
-                Personnaliser
+                {m.nav_customize()}
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
 
         <SidebarGroup className="mt-5.5 min-h-0 shrink-0 px-2.75 py-0">
-          <SidebarGroupLabel>Pipeline</SidebarGroupLabel>
+          <SidebarGroupLabel>{m.nav_pipeline()}</SidebarGroupLabel>
           <SidebarGroupContent className="min-h-0">
             {PIPELINE_STAGES.map((stage) => (
               <div
                 key={stage.label}
-                className="text-text-soft flex items-center justify-between py-1.25 text-xs"
+                className="text-muted-foreground flex items-center justify-between py-1.25 text-xs"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -94,7 +96,7 @@ export function AppSidebar({ profile }: Props) {
         </SidebarGroup>
 
         <SidebarGroup className="mt-6.5 shrink-0 px-2.75 py-0">
-          <SidebarGroupLabel>Relances</SidebarGroupLabel>
+          <SidebarGroupLabel>{m.nav_followUps()}</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="border-primary/15 bg-sidebar-accent rounded-xl border px-3.25 pt-3.25 pb-3">
               <div className="flex items-center gap-2.5">
@@ -106,14 +108,14 @@ export function AppSidebar({ profile }: Props) {
                     <span className="text-foreground text-lg font-bold tracking-tight tabular-nums">
                       {RELANCE.count}
                     </span>
-                    <span className="text-text-soft text-xs">à relancer</span>
+                    <span className="text-muted-foreground text-xs">{m.followUp_toContact()}</span>
                   </div>
-                  <div className="text-muted-foreground text-2xs">c’est là que ça se joue.</div>
+                  <div className="text-muted-foreground text-2xs">{m.followUp_tagline()}</div>
                 </div>
               </div>
               <div className="mt-3.25">
-                <div className="text-text-soft text-2xs mb-1.5 flex items-center justify-between">
-                  <span>Objectif de la semaine</span>
+                <div className="text-muted-foreground text-2xs mb-1.5 flex items-center justify-between">
+                  <span>{m.followUp_weeklyGoal()}</span>
                   <span className="text-foreground font-semibold tabular-nums">
                     {RELANCE.done}/{RELANCE.goal}
                   </span>
@@ -125,11 +127,8 @@ export function AppSidebar({ profile }: Props) {
                   />
                 </div>
               </div>
-              <Button
-                type="button"
-                className="mt-3.25 h-9 w-full gap-1.5 rounded-lg text-xs font-semibold [&_svg]:size-3.5"
-              >
-                Lancer les relances
+              <Button type="button" size="sm" className="mt-3.25 h-9 w-full font-semibold">
+                {m.followUp_start()}
                 <ArrowRight />
               </Button>
             </div>
@@ -141,11 +140,11 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-text-soft h-auto gap-2.5 px-2.75 py-2 text-xs font-medium [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-2 text-xs font-medium"
               render={<a href={EXTERNAL_LINKS.invite} />}
             >
-              <Send />
-              Inviter un ami
+              <Send className="size-3.75" />
+              {m.nav_inviteFriend()}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -153,29 +152,29 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.help} />}
             >
-              <HelpCircle />
-              Aide
+              <HelpCircle className="size-3.75" />
+              {m.nav_help()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.linkedin} target="_blank" rel="noreferrer" />}
             >
-              <LinkedInIcon />
-              Mon LinkedIn
+              <LinkedInIcon className="size-3.75" />
+              {m.nav_myLinkedin()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.feedback} />}
             >
-              <MessageCircle />
-              Donner un feedback
+              <MessageCircle className="size-3.75" />
+              {m.nav_giveFeedback()}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

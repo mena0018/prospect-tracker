@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 
 import { useTheme } from '@/components/theme/theme-provider'
 import { Button } from '@/components/ui/button'
+import { m } from '@/i18n/paraglide/messages'
 
 const DURATION = 450
 
@@ -40,10 +41,10 @@ export function ThemeToggle({ className }: Props) {
   return (
     <Button
       ref={buttonRef}
-      size="icon-md"
       variant="outline"
-      title="Changer de thème"
-      aria-label="Changer de thème"
+      title={m.theme_toggle()}
+      aria-label={m.theme_toggle()}
+      size="icon-responsive"
       className={className}
       onClick={() => circularReveal(buttonRef.current!, toggleTheme)}
     >

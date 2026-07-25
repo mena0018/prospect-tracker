@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { m } from '@/i18n/paraglide/messages'
 import { API_ROUTES } from '@/lib/routes'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -26,15 +27,19 @@ type ProfileAvatarProps = {
 
 function ProfileAvatar({ avatarUrl, initials, className }: ProfileAvatarProps) {
   if (avatarUrl) {
-    return <img src={avatarUrl} alt="Avatar" className={cn('object-cover', className)} />
+    return (
+      <img src={avatarUrl} alt={m.profile_avatarAlt()} className={cn('object-cover', className)} />
+    )
   }
   return (
-    <span className={cn('bg-surface-2 text-text-soft font-semibold', className)}>{initials}</span>
+    <span className={cn('bg-muted text-muted-foreground font-semibold', className)}>
+      {initials}
+    </span>
   )
 }
 
 const ITEM_CLASS =
-  'text-text-soft gap-2.5 rounded-lg px-2.25 py-2 text-xs font-medium [&_svg]:size-3.75!'
+  "text-muted-foreground gap-2.5 rounded-lg px-2.25 py-2 text-xs font-medium [&_svg:not([class*='size-'])]:size-3.75"
 
 async function handleLogout() {
   await getSupabaseBrowserClient().auth.signOut()
@@ -44,7 +49,7 @@ async function handleLogout() {
 export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="hover:bg-surface-2 flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left outline-none">
+      <DropdownMenuTrigger className="hover:bg-muted flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left">
         <ProfileAvatar
           avatarUrl={avatarUrl}
           initials={initials}
@@ -77,11 +82,11 @@ export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
         <div className="flex flex-col gap-0.75 p-1.5">
           <DropdownMenuItem className={ITEM_CLASS}>
             <UserIcon />
-            Compte
+            {m.profile_account()}
           </DropdownMenuItem>
           <DropdownMenuItem className={ITEM_CLASS}>
             <Bell />
-            Notifications
+            {m.profile_notifications()}
           </DropdownMenuItem>
         </div>
 
@@ -90,7 +95,7 @@ export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
         <div className="p-1.5">
           <DropdownMenuItem className={ITEM_CLASS} onClick={handleLogout}>
             <LogOut />
-            Se déconnecter
+            {m.profile_signOut()}
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>
