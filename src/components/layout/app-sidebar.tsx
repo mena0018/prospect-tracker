@@ -78,7 +78,7 @@ export function AppSidebar({ profile }: Props) {
             {PIPELINE_STAGES.map((stage) => (
               <div
                 key={stage.label}
-                className="text-text-soft flex items-center justify-between py-1.25 text-xs"
+                className="text-muted-foreground flex items-center justify-between py-1.25 text-xs"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -108,13 +108,13 @@ export function AppSidebar({ profile }: Props) {
                     <span className="text-foreground text-lg font-bold tracking-tight tabular-nums">
                       {RELANCE.count}
                     </span>
-                    <span className="text-text-soft text-xs">{m.followUp_toContact()}</span>
+                    <span className="text-muted-foreground text-xs">{m.followUp_toContact()}</span>
                   </div>
                   <div className="text-muted-foreground text-2xs">{m.followUp_tagline()}</div>
                 </div>
               </div>
               <div className="mt-3.25">
-                <div className="text-text-soft text-2xs mb-1.5 flex items-center justify-between">
+                <div className="text-muted-foreground text-2xs mb-1.5 flex items-center justify-between">
                   <span>{m.followUp_weeklyGoal()}</span>
                   <span className="text-foreground font-semibold tabular-nums">
                     {RELANCE.done}/{RELANCE.goal}
@@ -127,10 +127,7 @@ export function AppSidebar({ profile }: Props) {
                   />
                 </div>
               </div>
-              <Button
-                type="button"
-                className="mt-3.25 h-9 w-full gap-1.5 rounded-lg text-xs font-semibold [&_svg]:size-3.5"
-              >
+              <Button type="button" size="sm" className="mt-3.25 h-9 w-full font-semibold">
                 {m.followUp_start()}
                 <ArrowRight />
               </Button>
@@ -143,10 +140,10 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-text-soft h-auto gap-2.5 px-2.75 py-2 text-xs font-medium [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-2 text-xs font-medium"
               render={<a href={EXTERNAL_LINKS.invite} />}
             >
-              <Send />
+              <Send className="size-3.75" />
               {m.nav_inviteFriend()}
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -155,28 +152,28 @@ export function AppSidebar({ profile }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.help} />}
             >
-              <HelpCircle />
+              <HelpCircle className="size-3.75" />
               {m.nav_help()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.linkedin} target="_blank" rel="noreferrer" />}
             >
-              <LinkedInIcon />
+              <LinkedInIcon className="size-3.75" />
               {m.nav_myLinkedin()}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal [&_svg]:size-3.75"
+              className="text-muted-foreground h-auto gap-2.5 px-2.75 py-1.75 text-xs font-normal"
               render={<a href={EXTERNAL_LINKS.feedback} />}
             >
-              <MessageCircle />
+              <MessageCircle className="size-3.75" />
               {m.nav_giveFeedback()}
             </SidebarMenuButton>
           </SidebarMenuItem>

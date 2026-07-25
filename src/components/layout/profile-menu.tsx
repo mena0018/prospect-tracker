@@ -32,12 +32,14 @@ function ProfileAvatar({ avatarUrl, initials, className }: ProfileAvatarProps) {
     )
   }
   return (
-    <span className={cn('bg-surface-2 text-text-soft font-semibold', className)}>{initials}</span>
+    <span className={cn('bg-muted text-muted-foreground font-semibold', className)}>
+      {initials}
+    </span>
   )
 }
 
 const ITEM_CLASS =
-  'text-text-soft gap-2.5 rounded-lg px-2.25 py-2 text-xs font-medium [&_svg]:size-3.75!'
+  "text-muted-foreground gap-2.5 rounded-lg px-2.25 py-2 text-xs font-medium [&_svg:not([class*='size-'])]:size-3.75"
 
 async function handleLogout() {
   await getSupabaseBrowserClient().auth.signOut()
@@ -47,7 +49,7 @@ async function handleLogout() {
 export function ProfileMenu({ name, subtitle, initials, avatarUrl }: Profile) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="hover:bg-surface-2 flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left outline-none">
+      <DropdownMenuTrigger className="hover:bg-muted flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left">
         <ProfileAvatar
           avatarUrl={avatarUrl}
           initials={initials}

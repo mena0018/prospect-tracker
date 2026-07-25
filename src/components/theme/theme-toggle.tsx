@@ -5,7 +5,6 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/components/theme/theme-provider'
 import { Button } from '@/components/ui/button'
 import { m } from '@/i18n/paraglide/messages'
-import { useIsMobile } from '@/hooks/use-mobile'
 
 const DURATION = 450
 
@@ -36,7 +35,6 @@ type Props = {
 }
 
 export function ThemeToggle({ className }: Props) {
-  const isMobile = useIsMobile()
   const { toggleTheme } = useTheme()
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -46,7 +44,7 @@ export function ThemeToggle({ className }: Props) {
       variant="outline"
       title={m.theme_toggle()}
       aria-label={m.theme_toggle()}
-      size={isMobile ? 'icon-sm' : 'icon-md'}
+      size="icon-responsive"
       className={className}
       onClick={() => circularReveal(buttonRef.current!, toggleTheme)}
     >

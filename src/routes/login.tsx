@@ -25,8 +25,8 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   return (
-    <main className="bg-surface grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-      <aside className="bg-surface-2 border-border relative hidden flex-col justify-between overflow-hidden border-r p-12 lg:flex">
+    <main className="bg-card grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <aside className="bg-muted border-border relative hidden flex-col justify-between overflow-hidden border-r p-12 lg:flex">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(560px_420px_at_22%_16%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_66%),radial-gradient(340px_280px_at_14%_10%,color-mix(in_oklch,var(--primary)_11%,transparent),transparent_70%)]"
@@ -43,7 +43,7 @@ function LoginPage() {
           <blockquote className="text-foreground font-heading text-xl leading-relaxed font-medium text-balance">
             {m.auth_quote()}
           </blockquote>
-          <figcaption className="text-text-soft text-sm">{m.auth_quoteAuthor()}</figcaption>
+          <figcaption className="text-muted-foreground text-sm">{m.auth_quoteAuthor()}</figcaption>
         </figure>
       </aside>
 
