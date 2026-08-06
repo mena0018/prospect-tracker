@@ -5,6 +5,7 @@ import {
   check,
   date,
   foreignKey,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -14,6 +15,8 @@ import {
   uuid
 } from 'drizzle-orm/pg-core'
 import { authUsers } from 'drizzle-orm/supabase'
+
+import { DEFAULT_TJM_REFERENCE } from './defaults'
 
 // Source of truth for the data model. Rationale & reference:
 // docs/reference/data-model.md + docs/decisions/0001-user-configurable-pipeline.md.
@@ -33,6 +36,8 @@ export const STAGE_COLOR_TOKENS = [
   'pink'
 ] as const
 
+export type StageColorToken = (typeof STAGE_COLOR_TOKENS)[number]
+
 export const users = pgTable(
   'users',
   {
@@ -41,7 +46,7 @@ export const users = pgTable(
     fullName: text('full_name'),
     jobTitle: text('job_title'),
     avatarUrl: text('avatar_url'),
-    tjmReference: integer('tjm_reference').notNull().default(450),
+    tjmReference: integer('tjm_reference').notNull().default(DEFAULT_TJM_REFERENCE),
     plan: planEnum('plan').notNull().default('free'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
@@ -97,35 +102,46 @@ export const experienceLevels = pgTable('experience_levels', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
 
-export const opportunities = pgTable('opportunities', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  stageId: uuid('stage_id')
-    .notNull()
-    .references(() => stages.id, { onDelete: 'restrict' }),
-  jobTypeId: uuid('job_type_id').references(() => jobTypes.id, { onDelete: 'set null' }),
-  experienceId: uuid('experience_id').references(() => experienceLevels.id, {
-    onDelete: 'set null'
-  }),
-  recruiter: text('recruiter').notNull(),
-  esn: text('esn'),
-  endClient: text('end_client'),
-  need: text('need'),
-  dailyRate: integer('daily_rate'),
-  onsiteDays: smallint('onsite_days'),
-  location: text('location'),
-  lastContactAt: date('last_contact_at'),
-  nextReminderAt: date('next_reminder_at'),
-  phone: text('phone'),
-  offerUrl: text('offer_url'),
-  notes: text('notes'),
-  isPinned: boolean('is_pinned').notNull().default(false),
-  isArchived: boolean('is_archived').notNull().default(false),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-})
+export const opportunities = pgTable(
+  'opportunities',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    stageId: uuid('stage_id')
+      .notNull()
+      .references(() => stages.id, { onDelete: 'restrict' }),
+    jobTypeId: uuid('job_type_id').references(() => jobTypes.id, { onDelete: 'set null' }),
+    experienceId: uuid('experience_id').references(() => experienceLevels.id, {
+      onDelete: 'set null'
+    }),
+    recruiter: text('recruiter').notNull(),
+    esn: text('esn'),
+    endClient: text('end_client'),
+    need: text('need'),
+    dailyRate: integer('daily_rate'),
+    onsiteDays: smallint('onsite_days'),
+    location: text('location'),
+    lastContactAt: date('last_contact_at'),
+    nextReminderAt: date('next_reminder_at'),
+    phone: text('phone'),
+    offerUrl: text('offer_url'),
+    notes: text('notes'),
+    isPinned: boolean('is_pinned').notNull().default(false),
+    isArchived: boolean('is_archived').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    // Covers the table's default ordering; every page would otherwise sort the full set.
+    index('opportunities_user_pinned_updated_idx').on(
+      table.userId,
+      table.isPinned.desc(),
+      table.updatedAt.desc()
+    )
+  ]
+)
 
 export const usersRelations = relations(users, ({ many }) => ({
   stages: many(stages),

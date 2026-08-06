@@ -12,12 +12,25 @@
   "error_conflict": "Cet élément a été modifié entre-temps. Rechargez pour voir la dernière version.",
   "error_rateLimited": "Trop de tentatives. Patientez quelques instants avant de réessayer.",
   "error_server": "Une erreur est survenue de notre côté. Réessayez dans un instant.",
+  "error_authEmailTaken": "Un compte existe déjà avec cette adresse email.",
+  "error_authInvalidCredentials": "Email ou mot de passe incorrect.",
+  "error_authAccountLocked": "Ce compte a été suspendu. Contactez le support.",
+  "error_authSignupDisabled": "Les inscriptions sont temporairement fermées.",
   "opportunity_createFailed": "Impossible d'ajouter l'opportunité",
   "opportunity_updateFailed": "Impossible de modifier l’opportunité",
   "opportunity_deleteFailed": "Impossible de supprimer l’opportunité",
   "error_description": "Impossible de charger ces données. Réessayez dans un instant.",
   "error_dashboardDescription": "Impossible de charger votre tableau de bord. Réessayez dans un instant.",
-  "dashboard_activeOpportunities": "{count} opportunités actives",
+  "dashboard_activeOpportunities": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité active",
+        "countPlural=other": "{count} opportunités actives"
+      }
+    }
+  ],
   "notFound_title": "Page introuvable",
   "notFound_description": "Cette page n'existe pas ou a été déplacée.",
   "nav_tracker": "Tracker",
@@ -28,6 +41,7 @@
   "nav_help": "Aide",
   "nav_myLinkedin": "Mon LinkedIn",
   "nav_giveFeedback": "Donner un feedback",
+  "nav_more": "Plus",
   "followUp_toContact": "à relancer",
   "followUp_tagline": "c’est là que ça se joue.",
   "followUp_weeklyGoal": "Objectif de la semaine",
@@ -43,6 +57,8 @@
   "validation_passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
   "validation_fullNameRequired": "Indiquez votre nom.",
   "validation_fullNameTooLong": "Nom trop long (100 max).",
+  "validation_jobTitleRequired": "Indiquez votre intitulé de poste.",
+  "validation_jobTitleTooLong": "Intitulé trop long (100 max).",
   "validation_passwordsMismatch": "Les mots de passe ne correspondent pas.",
   "validation_stageRequired": "L'étape est obligatoire.",
   "validation_recruiterRequired": "Indiquez le nom du recruteur.",
@@ -67,6 +83,8 @@
   "auth_switchToSignin": "Se connecter",
   "auth_fullNameLabel": "Nom complet",
   "auth_fullNamePlaceholder": "Alex Laurent",
+  "auth_jobTitleLabel": "Intitulé de poste",
+  "auth_jobTitlePlaceholder": "Développeur fullstack",
   "auth_emailLabel": "Adresse email",
   "auth_emailPlaceholder": "nom@exemple.com",
   "auth_passwordLabel": "Mot de passe",
@@ -78,5 +96,58 @@
   "auth_signinSubmit": "Se connecter",
   "auth_signupSubmit": "Créer mon compte",
   "auth_oauthDivider": "Ou continuer avec",
-  "auth_oauthGoogle": "Continuer avec Google"
+  "auth_oauthGoogle": "Continuer avec Google",
+  "kpi_dueToday": "À relancer aujourd'hui",
+  "kpi_dueTodayUnit": "à traiter",
+  "kpi_stale": "Sans réponse +7j",
+  "kpi_staleUnit": "à relancer",
+  "kpi_interviews": "Entretiens à venir",
+  "kpi_interviewsUnit": "à préparer",
+  "kpi_responseRate": "Taux de réponse",
+  "table_tabActive": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Active",
+        "countPlural=other": "Actives"
+      }
+    }
+  ],
+  "table_tabArchived": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Archivée",
+        "countPlural=other": "Archivées"
+      }
+    }
+  ],
+  "table_searchPlaceholder": "Rechercher un prospect…",
+  "table_filter": "Filtrer",
+  "table_dueFilter": "À relancer",
+  "table_clearDueFilter": "Retirer le filtre",
+  "table_pin": "Épingler",
+  "table_unpin": "Désépingler",
+  "table_colLastContact": "Dernier contact",
+  "table_colRecruiter": "Recruteur",
+  "table_colEsn": "ESN",
+  "table_colEndClient": "Client final",
+  "table_colDailyRate": "TJM",
+  "table_colStage": "Étape",
+  "table_colLocation": "Localisation",
+  "table_fullRemote": "Full remote",
+  "table_onsiteDays": "{days}j/sem",
+  "table_empty": "Aucune opportunité pour l'instant.",
+  "table_emptyHint": "Ajoutez votre première opportunité pour lancer le suivi.",
+  "table_noResults": "Aucun résultat",
+  "table_noResultsHint": "Essayez une autre recherche ou retirez les filtres.",
+  "table_rangeLabel": "{from}–{to} sur {total}",
+  "table_perPage": "Par page",
+  "table_pageOf": "Page {page} / {total}",
+  "table_firstPage": "Première page",
+  "table_previousPage": "Page précédente",
+  "table_nextPage": "Page suivante",
+  "table_lastPage": "Dernière page"
 }

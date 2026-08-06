@@ -42,3 +42,6 @@ drizzle/.snapshots/
 # Agent tooling (local, per-developer — installed via `skills add`)
 .claude/skills/
 .claude/launch.json
+.codex
+.agents
+AGENTS.md

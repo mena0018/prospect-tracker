@@ -3,8 +3,10 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { db } from '@/db/client'
 import { credentialsSchema, signUpSchema } from '@/modules/auth/auth-schema'
+import { toAuthErrorCode } from '@/modules/auth/auth-utils'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
+import { type ErrorCode } from '@/lib/error'
 import { APP_ROUTES } from '@/lib/routes'
 import { getSupabaseServerClient, requireUser } from '@/lib/supabase/server'
 import { asString } from '@/lib/utils'
@@ -13,6 +15,7 @@ export type AuthUser = {
   id: string
   email: string
   fullName: string | null
+  jobTitle: string | null
   avatarUrl: string | null
   provisioned: boolean
 }
@@ -31,6 +34,7 @@ export const fetchUser = createServerFn({ method: 'GET' }).handler(
       id: user.id,
       email: user.email,
       fullName: asString(user.user_metadata?.full_name),
+      jobTitle: asString(user.user_metadata?.job_title),
       avatarUrl: asString(user.user_metadata?.avatar_url),
       provisioned: user.user_metadata?.provisioned === true
     }
@@ -39,23 +43,37 @@ export const fetchUser = createServerFn({ method: 'GET' }).handler(
 
 export const signInWithPassword = createServerFn({ method: 'POST' })
   .validator(credentialsSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<{ errorCode: ErrorCode | null }> => {
     const supabase = getSupabaseServerClient()
     const { error } = await supabase.auth.signInWithPassword(data)
-    return { error: error ? 'Email ou mot de passe incorrect.' : null }
+
+    if (!error) return { errorCode: null }
+
+    const code = toAuthErrorCode(error.code)
+    const SAFE_TO_REVEAL = ['RATE_LIMITED', 'AUTH_SIGNUP_DISABLED'] as const
+    const isSafeToReveal = SAFE_TO_REVEAL.some((safeCode) => safeCode === code)
+
+    return { errorCode: isSafeToReveal ? code : 'AUTH_INVALID_CREDENTIALS' }
   })
 
 export const signUpWithPassword = createServerFn({ method: 'POST' })
   .validator(signUpSchema)
-  .handler(async ({ data: { email, password, fullName } }) => {
-    const supabase = getSupabaseServerClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } }
-    })
-    return { error: error ? error.message : null }
-  })
+  .handler(
+    async ({
+      data: { email, password, fullName, jobTitle }
+    }): Promise<{ errorCode: ErrorCode | null }> => {
+      const supabase = getSupabaseServerClient()
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName, job_title: jobTitle } }
+      })
+
+      if (!error) return { errorCode: null }
+
+      return { errorCode: toAuthErrorCode(error.code) }
+    }
+  )
 
 export const provisionUser = createServerFn({ method: 'POST' }).handler(async (): Promise<User> => {
   const user = await requireUser()
@@ -78,6 +96,7 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
           id: authUser.id,
           email: authUser.email,
           fullName: asString(user.user_metadata?.full_name),
+          jobTitle: asString(user.user_metadata?.job_title),
           avatarUrl: asString(user.user_metadata?.avatar_url)
         })
         .returning()

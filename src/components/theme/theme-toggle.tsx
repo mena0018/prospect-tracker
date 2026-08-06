@@ -44,7 +44,7 @@ export function ThemeToggle({ className }: Props) {
       variant="outline"
       title={m.theme_toggle()}
       aria-label={m.theme_toggle()}
-      size="icon-responsive"
+      size="icon-md"
       className={className}
       onClick={() => circularReveal(buttonRef.current!, toggleTheme)}
     >

@@ -4,13 +4,14 @@ import { useForm } from '@tanstack/react-form'
 import { useRouter } from '@tanstack/react-router'
 
 import { EmailField } from '@/modules/auth/components/email-field'
-import { toErrorMessage } from '@/modules/auth/auth-utils'
+import { toFormErrorCode } from '@/modules/auth/auth-utils'
+import { toErrorMessage } from '@/lib/error'
 import { OAuthSection } from '@/modules/auth/components/oauth-section'
 import { PasswordField } from '@/modules/auth/components/password-field'
+import { TextField } from '@/modules/auth/components/text-field'
 import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
 import { Button } from '@/components/ui/button'
-import { Field, FieldAlert, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { FieldAlert, FieldGroup } from '@/components/ui/field'
 import { m } from '@/i18n/paraglide/messages'
 import { signUpFormSchema } from '@/modules/auth/auth-schema'
 import { signUpWithPassword } from '@/modules/auth/auth-server'
@@ -28,14 +29,19 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
   const { googleMutation, googleError } = useGoogleOAuth(next, oauthFailed)
 
   const form = useForm({
-    defaultValues: { fullName: '', email, password: '', confirmPassword: '' },
+    defaultValues: { fullName: '', jobTitle: '', email, password: '', confirmPassword: '' },
     validators: {
       onChange: signUpFormSchema,
       onSubmitAsync: async ({ value }) => {
-        const { error } = await signUpWithPassword({
-          data: { fullName: value.fullName, email: value.email, password: value.password }
+        const { errorCode } = await signUpWithPassword({
+          data: {
+            fullName: value.fullName,
+            jobTitle: value.jobTitle,
+            email: value.email,
+            password: value.password
+          }
         })
-        return error ? { form: error } : null
+        return errorCode ? { form: errorCode } : null
       }
     },
     onSubmit: () => {
@@ -53,26 +59,25 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
     >
       <FieldGroup>
         <form.Field name="fullName">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+          {(field) => (
+            <TextField
+              field={field}
+              label={m.auth_fullNameLabel()}
+              placeholder={m.auth_fullNamePlaceholder()}
+              autoComplete="name"
+            />
+          )}
+        </form.Field>
 
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>{m.auth_fullNameLabel()}</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  autoComplete="name"
-                  placeholder={m.auth_fullNamePlaceholder()}
-                />
-                {isInvalid ? <FieldError errors={field.state.meta.errors} /> : null}
-              </Field>
-            )
-          }}
+        <form.Field name="jobTitle">
+          {(field) => (
+            <TextField
+              field={field}
+              label={m.auth_jobTitleLabel()}
+              placeholder={m.auth_jobTitlePlaceholder()}
+              autoComplete="organization-title"
+            />
+          )}
         </form.Field>
 
         <form.Field name="email">
@@ -98,13 +103,15 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
               label={m.auth_confirmPasswordLabel()}
               autoComplete="new-password"
               shown={showPassword}
+              onToggle={() => setShowPassword((shown) => !shown)}
             />
           )}
         </form.Field>
 
         <form.Subscribe selector={(s) => s.errorMap.onSubmit}>
           {(formError) => {
-            const message = toErrorMessage(formError) ?? googleError
+            const code = toFormErrorCode(formError)
+            const message = code ? toErrorMessage(code) : googleError
             return message ? <FieldAlert>{message}</FieldAlert> : null
           }}
         </form.Subscribe>

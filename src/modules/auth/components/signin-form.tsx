@@ -4,7 +4,8 @@ import { useForm } from '@tanstack/react-form'
 import { useRouter } from '@tanstack/react-router'
 
 import { EmailField } from '@/modules/auth/components/email-field'
-import { toErrorMessage } from '@/modules/auth/auth-utils'
+import { toFormErrorCode } from '@/modules/auth/auth-utils'
+import { toErrorMessage } from '@/lib/error'
 import { OAuthSection } from '@/modules/auth/components/oauth-section'
 import { PasswordField } from '@/modules/auth/components/password-field'
 import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
@@ -31,8 +32,8 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
     validators: {
       onChange: credentialsSchema,
       onSubmitAsync: async ({ value }) => {
-        const { error } = await signInWithPassword({ data: value })
-        return error ? { form: error } : null
+        const { errorCode } = await signInWithPassword({ data: value })
+        return errorCode ? { form: errorCode } : null
       }
     },
     onSubmit: () => {
@@ -68,7 +69,8 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
 
         <form.Subscribe selector={(s) => s.errorMap.onSubmit}>
           {(formError) => {
-            const message = toErrorMessage(formError) ?? googleError
+            const code = toFormErrorCode(formError)
+            const message = code ? toErrorMessage(code) : googleError
             return message ? <FieldAlert>{message}</FieldAlert> : null
           }}
         </form.Subscribe>
