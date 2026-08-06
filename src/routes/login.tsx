@@ -1,21 +1,15 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { z } from 'zod/v4'
 
 import { AuthForm } from '@/modules/auth/components/auth-form'
+import { loginSearchSchema } from '@/modules/auth/auth-schema'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
 import { APP_ROUTES } from '@/lib/routes'
 
-const searchSchema = z.object({
-  redirect: z.string().optional(),
-  error: z.string().optional(),
-  mode: z.enum(['signin', 'signup']).default('signin')
-})
-
 export const Route = createFileRoute('/login')({
-  validateSearch: searchSchema,
+  validateSearch: loginSearchSchema,
   beforeLoad: ({ context, search }) => {
     if (context.user) {
       throw redirect({ to: search.redirect ?? APP_ROUTES.dashboard })
@@ -37,11 +31,13 @@ function LoginPage() {
           <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg text-sm font-semibold tracking-tight">
             {CONFIG.brandInitials}
           </div>
-          <span className="text-foreground text-lg font-bold tracking-tight">{CONFIG.brand}</span>
+          <span className="text-foreground tracking-page-title text-lg font-semibold">
+            {CONFIG.brand}
+          </span>
         </div>
 
         <figure className="relative max-w-sm space-y-5">
-          <blockquote className="text-foreground font-heading text-xl leading-relaxed font-medium text-balance">
+          <blockquote className="text-2xl leading-relaxed font-medium text-balance">
             {m.auth_quote()}
           </blockquote>
           <figcaption className="text-muted-foreground text-sm">{m.auth_quoteAuthor()}</figcaption>
@@ -54,7 +50,7 @@ function LoginPage() {
             <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg text-xs font-semibold tracking-tight">
               {CONFIG.brandInitials}
             </div>
-            <span className="text-foreground text-sm font-semibold tracking-tight">
+            <span className="text-foreground tracking-title text-lg font-semibold">
               {CONFIG.brand}
             </span>
           </div>
@@ -64,7 +60,7 @@ function LoginPage() {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-6 pb-16 md:px-10">
+        <div className="flex flex-1 items-center justify-center px-6 py-16 md:px-10 md:pt-0">
           <AuthForm />
         </div>
       </div>

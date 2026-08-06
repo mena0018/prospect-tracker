@@ -7,10 +7,14 @@ const ERROR_MESSAGES = {
   VALIDATION: m.error_validation,
   CONFLICT: m.error_conflict,
   RATE_LIMITED: m.error_rateLimited,
-  SERVER: m.error_server
+  SERVER: m.error_server,
+  AUTH_EMAIL_TAKEN: m.error_authEmailTaken,
+  AUTH_INVALID_CREDENTIALS: m.error_authInvalidCredentials,
+  AUTH_ACCOUNT_LOCKED: m.error_authAccountLocked,
+  AUTH_SIGNUP_DISABLED: m.error_authSignupDisabled
 } as const
 
-type ErrorCode = keyof typeof ERROR_MESSAGES
+export type ErrorCode = keyof typeof ERROR_MESSAGES
 
 function isErrorCode(value: string): value is ErrorCode {
   return value in ERROR_MESSAGES
@@ -22,7 +26,7 @@ export function appError(code: ErrorCode) {
 
 // An unknown message (crash, network drop) is replaced: it could leak internals
 export function toErrorMessage(error: unknown): string {
-  const code = error instanceof Error ? error.message : null
+  const code = error instanceof Error ? error.message : typeof error === 'string' ? error : null
   const message = code && isErrorCode(code) ? ERROR_MESSAGES[code] : ERROR_MESSAGES.SERVER
 
   return message()
