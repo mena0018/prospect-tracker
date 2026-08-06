@@ -1,6 +1,7 @@
 import { z } from 'zod/v4'
 
 import { m } from '@/i18n/paraglide/messages'
+import { tableSearchSchema } from '@/modules/table/table-schema'
 
 // See docs/reference/data-model.md for the nullable + optional rule
 const nullableText = z.string().trim().nullable().optional()
@@ -59,3 +60,63 @@ export const deleteOpportunitySchema = z.object({ id: z.uuid() })
 
 export type CreateOpportunityInput = z.infer<typeof createOpportunitySchema>
 export type UpdateOpportunityInput = z.infer<typeof updateOpportunitySchema>
+
+export const PAGE_SIZES: readonly number[] = [8, 10, 15] as const
+
+// Whitelist, not a hint: the value reaches an ORDER BY.
+export const SORT_COLUMNS = [
+  'lastContactAt',
+  'recruiter',
+  'esn',
+  'endClient',
+  'dailyRate',
+  'stage',
+  'location'
+] as const
+
+export type SortColumn = (typeof SORT_COLUMNS)[number]
+
+// Also feeds the route's stripSearchParams, which keeps an unfiltered URL bare.
+export const OPPORTUNITIES_SEARCH_DEFAULTS = {
+  tab: 'active' as const,
+  q: '',
+  due: false,
+  sort: '',
+  page: 1,
+  perPage: 8
+}
+
+// Own filters + the sort/page slice every table shares. See docs/reference/table-module.md
+export const opportunitiesSearchSchema = z.object({
+  tab: z.enum(['active', 'archived']).catch(OPPORTUNITIES_SEARCH_DEFAULTS.tab),
+  q: z.string().catch(OPPORTUNITIES_SEARCH_DEFAULTS.q),
+  due: z.boolean().catch(OPPORTUNITIES_SEARCH_DEFAULTS.due),
+  ...tableSearchSchema({
+    sortColumns: SORT_COLUMNS,
+    pageSizes: PAGE_SIZES,
+    defaultPerPage: OPPORTUNITIES_SEARCH_DEFAULTS.perPage
+  }).shape
+})
+
+export type OpportunitiesSearch = z.infer<typeof opportunitiesSearchSchema>
+
+export const listOpportunitiesSchema = z.object({
+  tab: z.enum(['active', 'archived']),
+  q: z.string().trim().max(200),
+  due: z.boolean(),
+  sortBy: z.enum(SORT_COLUMNS).nullable(),
+  sortDesc: z.boolean(),
+  page: z.int().min(1),
+  perPage: z.int().refine((size) => PAGE_SIZES.includes(size)),
+  today: z.iso.date()
+})
+
+export type ListOpportunitiesInput = z.infer<typeof listOpportunitiesSchema>
+
+export const opportunitiesSummarySchema = z.object({ today: z.iso.date() })
+
+// Pipeline rules shared by the client calculations and their SQL counterparts. See docs/reference/kpis.md
+export const SAVED_POSITION = 0
+export const INTERVIEW_POSITION = 3
+export const OFFER_POSITION = 4
+export const STALE_THRESHOLD_DAYS = 7

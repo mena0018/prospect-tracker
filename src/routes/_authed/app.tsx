@@ -1,37 +1,46 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { getCookie } from '@tanstack/react-start/server'
+import { createFileRoute, stripSearchParams, useRouter } from '@tanstack/react-router'
 
 import { ErrorState } from '@/components/error-state'
-import { AppShell } from '@/components/layout/app-shell'
 import { m } from '@/i18n/paraglide/messages'
-import { toDisplayName, toInitials } from '@/lib/utils'
-
-// Read on the server so the sidebar renders in its persisted state on first paint.
-const getSidebarState = createServerFn().handler(() => getCookie('sidebar_state') !== 'false')
+import { getCustomization } from '@/modules/customization/customization-server'
+import {
+  OPPORTUNITIES_SEARCH_DEFAULTS,
+  opportunitiesSearchSchema
+} from '@/modules/opportunities/opportunities-schema'
+import {
+  OpportunitiesPanel,
+  OpportunitiesPanelSkeleton
+} from '@/modules/opportunities/components/opportunities-panel'
+import { stagesQueryOptions } from '@/modules/stages/hooks/use-stages'
 
 export const Route = createFileRoute('/_authed/app')({
-  loader: () => getSidebarState(),
+  ssr: 'data-only',
+  validateSearch: opportunitiesSearchSchema,
+  search: { middlewares: [stripSearchParams(OPPORTUNITIES_SEARCH_DEFAULTS)] },
+
+  loader: async ({ context: { queryClient } }) => {
+    const [{ dailyRateReference }] = await Promise.all([
+      getCustomization(),
+      queryClient.ensureQueryData(stagesQueryOptions())
+    ])
+
+    return { dailyRateReference }
+  },
   component: Dashboard,
+  pendingComponent: DashboardPending,
   errorComponent: DashboardError
 })
 
+function DashboardPending() {
+  const { perPage } = Route.useSearch()
+
+  return <OpportunitiesPanelSkeleton rowCount={perPage} />
+}
+
 function Dashboard() {
-  const defaultSidebarOpen = Route.useLoaderData()
-  const { user } = Route.useRouteContext()
+  const { dailyRateReference } = Route.useLoaderData()
 
-  const name = toDisplayName(user.fullName)
-  const initials = toInitials(user.fullName)
-
-  return (
-    <AppShell
-      headerSubtitle={m.dashboard_activeOpportunities({ count: 11 })}
-      defaultSidebarOpen={defaultSidebarOpen}
-      profile={{ name, subtitle: user.email, initials, avatarUrl: user.avatarUrl }}
-    >
-      <div className="h-full" />
-    </AppShell>
-  )
+  return <OpportunitiesPanel dailyRateReference={dailyRateReference} />
 }
 
 function DashboardError() {

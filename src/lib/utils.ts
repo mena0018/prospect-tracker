@@ -9,16 +9,15 @@ export function asString(value: unknown): string | null {
   return typeof value === 'string' ? value : null
 }
 
-export function toDisplayName(fullName: string | null) {
-  if (!fullName) return 'N/C'
+export function formatDate(isoDate: string | null) {
+  if (!isoDate) return '—'
 
-  const [first = '', second = ''] = fullName.split(/\s+/).filter(Boolean)
-  return `${first}. ${second[0] ?? ''}`.trim()
+  const [year, month, day] = isoDate.split('-')
+  if (!year || !month || !day) return '—'
+
+  return `${day}/${month}/${year}`
 }
 
-export function toInitials(fullName: string | null) {
-  if (!fullName) return 'N/C'
-
-  const [first = '', second = ''] = fullName.split(/\s+/).filter(Boolean)
-  return ((first[0] ?? '') + (second[0] ?? first[1] ?? '')).toUpperCase()
+export function formatValue(value: string | number | null | undefined, suffix = '') {
+  return value == null ? '—' : `${value}${suffix}`
 }

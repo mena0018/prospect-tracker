@@ -21,7 +21,16 @@
   "opportunity_deleteFailed": "Impossible de supprimer l’opportunité",
   "error_description": "Impossible de charger ces données. Réessayez dans un instant.",
   "error_dashboardDescription": "Impossible de charger votre tableau de bord. Réessayez dans un instant.",
-  "dashboard_activeOpportunities": "{count} opportunités actives",
+  "dashboard_activeOpportunities": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité active",
+        "countPlural=other": "{count} opportunités actives"
+      }
+    }
+  ],
   "notFound_title": "Page introuvable",
   "notFound_description": "Cette page n'existe pas ou a été déplacée.",
   "nav_tracker": "Tracker",
@@ -86,5 +95,60 @@
   "auth_signinSubmit": "Se connecter",
   "auth_signupSubmit": "Créer mon compte",
   "auth_oauthDivider": "Ou continuer avec",
-  "auth_oauthGoogle": "Continuer avec Google"
+  "auth_oauthGoogle": "Continuer avec Google",
+  "kpi_dueToday": "À relancer aujourd'hui",
+  "kpi_dueTodayUnit": "à traiter",
+  "kpi_stale": "Sans réponse +7j",
+  "kpi_staleUnit": "à relancer",
+  "kpi_interviews": "Entretiens à venir",
+  "kpi_interviewsUnit": "à préparer",
+  "kpi_responseRate": "Taux de réponse",
+  "table_tabActive": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Active",
+        "countPlural=other": "Actives"
+      }
+    }
+  ],
+  "table_tabArchived": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Archivée",
+        "countPlural=other": "Archivées"
+      }
+    }
+  ],
+  "table_searchPlaceholder": "Rechercher un prospect…",
+  "table_resetFilters": "Réinitialiser",
+  "table_caption": "Liste des opportunités",
+  "table_colPinned": "Épinglée",
+  "table_dueFilter": "À relancer",
+  "table_clearDueFilter": "Retirer le filtre",
+  "table_pin": "Épingler",
+  "table_unpin": "Désépingler",
+  "table_colLastContact": "Dernier contact",
+  "table_colRecruiter": "Recruteur",
+  "table_colEsn": "ESN",
+  "table_colEndClient": "Client final",
+  "table_colDailyRate": "TJM",
+  "table_colStage": "Étape",
+  "table_colLocation": "Localisation",
+  "table_fullRemote": "Full remote",
+  "table_onsiteDays": "{days}j/sem",
+  "table_empty": "Aucune opportunité pour l'instant.",
+  "table_emptyHint": "Ajoutez votre première opportunité pour lancer le suivi.",
+  "table_noResults": "Aucun résultat",
+  "table_noResultsHint": "Essayez une autre recherche ou retirez les filtres.",
+  "table_rangeLabel": "{from}–{to} sur {total}",
+  "table_perPage": "Par page",
+  "table_pageOf": "Page {page} / {total}",
+  "table_firstPage": "Première page",
+  "table_previousPage": "Page précédente",
+  "table_nextPage": "Page suivante",
+  "table_lastPage": "Dernière page"
 }
