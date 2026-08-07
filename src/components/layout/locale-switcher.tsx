@@ -13,12 +13,10 @@ export function LocaleSwitcher({ className }: Props) {
   return (
     <ToggleGroup
       spacing={1}
+      height="responsive"
       value={[active]}
       aria-label={m.common_switchLocale()}
-      className={cn(
-        'border-border bg-muted h-8 gap-0 rounded-lg border p-0.75 md:h-9.5',
-        className
-      )}
+      className={cn('border-border bg-muted gap-0 rounded-lg border p-0.75', className)}
     >
       {locales.map((locale) => (
         <ToggleGroupItem

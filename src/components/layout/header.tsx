@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
+import { useOpportunitiesSummary } from '@/modules/opportunities/hooks/use-opportunities'
+import { Skeleton } from '@/components/ui/skeleton'
 
-type Props = {
-  subtitle: string
-}
+export function Header() {
+  const { data, isPending } = useOpportunitiesSummary()
 
-export function Header({ subtitle }: Props) {
   return (
     <header className="border-border bg-card flex flex-none items-center justify-between gap-4 border-b px-6.5 py-3.5">
       <div className="flex min-w-0 flex-1 items-center gap-3.25">
@@ -21,10 +21,16 @@ export function Header({ subtitle }: Props) {
           title={m.header_toggleSidebar()}
         />
         <div className="flex min-w-0 flex-col justify-center gap-1.5">
-          <h1 className="text-foreground tracking-title truncate leading-none font-semibold">
+          <h1 className="text-foreground tracking-page-title truncate text-lg leading-none font-semibold">
             {m.nav_tracker()}
           </h1>
-          <span className="text-muted-foreground truncate text-xs leading-none">{subtitle}</span>
+          {isPending || !data ? (
+            <Skeleton className="h-3 w-18 md:w-32" />
+          ) : (
+            <span className="text-muted-foreground truncate text-xs leading-none">
+              {m.dashboard_activeOpportunities({ count: data.activeCount })}
+            </span>
+          )}
         </div>
       </div>
       <div className="flex flex-none items-center gap-2.25">
