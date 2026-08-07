@@ -1,0 +1,182 @@
+import { createColumnHelper, useTable } from '@tanstack/react-table'
+
+import { m } from '@/i18n/paraglide/messages'
+import { cn, formatDate, formatValue } from '@/lib/utils'
+import { PinButton } from '@/modules/opportunities/components/pin-button'
+import { StageBadge } from '@/modules/stages/components/stage-badge'
+import { DataTable } from '@/modules/table/components/data-table'
+import { DataTablePagination } from '@/modules/table/components/data-table-pagination'
+import { tableModuleFeatures } from '@/modules/table/table-features'
+import { PAGE_SIZES } from '@/modules/opportunities/opportunities-schema'
+import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
+import {
+  formatDailyRate,
+  isAboveReference,
+  type OpportunityRow
+} from '@/modules/opportunities/opportunities-utils'
+
+export const OPPORTUNITIES_GRID_TEMPLATE =
+  'grid-cols-[30px_150px_minmax(140px,1fr)_minmax(130px,0.9fr)_minmax(150px,1.15fr)_78px_156px_minmax(120px,0.95fr)]'
+
+export const OPPORTUNITIES_COLUMN_COUNT = 7
+
+const PIN_COLUMN_ID = 'pin'
+const PIN_SORT = { id: PIN_COLUMN_ID, desc: true } as const
+
+const columnHelper = createColumnHelper<typeof tableModuleFeatures, OpportunityRow>()
+
+const cellClassName = (columnId: string) =>
+  columnId === PIN_COLUMN_ID
+    ? 'justify-center px-0'
+    : columnId === 'dailyRate'
+      ? 'justify-end'
+      : undefined
+
+type Props = {
+  rows: OpportunityRow[]
+  total: number
+  // Clamped server-side, so it can differ from `?page=`. See docs/reference/server-side-table.md
+  servedPage: number
+  pageCount: number
+  isFetching: boolean
+  dailyRateReference: number
+  onTogglePin: (row: OpportunityRow) => void
+  emptyTitle: string
+  emptyHint: string
+}
+
+export function OpportunitiesTable({
+  rows,
+  total,
+  servedPage,
+  pageCount,
+  isFetching,
+  dailyRateReference,
+  onTogglePin,
+  emptyTitle,
+  emptyHint
+}: Props) {
+  const { sorting, pagination, setSorting, setPagination } = useOpportunitiesFilters()
+
+  const paginationLabels = {
+    range: m.table_rangeLabel,
+    pageOf: m.table_pageOf,
+    perPage: m.table_perPage(),
+    firstPage: m.table_firstPage(),
+    previousPage: m.table_previousPage(),
+    nextPage: m.table_nextPage(),
+    lastPage: m.table_lastPage()
+  }
+
+  const columns = columnHelper.columns([
+    columnHelper.accessor('isPinned', {
+      id: PIN_COLUMN_ID,
+      sortFn: 'basic',
+      cell: ({ row }) => (
+        <PinButton isPinned={row.original.isPinned} onToggle={() => onTogglePin(row.original)} />
+      )
+    }),
+    columnHelper.accessor('lastContactAt', {
+      header: m.table_colLastContact(),
+      cell: ({ getValue, row }) => (
+        <span
+          className={cn(
+            'text-sm font-semibold',
+            row.original.isDue ? 'text-destructive' : 'text-foreground'
+          )}
+        >
+          {formatDate(getValue())}
+        </span>
+      )
+    }),
+    columnHelper.accessor('recruiter', {
+      header: m.table_colRecruiter(),
+      cell: ({ getValue }) => <span className="truncate text-sm font-semibold">{getValue()}</span>
+    }),
+    columnHelper.accessor('esn', {
+      header: m.table_colEsn(),
+      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+    }),
+    columnHelper.accessor('endClient', {
+      header: m.table_colEndClient(),
+      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+    }),
+    columnHelper.accessor('dailyRate', {
+      header: m.table_colDailyRate(),
+      cell: ({ getValue }) => {
+        const dailyRate = getValue()
+
+        return (
+          <span
+            className={cn(
+              'text-sm font-semibold tabular-nums',
+              dailyRate === null
+                ? 'text-muted-foreground'
+                : isAboveReference(dailyRate, dailyRateReference)
+                  ? 'text-rate-above'
+                  : 'text-rate-below'
+            )}
+          >
+            {formatDailyRate(dailyRate)}
+          </span>
+        )
+      }
+    }),
+    columnHelper.accessor((row) => row.stage?.position ?? -1, {
+      id: 'stage',
+      header: m.table_colStage(),
+      cell: ({ row }) => {
+        const stage = row.original.stage
+        if (!stage) return <span className="text-muted-foreground text-sm">—</span>
+
+        return <StageBadge name={stage.name} color={stage.color} />
+      }
+    }),
+    columnHelper.accessor('location', {
+      header: m.table_colLocation(),
+      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+    })
+  ])
+
+  // Pinning is a permanent lead sort, so pinned rows stay on top of any column sort.
+  const sortingWithPin = [PIN_SORT, ...sorting]
+
+  // Served, not requested: paging from a clamped `?page=999` moves relative to what is shown.
+  const servedPagination = { pageIndex: servedPage - 1, pageSize: pagination.pageSize }
+
+  const table = useTable({
+    features: tableModuleFeatures,
+    data: rows,
+    columns,
+    state: { sorting: sortingWithPin, pagination: servedPagination },
+    onSortingChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(sortingWithPin) : updater
+      setSorting(next.filter((entry) => entry.id !== PIN_SORT.id))
+    },
+    onPaginationChange: (updater) =>
+      setPagination(typeof updater === 'function' ? updater(servedPagination) : updater),
+    getRowId: (row) => row.id,
+    enableSortingRemoval: false,
+    manualSorting: true,
+    manualPagination: true,
+    rowCount: total,
+    pageCount
+  })
+
+  return (
+    <>
+      <DataTable
+        table={table}
+        gridTemplate={OPPORTUNITIES_GRID_TEMPLATE}
+        isFetching={isFetching}
+        emptyTitle={emptyTitle}
+        emptyHint={emptyHint}
+        silentColumns={{ [PIN_COLUMN_ID]: m.table_colPinned() }}
+        cellClassName={cellClassName}
+        rowClassName={(row) => (row.isPinned ? 'bg-accent/35' : undefined)}
+        caption={m.table_caption()}
+      />
+      <DataTablePagination table={table} pageSizes={PAGE_SIZES} labels={paginationLabels} />
+    </>
+  )
+}

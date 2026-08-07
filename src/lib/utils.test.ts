@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { asString, cn, toDisplayName, toInitials } from './utils'
+import { asString, cn, formatDate, formatValue } from './utils'
 
 describe('cn', () => {
   it('merges class names', () => {
@@ -31,58 +31,39 @@ describe('asString', () => {
   })
 })
 
-describe('toDisplayName', () => {
-  it('takes the first name and the initial of the second name', () => {
-    expect(toDisplayName('Rabie Menad')).toBe('Rabie. M')
-    expect(toDisplayName('Jean Dupont')).toBe('Jean. D')
-    expect(toDisplayName('Marie Claire Dubois')).toBe('Marie. C')
+describe('formatDate', () => {
+  it('formats an ISO date as DD/MM/YYYY', () => {
+    expect(formatDate('2026-07-26')).toBe('26/07/2026')
+    expect(formatDate('2026-01-01')).toBe('01/01/2026')
   })
 
-  it('falls back to the first name if there is no second name', () => {
-    expect(toDisplayName('Cher')).toBe('Cher.')
-    expect(toDisplayName('john-doe')).toBe('john-doe.')
+  it('does not shift the day across timezones', () => {
+    expect(formatDate('2026-03-29')).toBe('29/03/2026')
+    expect(formatDate('2026-12-31')).toBe('31/12/2026')
   })
 
-  it('ignores extra whitespace', () => {
-    expect(toDisplayName('  Marie   Curie  ')).toBe('Marie. C')
-    expect(toDisplayName('\tAda\nLovelace ')).toBe('Ada. L')
-  })
-
-  it('handles too-short input', () => {
-    expect(toDisplayName('X')).toBe('X.')
-    expect(toDisplayName('   ')).toBe('.')
-  })
-
-  it('falls back to N/C when there is no name', () => {
-    expect(toDisplayName(null)).toBe('N/C')
-    expect(toDisplayName('')).toBe('N/C')
+  it('falls back to a dash for missing or malformed dates', () => {
+    expect(formatDate(null)).toBe('—')
+    expect(formatDate('')).toBe('—')
+    expect(formatDate('2026-07')).toBe('—')
   })
 })
 
-describe('toInitials', () => {
-  it('takes the first letter of the two first words', () => {
-    expect(toInitials('Rabie Menad')).toBe('RM')
-    expect(toInitials('Jean Dupont')).toBe('JD')
-    expect(toInitials('Marie Claire Dubois')).toBe('MC')
+describe('formatValue', () => {
+  it('renders a value, with an optional suffix', () => {
+    expect(formatValue('Paris')).toBe('Paris')
+    expect(formatValue(450, ' €')).toBe('450 €')
+    expect(formatValue(72, '%')).toBe('72%')
   })
 
-  it('falls back to the two first letters of a single word', () => {
-    expect(toInitials('Cher')).toBe('CH')
-    expect(toInitials('john-doe')).toBe('JO')
+  it('keeps zero, which is a real value rather than an absent one', () => {
+    expect(formatValue(0)).toBe('0')
+    expect(formatValue(0, '%')).toBe('0%')
   })
 
-  it('ignores extra whitespace', () => {
-    expect(toInitials('  Marie   Curie  ')).toBe('MC')
-    expect(toInitials('\tAda\nLovelace ')).toBe('AL')
-  })
-
-  it('handles too-short input', () => {
-    expect(toInitials('X')).toBe('X')
-    expect(toInitials('   ')).toBe('')
-  })
-
-  it('falls back to N/C when there is no name', () => {
-    expect(toInitials(null)).toBe('N/C')
-    expect(toInitials('')).toBe('N/C')
+  it('falls back to a dash for null and undefined', () => {
+    expect(formatValue(null)).toBe('—')
+    expect(formatValue(undefined)).toBe('—')
+    expect(formatValue(null, ' €')).toBe('—')
   })
 })
