@@ -3,6 +3,8 @@
 Prospecting-tracker SaaS for freelancers, work-study students and job seekers.
 Product reference: see `docs/PRD.md`.
 
+`AGENTS.md` is a symlink to this file — every agent reads the same instructions.
+
 **Language rule:** code, comments, identifiers and docs are **English**. Only end-user-facing
 UI copy (tracker labels, buttons, follow-up emails) is in **French** — the target audience is
 French freelancers.
@@ -83,6 +85,15 @@ after login. Rules: `docs/reference/guest-mode.md`.
   Keep the path complete (clickable in the editor) and skip section anchors — titles change,
   paths rarely do. Update the doc, not the comment, when the reasoning evolves.
 
+- **Never hand-roll a UI primitive.** Before writing a `<button>`, `<select>`, `<input>`, a
+  tab bar, a dialog, a tooltip…, check `src/components/ui/`, then the shadcn registry
+  (`pnpm dlx shadcn@latest add <name>`). The project is on the **Base UI** style
+  (`components.json` → `style: base-nova`), so the CLI installs the Base UI variant, not
+  Radix — no new dependency. Hand-rolled controls lose focus rings, `disabled` semantics,
+  keyboard nav and ARIA, and drift from the rest of the app. Only build custom after
+  confirming nothing in the registry fits, and say why in the PR.
+- **Reuse an existing composition before inventing a new one.** A segmented control already
+  exists (`locale-switcher.tsx`); a new one must look identical, not merely similar.
 - Env vars in `.env` (never hardcoded, never committed).
 - **Zod validation** (`.validator`) on every `createServerFn` before touching the DB.
 - Strict typing, no `any`, `noUncheckedIndexedAccess` on. Use precise types.
@@ -156,8 +167,8 @@ pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
   style/formatting · `:rocket:` deploy/release · `:fire:` remove dead code ·
   `:adhesive_bandage:` simple fix (not a real bug). Full list: https://gitmoji.dev/
 
-- **Never add a `Co-Authored-By: Claude` trailer or any "Generated with Claude Code" mention**
-  in commits or PR bodies. No agent co-signature.
+- **Never add a `Co-Authored-By:` trailer or any "Generated with …" mention** (Claude, Codex or
+  any other agent) in commits or PR bodies. No agent co-signature.
 - Commit/push only when explicitly asked.
 - One Linear ticket = one `dev-XX-…` branch (name provided by Linear) = one PR to `main`.
 - PR title in conventional-commit form referencing the ticket. Explain any new reusable
