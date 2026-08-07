@@ -74,9 +74,18 @@ swatches instead of a color picker, so a stable token lets us restyle the palett
 (and handle light/dark) without touching stored rows. Allowed tokens: `slate`,
 `blue`, `teal`, `green`, `amber`, `orange`, `red`, `rose`, `violet`, `pink`
 (default `slate`). Validated at two levels: a Zod `z.enum(STAGE_COLOR_TOKENS)` in
-the `createServerFn`, and a Postgres `CHECK` (`stages_color_token`). The token →
-light/dark hex mapping is a front-end concern, added with the UI (DEV-19/21/26);
-`STAGE_COLOR_TOKENS` in the schema stays the source of truth for the token list.
+the `createServerFn`, and a Postgres `CHECK` (`stages_color_token`).
+
+`STAGE_COLOR_TOKENS` and its derived `StageColorToken` type are the source of
+truth for the list. Each token maps to a `--stage-<token>` CSS variable declared
+twice in [`globals.css`](../../src/styles/globals.css) — once per theme, the dark
+values being lighter to stay legible. `stageColorVar()`
+([`stages-utils.ts`](../../src/modules/stages/stages-utils.ts)) builds that
+variable name and falls back to `slate` on an unknown token.
+
+The two-value-per-token setup is why the MVP keeps a closed palette instead of a
+color picker: a single stored hex cannot stay readable on both themes, and a
+token lets us restyle the palette without touching stored rows.
 
 ### `job_types` — opportunity job types (per user)
 
@@ -182,7 +191,8 @@ and the stage's delay (or a user-forced date):
   AND opp.stage.is_archived = false
 ```
 
-- The **KPI** "À relancer aujourd'hui" counts opportunities matching this.
+- The **KPI** "À relancer aujourd'hui" counts opportunities matching this. The
+  dashboard KPI band is documented in [`kpis.md`](kpis.md).
 - The kanban **"En retard · <date>"** badge shows when the computed due date has
   passed.
 - "Lancer les relances" applies an **"À relancer" filter** to the list — it is not

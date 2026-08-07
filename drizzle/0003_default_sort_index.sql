@@ -1,0 +1,1 @@
+CREATE INDEX "opportunities_user_pinned_updated_idx" ON "opportunities" USING btree ("user_id","is_pinned" DESC NULLS LAST,"updated_at" DESC NULLS LAST);
