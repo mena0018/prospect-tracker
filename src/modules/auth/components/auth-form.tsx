@@ -20,7 +20,7 @@ export function AuthForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 space-y-2 text-center">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+        <h1 className="text-3xl font-semibold tracking-tight">
           {isSignin ? m.auth_signinTitle() : m.auth_signupTitle()}
         </h1>
         <p className="text-muted-foreground">
@@ -30,16 +30,18 @@ export function AuthForm() {
 
       {isSignin ? <SigninForm {...formProps} /> : <SignupForm {...formProps} />}
 
-      <p className="text-muted-foreground mt-8 space-x-1 text-center text-sm">
-        <span>{isSignin ? m.auth_noAccount() : m.auth_hasAccount()}</span>
+      <div className="mt-8 space-x-1 text-center text-sm">
+        <span className="text-muted-foreground">
+          {isSignin ? m.auth_noAccount() : m.auth_hasAccount()}
+        </span>
         <Link
           to={APP_ROUTES.login}
           search={(prev) => ({ ...prev, mode: isSignin ? 'signup' : 'signin' })}
-          className="text-foreground hover:text-primary underline underline-offset-4"
+          className="hover:text-primary underline underline-offset-4"
         >
           {isSignin ? m.auth_switchToSignup() : m.auth_switchToSignin()}
         </Link>
-      </p>
+      </div>
     </div>
   )
 }

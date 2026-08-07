@@ -14,7 +14,7 @@ export function OAuthSection({ pending, onClick }: Props) {
     <>
       <div className="flex items-center gap-4">
         <Separator className="flex-1" />
-        <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+        <span className="text-muted-foreground tracking-label text-2xs font-semibold uppercase">
           {m.auth_oauthDivider()}
         </span>
         <Separator className="flex-1" />
