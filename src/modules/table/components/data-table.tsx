@@ -39,6 +39,7 @@ export function DataTable<TData extends RowData>({
 }: Props<TData>) {
   const rows = table.getRowModel().rows
   const headers = table.getHeaderGroups().flatMap((headerGroup) => headerGroup.headers)
+  const isEmpty = rows.length === 0
 
   return (
     <div
@@ -48,7 +49,7 @@ export function DataTable<TData extends RowData>({
         isFetching && 'pointer-events-none opacity-50'
       )}
     >
-      <table className={TABLE_LAYOUT}>
+      <table className={cn(TABLE_LAYOUT, isEmpty && 'h-full grid-rows-[auto_1fr]')}>
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-secondary sticky top-0 z-10 grid">
           <tr className={cn(HEADER_ROW_LAYOUT, gridTemplate)}>
@@ -106,8 +107,8 @@ export function DataTable<TData extends RowData>({
           </tr>
         </thead>
 
-        <tbody className="grid">
-          {rows.length === 0 ? (
+        <tbody className={cn('grid', isEmpty && 'grid-rows-[1fr]')}>
+          {isEmpty ? (
             <tr className="grid">
               <td
                 colSpan={headers.length}
