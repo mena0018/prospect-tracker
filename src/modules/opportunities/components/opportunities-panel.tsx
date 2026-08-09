@@ -23,25 +23,29 @@ import { useOpportunityMutations } from '@/modules/opportunities/hooks/use-oppor
 import { TODAY, toRows, type OpportunityRow } from '@/modules/opportunities/opportunities-utils'
 import { indexStages } from '@/modules/stages/stages-utils'
 import { useStages } from '@/modules/stages/hooks/use-stages'
+import { useCustomization } from '@/modules/customization/use-customization'
 
 const PANEL_LAYOUT = 'flex h-full min-h-0 flex-col'
 const PANEL_CARD_LAYOUT =
   'bg-card border-border flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border'
 
-type Props = {
-  dailyRateReference: number
-}
+export function OpportunitiesPanel() {
+  const listInput = useOpportunitiesListInput()
+  const { hasFilters, pagination } = useOpportunitiesFilters()
 
-export function OpportunitiesPanel({ dailyRateReference }: Props) {
+  const {
+    data: customization,
+    isPending: isCustomizationPending,
+    isError: isCustomizationError,
+    refetch: refetchCustomization
+  } = useCustomization()
+
   const {
     data: stages,
     isPending: isStagesPending,
     isError: isStagesError,
     refetch: refetchStages
   } = useStages()
-
-  const listInput = useOpportunitiesListInput()
-  const { hasFilters, pagination } = useOpportunitiesFilters()
 
   const {
     data: page,
@@ -58,8 +62,8 @@ export function OpportunitiesPanel({ dailyRateReference }: Props) {
     refetch: refetchSummary
   } = useOpportunitiesSummary()
 
-  const hasError = isPageError || isStagesError || isSummaryError
-  const isPending = isPagePending || isStagesPending || isSummaryPending
+  const hasError = isPageError || isStagesError || isSummaryError || isCustomizationError
+  const isPending = isPagePending || isStagesPending || isSummaryPending || isCustomizationPending
 
   const { update } = useOpportunityMutations()
   const { mutate: updateOpportunity } = update
@@ -79,13 +83,14 @@ export function OpportunitiesPanel({ dailyRateReference }: Props) {
     void refetchPage()
     void refetchStages()
     void refetchSummary()
+    void refetchCustomization()
   }
 
   if (hasError) {
     return <ErrorState variant="section" description={m.error_description()} onRetry={retry} />
   }
 
-  if (isPending || !page || !summary) {
+  if (isPending) {
     return <OpportunitiesPanelSkeleton rowCount={pagination.pageSize} />
   }
 
@@ -103,8 +108,8 @@ export function OpportunitiesPanel({ dailyRateReference }: Props) {
           servedPage={page.page}
           pageCount={page.pageCount}
           isFetching={isPageFetching}
-          dailyRateReference={dailyRateReference}
           onTogglePin={togglePin}
+          dailyRateReference={customization.dailyRateReference}
           emptyTitle={hasFilters ? m.table_noResults() : m.table_empty()}
           emptyHint={hasFilters ? m.table_noResultsHint() : m.table_emptyHint()}
         />

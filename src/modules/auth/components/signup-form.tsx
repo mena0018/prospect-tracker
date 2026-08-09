@@ -44,9 +44,9 @@ export function SignupForm({ next, oauthFailed, email, onEmailChange }: Props) {
         return errorCode ? { form: errorCode } : null
       }
     },
-    onSubmit: () => {
-      router.invalidate()
-      router.navigate({ to: next })
+    onSubmit: async () => {
+      await router.invalidate()
+      await router.navigate({ to: next })
     }
   })
 

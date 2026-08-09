@@ -37,7 +37,7 @@ function LoginPage() {
         </div>
 
         <figure className="relative max-w-sm space-y-5">
-          <blockquote className="text-2xl leading-relaxed font-medium text-balance">
+          <blockquote className="text-2xl leading-snug font-medium text-balance italic">
             {m.auth_quote()}
           </blockquote>
           <figcaption className="text-muted-foreground text-sm">{m.auth_quoteAuthor()}</figcaption>

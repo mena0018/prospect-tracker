@@ -32,7 +32,7 @@
     }
   ],
   "notFound_title": "Page introuvable",
-  "notFound_description": "Cette page n'existe pas ou a été déplacée.",
+  "notFound_description": "La page que vous cherchez n'existe pas ou a été déplacée.",
   "nav_tracker": "Tracker",
   "nav_customize": "Personnaliser",
   "nav_pipeline": "Pipeline",

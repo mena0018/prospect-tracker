@@ -17,6 +17,7 @@ const db = drizzle({ client, schema })
 const args = process.argv.slice(2)
 const emailArg = args.find((arg) => arg.startsWith('--email='))?.slice('--email='.length)
 const shouldReset = args.includes('--reset')
+const clearOnly = args.includes('--clear')
 
 function isoDateFromOffset(offsetDays: number | null) {
   if (offsetDays === null) return null
@@ -47,6 +48,17 @@ async function resolveUser(email: string | undefined) {
 
 async function main() {
   const user = await resolveUser(emailArg)
+  console.log(`Target user: ${user.email}`)
+
+  if (clearOnly) {
+    const deleted = await db
+      .delete(opportunities)
+      .where(eq(opportunities.userId, user.id))
+      .returning({ id: opportunities.id })
+
+    console.log(`Deleted ${deleted.length} opportunities for ${user.email}`)
+    return
+  }
 
   const [userStages, userJobTypes, userExperiences] = await Promise.all([
     db.select().from(stages).where(eq(stages.userId, user.id)),

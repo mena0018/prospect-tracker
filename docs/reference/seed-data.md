@@ -10,7 +10,16 @@ pagination, sorting, filters) instead of mocks.
 pnpm db:seed                              # first user created, keeps existing rows
 pnpm db:seed -- --email=you@example.com   # target a specific user
 pnpm db:seed -- --reset                   # delete that user's opportunities first
+pnpm db:seed -- --clear                   # delete only, insert nothing
 ```
+
+**Always pass `--` before the flags.** `pnpm db:seed --email=x` lets pnpm swallow the flag, so
+`--email` never reaches the script and it silently falls back to the oldest user — which seeds
+the wrong account when several exist. The script prints `Target user: <email>` before writing,
+so check that line.
+
+`--clear` deletes the target user's opportunities and exits without inserting. It skips the
+stage/job-type resolution entirely, so it works even on a user whose pipeline was never seeded.
 
 The script reads `DATABASE_URL` from `.env` via `tsx --env-file=.env`. It never creates users:
 the target must already exist in `public.users`, which happens on first login through
