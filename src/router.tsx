@@ -17,8 +17,12 @@ export function getRouter() {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+
+    // Default 1000ms leaves the dashboard blank — see docs/reference/loading-states.md
+    defaultPendingMs: 150,
     defaultPreload: 'intent',
     defaultNotFoundComponent: () => <NotFound />,
+
     rewrite: {
       input: ({ url }) => deLocalizeUrl(url),
       output: ({ url }) => localizeUrl(url)
