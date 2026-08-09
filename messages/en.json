@@ -32,7 +32,7 @@
     }
   ],
   "notFound_title": "Page not found",
-  "notFound_description": "This page does not exist or has been moved.",
+  "notFound_description": "The page you are looking for does not exist or has been moved.",
   "nav_tracker": "Tracker",
   "nav_customize": "Customize",
   "nav_pipeline": "Pipeline",
