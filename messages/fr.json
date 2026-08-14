@@ -2,7 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "common_localeName": "Français",
   "common_switchLocale": "Langue",
-  "common_tagline": "Relance. Décroche.",
+  "common_tagline": "Relancez jusqu’à décrocher",
   "common_retry": "Réessayer",
   "common_backHome": "Retour à l'accueil",
   "error_title": "Une erreur est survenue.",
