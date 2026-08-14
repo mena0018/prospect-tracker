@@ -171,5 +171,13 @@ pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
   any other agent) in commits or PR bodies. No agent co-signature.
 - Commit/push only when explicitly asked.
 - One Linear ticket = one `dev-XX-…` branch (name provided by Linear) = one PR to `main`.
-- PR title in conventional-commit form referencing the ticket. Explain any new reusable
-  pattern or new dependency (why, rejected alternative). Note mobile/dark states when UI.
+- **PR title: `DEV-XX · Short description`** — ticket id, a middle dot, then plain English.
+  **Not** conventional-commit form, and no gitmoji: that format is for commits only.
+
+  ```
+  DEV-42 · Loading states between login and dashboard
+  DEV-41 · App shell, sidebar and profile menu
+  ```
+
+- In the PR description, explain any new reusable pattern or new dependency (why, rejected
+  alternative). Note mobile/dark states when UI.
