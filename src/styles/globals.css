@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+
 @import '@fontsource-variable/geist';
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
 
 @import './animations.css';
 
@@ -103,12 +105,19 @@
 
 @theme inline {
   --font-sans: 'Geist Variable', system-ui, sans-serif;
-  --font-heading: var(--font-sans);
+  --font-heading: 'Bricolage Grotesque Variable', var(--font-sans);
 
   --text-2xs: 0.6875rem; /* 11px — uppercase labels, meta */
   --text-2xs--line-height: 0.9375rem;
+
   --text-xs: 0.78125rem; /* 12.5px — pagination, badges, meta */
   --text-xs--line-height: 1.0625rem;
+
+  --text-base: 0.875rem; /* 14px — body, so imported components land on scale */
+  --text-base--line-height: 1.25rem;
+
+  --text-md: 1rem; /* 16px — titles, lg button */
+  --text-md--line-height: 1.5rem;
 
   --tracking-label: 0.3px;
   --tracking-title: -0.2px;
@@ -156,7 +165,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-sm;
   }
   html {
     @apply font-sans antialiased;

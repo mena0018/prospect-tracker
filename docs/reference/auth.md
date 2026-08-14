@@ -63,7 +63,7 @@ here and must never be `VITE_`-prefixed.
   session (`exchangeCodeForSession`) and redirects to `next` (default `/app`).
   Every callback origin must be registered in Supabase → Auth → URL Configuration:
   `localhost`, the stable prod domain, and a **wildcard** for Vercel previews
-  (`https://prospect-tracker-*-<scope>.vercel.app/api/auth/callback`). The
+  (`https://meetprospect-*-<scope>.vercel.app/api/auth/callback`). The
   wildcard also matters because the `?next=` query string means the `redirectTo`
   never equals a bare allow-list entry — a wildcard entry is what makes it match;
   otherwise Supabase silently falls back to the Site URL.

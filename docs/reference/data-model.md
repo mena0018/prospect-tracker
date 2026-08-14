@@ -1,4 +1,4 @@
-# Data model — ProspectTracker
+# Data model — MeetProspect
 
 Reference for the application data model. The source of truth is the Drizzle
 schema in [`src/db/schema.ts`](../src/db/schema.ts); this document explains it and

@@ -20,7 +20,7 @@ export function AuthForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 space-y-2 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">
           {isSignin ? m.auth_signinTitle() : m.auth_signupTitle()}
         </h1>
         <p className="text-muted-foreground">
@@ -30,7 +30,7 @@ export function AuthForm() {
 
       {isSignin ? <SigninForm {...formProps} /> : <SignupForm {...formProps} />}
 
-      <div className="mt-8 space-x-1 text-center text-sm">
+      <div className="mt-8 space-x-1 text-center">
         <span className="text-muted-foreground">
           {isSignin ? m.auth_noAccount() : m.auth_hasAccount()}
         </span>

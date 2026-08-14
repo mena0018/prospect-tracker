@@ -1,4 +1,4 @@
-# CLAUDE.md — ProspectTracker
+# CLAUDE.md — MeetProspect
 
 Prospecting-tracker SaaS for freelancers, work-study students and job seekers.
 Product reference: see `docs/PRD.md`.
@@ -92,6 +92,10 @@ after login. Rules: `docs/reference/guest-mode.md`.
   Radix — no new dependency. Hand-rolled controls lose focus rings, `disabled` semantics,
   keyboard nav and ARIA, and drift from the rest of the app. Only build custom after
   confirming nothing in the registry fits, and say why in the PR.
+- **The type scale is recentred on a 14px body.** Write `text-sm` (14px) for body copy and
+  `text-md` (16px) to promote a title. **Never write `text-base`** — it is pinned to 14px as
+  the landing zone for imported shadcn components, and keeping it out of our own code is what
+  lets it be retuned independently. See `docs/reference/design-tokens.md`.
 - **Reuse an existing composition before inventing a new one.** A segmented control already
   exists (`locale-switcher.tsx`); a new one must look identical, not merely similar.
 - Env vars in `.env` (never hardcoded, never committed).

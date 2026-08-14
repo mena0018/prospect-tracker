@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AuthForm } from '@/modules/auth/components/auth-form'
 import { loginSearchSchema } from '@/modules/auth/auth-schema'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
+import { BrandMark } from '@/components/icons/brand-mark'
 import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
@@ -28,10 +29,10 @@ function LoginPage() {
         />
 
         <div className="relative flex items-center gap-3">
-          <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg text-sm font-semibold tracking-tight">
-            {CONFIG.brandInitials}
+          <div className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg">
+            <BrandMark className="size-8.5" />
           </div>
-          <span className="text-foreground tracking-page-title text-lg font-semibold">
+          <span className="text-foreground font-heading tracking-page-title text-lg font-semibold">
             {CONFIG.brand}
           </span>
         </div>
@@ -40,17 +41,17 @@ function LoginPage() {
           <blockquote className="text-2xl leading-snug font-medium text-balance italic">
             {m.auth_quote()}
           </blockquote>
-          <figcaption className="text-muted-foreground text-sm">{m.auth_quoteAuthor()}</figcaption>
+          <figcaption className="text-muted-foreground">{m.auth_quoteAuthor()}</figcaption>
         </figure>
       </aside>
 
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-6 py-5 md:px-10">
           <div className="flex items-center gap-2.5 lg:hidden">
-            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg text-xs font-semibold tracking-tight">
-              {CONFIG.brandInitials}
+            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
+              <BrandMark className="size-6.5" />
             </div>
-            <span className="text-foreground tracking-title text-lg font-semibold">
+            <span className="text-foreground font-heading tracking-title text-lg font-semibold">
               {CONFIG.brand}
             </span>
           </div>
