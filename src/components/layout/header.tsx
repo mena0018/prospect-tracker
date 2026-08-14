@@ -21,7 +21,7 @@ export function Header() {
           title={m.header_toggleSidebar()}
         />
         <div className="flex min-w-0 flex-col justify-center gap-1.5">
-          <h1 className="text-foreground tracking-page-title truncate text-lg leading-none font-semibold">
+          <h1 className="text-foreground font-heading tracking-page-title truncate text-lg leading-none font-semibold">
             {m.nav_tracker()}
           </h1>
           {isPending || !data ? (

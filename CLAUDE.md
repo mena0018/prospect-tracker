@@ -1,4 +1,4 @@
-# CLAUDE.md — ProspectTracker
+# CLAUDE.md — MeetProspect
 
 Prospecting-tracker SaaS for freelancers, work-study students and job seekers.
 Product reference: see `docs/PRD.md`.
@@ -92,6 +92,10 @@ after login. Rules: `docs/reference/guest-mode.md`.
   Radix — no new dependency. Hand-rolled controls lose focus rings, `disabled` semantics,
   keyboard nav and ARIA, and drift from the rest of the app. Only build custom after
   confirming nothing in the registry fits, and say why in the PR.
+- **The type scale is recentred on a 14px body.** Write `text-sm` (14px) for body copy and
+  `text-md` (16px) to promote a title. **Never write `text-base`** — it is pinned to 14px as
+  the landing zone for imported shadcn components, and keeping it out of our own code is what
+  lets it be retuned independently. See `docs/reference/design-tokens.md`.
 - **Reuse an existing composition before inventing a new one.** A segmented control already
   exists (`locale-switcher.tsx`); a new one must look identical, not merely similar.
 - Env vars in `.env` (never hardcoded, never committed).
@@ -171,5 +175,13 @@ pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
   any other agent) in commits or PR bodies. No agent co-signature.
 - Commit/push only when explicitly asked.
 - One Linear ticket = one `dev-XX-…` branch (name provided by Linear) = one PR to `main`.
-- PR title in conventional-commit form referencing the ticket. Explain any new reusable
-  pattern or new dependency (why, rejected alternative). Note mobile/dark states when UI.
+- **PR title: `DEV-XX · Short description`** — ticket id, a middle dot, then plain English.
+  **Not** conventional-commit form, and no gitmoji: that format is for commits only.
+
+  ```
+  DEV-42 · Loading states between login and dashboard
+  DEV-41 · App shell, sidebar and profile menu
+  ```
+
+- In the PR description, explain any new reusable pattern or new dependency (why, rejected
+  alternative). Note mobile/dark states when UI.

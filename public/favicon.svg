@@ -1,14 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="loop-fade" x1="23.72" y1="15.72" x2="16" y2="8.65" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.4" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="1" />
+    </linearGradient>
+  </defs>
   <rect width="32" height="32" rx="9" fill="oklch(0.585 0.204 277.1)" />
-  <text
-    x="16"
-    y="16"
-    font-family="Inter, system-ui, sans-serif"
-    font-size="15"
-    font-weight="600"
-    letter-spacing="-0.5"
-    fill="#ffffff"
-    text-anchor="middle"
-    dominant-baseline="central"
-  >PT</text>
+  <path
+    d="M23.72 15.72A7.75 7.75 0 1 1 16 8.65"
+    fill="none"
+    stroke="url(#loop-fade)"
+    stroke-width="3.88"
+    stroke-linecap="round"
+  />
+  <path d="M16 5.37 20.77 8.65 16 11.93z" fill="#ffffff" />
+  <circle cx="16" cy="16.4" r="2.38" fill="#ffffff" />
 </svg>

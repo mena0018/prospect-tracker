@@ -1,4 +1,4 @@
-# ProspectTracker
+# MeetProspect
 
 **The prospecting tracker built for the freelance mission cycle** — smart follow-ups
 and a view that drives action ("who do I follow up with today?") rather than
@@ -6,10 +6,10 @@ contemplation.
 
 Freelancers, work-study students and job seekers track their prospecting by hand
 (Notion, Excel, gut feeling): no automatic follow-ups, no scoring, no reason to open the
-tool in the morning. ProspectTracker is the daily action-oriented work tool that fixes
+tool in the morning. MeetProspect is the daily action-oriented work tool that fixes
 that.
 
-![ProspectTracker — Tracker view](docs/assets/preview-tracker.webp)
+![MeetProspect — Tracker view](docs/assets/preview-tracker.webp)
 
 ## Features
 

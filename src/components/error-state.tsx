@@ -36,11 +36,14 @@ export function ErrorState({
         !
       </p>
       <h2
-        className={cn('font-semibold tracking-tight', variant === 'page' ? 'text-2xl' : 'text-lg')}
+        className={cn(
+          'font-heading font-semibold tracking-tight',
+          variant === 'page' ? 'text-2xl' : 'text-lg'
+        )}
       >
         {title}
       </h2>
-      <p className="text-muted-foreground max-w-sm text-sm">{description}</p>
+      <p className="text-muted-foreground max-w-sm">{description}</p>
       <div className="mt-2 flex gap-3">
         {onRetry ? (
           <Button type="button" onClick={onRetry}>

@@ -4,49 +4,82 @@ Source of truth for typography and text colors.
 
 Implementation: `src/styles/globals.css` (`@theme inline` block).
 
-The guiding rule is **stay on Tailwind's defaults**. Every override is a step someone has to
-memorise, so the scale below only departs from stock Tailwind where the product genuinely
-needs it — two steps, both below `sm`. Reach for a stock utility before proposing a new
-token.
+The guiding rule is **the scale is recentred on a 14px body**. Tailwind's stock scale assumes
+a 16px body; this app's body copy is 14px, so every stock token sits one step too large.
+Rather than correcting that at each call site, the scale below shifts the tokens themselves.
+Overrides still cost something to memorise — reach for an existing token before proposing a
+new one.
 
 ## Fonts
 
-| Token            | Stack                                     | Usage      |
-| ---------------- | ----------------------------------------- | ---------- |
-| `--font-sans`    | `'Geist Variable', system-ui, sans-serif` | everything |
-| `--font-heading` | alias of `--font-sans`                    | everything |
+| Token            | Stack                                             | Usage                              |
+| ---------------- | ------------------------------------------------- | ---------------------------------- |
+| `--font-sans`    | `'Geist Variable', system-ui, sans-serif`         | body, UI, numerics                 |
+| `--font-heading` | `'Bricolage Grotesque Variable'`, falls to `sans` | titles, brand — via `font-heading` |
 
-The app is **single-typeface**: Geist covers body copy and headings alike. `--font-heading`
-stays as an alias so a display face can be swapped in later without touching call sites.
-Headings separate from body copy through weight and tracking (`font-semibold` +
-`tracking-title` / `tracking-page-title`), not through a second family.
+**Two typefaces.** Geist carries body copy, controls and every numeric column; Bricolage
+Grotesque is the display face, applied through the `font-heading` utility on page titles
+(`h1`/`h2`), UI component titles (card, sheet, dialog) and the brand wordmark. Headings still
+carry weight and tracking (`font-semibold` + `tracking-title` / `tracking-page-title`) — the
+second family adds to that contrast, it does not replace it.
 
-Numeric columns (KPI figures, day rates, dates) use `tabular-nums` so digits stay aligned
-across rows.
+**Numerics stay on Geist.** KPI figures, day rates and paginated counts use `tabular-nums`
+and sit in aligned columns; Bricolage's digits are far more characterful and read as noise
+when stacked. Do not put `font-heading` on a number.
+
+Bricolage is imported as the **`wght`-only variable build** (`@fontsource-variable/bricolage-grotesque/wght.css`,
+41 KB latin) rather than `standard.css` (131 KB), which also ships the `wdth` and `opsz` axes.
+Nothing varies width or optical size today. Switch the import if that changes.
 
 ## Type scale
 
-Stock Tailwind, with two additions below `sm`. `text-sm` and everything above it are
-untouched Tailwind values, so the ramp is strictly increasing and `base` is still 16px.
+| Token       | Size     | Line height | Usage                                    |
+| ----------- | -------- | ----------- | ---------------------------------------- |
+| `text-2xs`  | 11px †   | 15px        | uppercase labels, meta                   |
+| `text-xs`   | 12.5px † | 17px        | pagination, badges, secondary links      |
+| `text-sm`   | 14px     | 20px        | **the one to write** — body copy         |
+| `text-base` | 14px †   | 20px        | **shadcn landing zone** — never write it |
+| `text-md`   | 16px †   | 24px        | card/sheet/dialog titles, `lg` button    |
+| `text-lg`   | 18px     | 28px        | Tailwind default — page title            |
+| `text-xl`   | 20px     | 28px        | Tailwind default                         |
+| `text-2xl`  | 24px     | 32px        | Tailwind default — marketing quote       |
+| `text-3xl`  | 30px     | 36px        | Tailwind default — KPI figures, auth h1  |
 
-| Token       | Size     | Line height | Usage                                     |
-| ----------- | -------- | ----------- | ----------------------------------------- |
-| `text-2xs`  | 11px †   | 15px        | uppercase labels, meta                    |
-| `text-xs`   | 12.5px † | 17px        | pagination, badges, secondary links       |
-| `text-sm`   | 14px     | 20px        | nav, buttons, table cells, most body copy |
-| `text-base` | 16px     | 24px        | card and section titles, brand name       |
-| `text-lg`   | 18px     | 28px        | Tailwind default — page title             |
-| `text-xl`   | 20px     | 28px        | Tailwind default                          |
-| `text-2xl`  | 24px     | 32px        | Tailwind default — marketing quote        |
-| `text-3xl`  | 30px     | 36px        | Tailwind default — KPI figures, auth h1   |
+† Four overrides. `2xs` does not exist in Tailwind at all; `xs` is nudged from 12px to keep a
+readable gap under `sm`. The other two are the recentring: `base` drops from 16px to 14px,
+and `md` is added at 16px to carry what `base` used to.
 
-† The two overrides, both for text too small to have a stock equivalent that fits: `2xs` does
-not exist in Tailwind at all, and `xs` is nudged from 12px to keep a readable gap under
-`sm`. Everything from `sm` up is stock.
+**`text-sm` and `text-base` are both 14px, and the split is deliberate.** Write `text-sm`.
+`text-base` is reserved for imported code: every shadcn component writes it (`md` does not
+exist upstream), so pinning it to the body size means a freshly added component lands
+on-scale with no edit. Keeping it out of our own code is what preserves the split — retune
+`--text-base` later and only imported markup moves.
 
-`text-sm` (14px) is the workhorse: sidebar nav, buttons, table cells, body copy. Keep at
-least one step between adjacent tokens in use — 12.5 and 13 were indistinguishable, which is
-why the 13px step was dropped.
+`body` carries `text-sm` in `@layer base`, so unclassed text inherits 14px rather than the
+browser's 16px. That is a safety net, not a substitute — a component still inherits from its
+_parent_, so anything nested under a `text-md` title must declare its own size.
+
+14px is the workhorse size: sidebar nav, buttons, table cells, body copy. Keep at least one
+step between adjacent tokens in use — 12.5 and 13 were indistinguishable, which is why the
+13px step was dropped.
+
+### Importing a shadcn component
+
+Nothing to do. The registry assumes a 16px body and writes `text-base` for body copy, which
+resolves to 14px here — the component is on-scale as installed. The only manual step is
+_promoting_ a title: if a new component's title should outrank its body, give it `text-md`.
+That is a design decision no token can make, and it comes up rarely — every component with a
+title (card, sheet, dialog, alert-dialog) is already installed.
+
+The trade-off this buys: inaction no longer produces an inconsistency. Before the recentring,
+skipping the review left a 16px island in a 14px UI; now skipping it leaves a title that is
+merely unpromoted.
+
+**The iOS zoom is real but untreated.** Form controls sit at 14px, and the viewport is
+`width=device-width, initial-scale=1` with no `maximum-scale`, so Safari zooms when a native
+`<input>`/`<textarea>` takes focus. Adding `maximum-scale=1` would stop it, at the cost of
+killing pinch-to-zoom for everyone — a WCAG 1.4.4 failure. Scale consistency won; revisit
+only with a fix that does not disable user zoom.
 
 Tracking tokens: `tracking-label` (`.3px`, uppercase labels only), `tracking-title`
 (`-.2px`), `tracking-page-title` (`-.3px`). Anything else uses Tailwind's own utilities.

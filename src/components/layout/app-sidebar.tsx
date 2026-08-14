@@ -1,6 +1,7 @@
 import { ArrowRight, Bell, ListFilter } from 'lucide-react'
 
 import { CustomizeIcon } from '@/components/icons/customize'
+import { BrandMark } from '@/components/icons/brand-mark'
 import { ProfileMenu } from '@/modules/auth/components/profile-menu'
 import { AppSidebarFooter } from '@/components/layout/app-sidebar-footer'
 import { Button } from '@/components/ui/button'
@@ -44,11 +45,13 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="gap-0 p-0 px-4 pt-4.5">
         <div className="flex items-center gap-2.75 px-1.5 pt-1.5 pb-5">
-          <div className="bg-primary text-primary-foreground tracking-title flex size-8.5 flex-none items-center justify-center rounded-lg text-sm font-semibold">
-            {CONFIG.brandInitials}
+          <div className="bg-primary text-primary-foreground flex size-8.5 flex-none items-center justify-center rounded-lg">
+            <BrandMark className="size-7.5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-foreground tracking-title font-semibold">{CONFIG.brand}</span>
+            <span className="text-foreground text-md font-heading tracking-title font-semibold">
+              {CONFIG.brand}
+            </span>
             <span className="text-muted-foreground text-xs">{m.common_tagline()}</span>
           </div>
         </div>

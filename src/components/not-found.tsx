@@ -15,7 +15,7 @@ export function NotFound() {
         >
           404
         </span>
-        <h1 className="relative text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="font-heading relative text-3xl font-semibold tracking-tight sm:text-4xl">
           {m.notFound_title()}
         </h1>
         <p className="text-muted-foreground mt-2 mb-8 font-medium tracking-tight text-balance">
