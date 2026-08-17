@@ -1,15 +1,10 @@
-import { useState } from 'react'
-
-import { useForm } from '@tanstack/react-form'
 import { useRouter } from '@tanstack/react-router'
 
-import { EmailField } from '@/modules/auth/components/email-field'
+import { useAppForm } from '@/components/form/form-hook'
 import { toFormErrorCode } from '@/modules/auth/auth-utils'
 import { toErrorMessage } from '@/lib/error'
 import { OAuthSection } from '@/modules/auth/components/oauth-section'
-import { PasswordField } from '@/modules/auth/components/password-field'
 import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
-import { Button } from '@/components/ui/button'
 import { FieldAlert, FieldGroup } from '@/components/ui/field'
 import { m } from '@/i18n/paraglide/messages'
 import { credentialsSchema } from '@/modules/auth/auth-schema'
@@ -24,10 +19,9 @@ type Props = {
 
 export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
   const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
   const { googleError, googleMutation } = useGoogleOAuth(next, oauthFailed)
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { email, password: '' },
     validators: {
       onChange: credentialsSchema,
@@ -50,22 +44,32 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
       }}
     >
       <FieldGroup>
-        <form.Field name="email">
-          {(field) => <EmailField field={field} autoComplete="username" onSync={onEmailChange} />}
-        </form.Field>
-
-        <form.Field name="password">
+        <form.AppField name="email">
           {(field) => (
-            <PasswordField
-              withForgotLink
-              field={field}
-              shown={showPassword}
-              label={m.auth_passwordLabel()}
-              autoComplete="current-password"
-              onToggle={() => setShowPassword((shown) => !shown)}
+            <field.TextInputField
+              type="email"
+              label={m.auth_emailLabel()}
+              placeholder={m.auth_emailPlaceholder()}
+              autoComplete="username"
+              onBlurValue={onEmailChange}
             />
           )}
-        </form.Field>
+        </form.AppField>
+
+        <form.AppField name="password">
+          {(field) => (
+            <field.PasswordField
+              label={m.auth_passwordLabel()}
+              autoComplete="current-password"
+              /* TODO: link to the reset route once it exists. */
+              labelSuffix={
+                <span className="text-muted-foreground text-xs font-medium">
+                  {m.auth_forgotPassword()}
+                </span>
+              }
+            />
+          )}
+        </form.AppField>
 
         <form.Subscribe selector={(s) => s.errorMap.onSubmit}>
           {(formError) => {
@@ -75,17 +79,9 @@ export function SigninForm({ next, oauthFailed, email, onEmailChange }: Props) {
           }}
         </form.Subscribe>
 
-        <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting] as const}>
-          {([canSubmit, isSubmitting]) => (
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              disabled={!canSubmit || googleMutation.isPending}
-            >
-              {m.auth_signinSubmit()}
-            </Button>
-          )}
-        </form.Subscribe>
+        <form.AppForm>
+          <form.SubmitButton label={m.auth_signinSubmit()} busy={googleMutation.isPending} />
+        </form.AppForm>
 
         <OAuthSection pending={googleMutation.isPending} onClick={() => googleMutation.mutate()} />
       </FieldGroup>

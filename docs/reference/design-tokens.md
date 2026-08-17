@@ -148,6 +148,24 @@ surface while keeping a visible step below `secondary-foreground`.
 Primary on the soft accent background measures 3.99:1 — the active nav item and the filter
 badge both sit on that pair, so the darker indigo brings them to 5.6:1.
 
+### Warning
+
+`--warning` marks a value approaching a limit — the step before `--destructive`, never an error
+on its own. Today: the notes character counter in the opportunity sheet.
+
+| Theme | oklch                    | Contrast on `card` | on `muted` |
+| ----- | ------------------------ | ------------------ | ---------- |
+| Light | `oklch(0.56 0.132 62.5)` | 4.86:1             | 4.50:1     |
+| Dark  | `oklch(0.76 0.145 68.2)` | 8.06:1             | —          |
+
+The light value is **darker than the amber it started from** (`oklch(0.588 …)`, the same hue as
+`--stage-amber`). At that lightness it measures 4.29:1 — under AA, and the counter renders at
+11px, so the 3:1 large-text floor does not apply.
+
+It is a distinct token rather than a reuse of `--stage-amber`: the stage palette identifies
+pipeline stages, and borrowing one of its hues would attach a second, unrelated meaning to a
+token the stages own — they would then be unable to change it independently.
+
 ## Surfaces
 
 | Role                           | Light     | Dark      |
