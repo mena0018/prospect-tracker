@@ -4,7 +4,7 @@ import {
   getOpportunitiesSummary,
   listOpportunities
 } from '@/modules/opportunities/opportunities-server'
-import { TODAY } from '@/modules/opportunities/opportunities-utils'
+import { useToday } from '@/hooks/use-today'
 import type { ListOpportunitiesInput } from '@/modules/opportunities/opportunities-schema'
 
 export const OPPORTUNITIES_QUERY_KEY = ['opportunities']
@@ -22,12 +22,15 @@ export function useOpportunities(input: ListOpportunitiesInput) {
   return useQuery(opportunitiesQueryOptions(input))
 }
 
-const summaryQueryOptions = () =>
+const summaryQueryOptions = (today: string, q: string) =>
   queryOptions({
-    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'summary', TODAY],
-    queryFn: () => getOpportunitiesSummary({ data: { today: TODAY } })
+    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'summary', today, q],
+    queryFn: () => getOpportunitiesSummary({ data: { today, q } }),
+
+    // The tab counts follow the search, so keep the last ones while the next arrive.
+    placeholderData: (previous) => previous
   })
 
-export function useOpportunitiesSummary() {
-  return useQuery(summaryQueryOptions())
+export function useOpportunitiesSummary(q: string) {
+  return useQuery(summaryQueryOptions(useToday(), q))
 }

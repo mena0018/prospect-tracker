@@ -23,6 +23,8 @@ type Props<TData extends RowData> = {
   silentColumns?: Readonly<Record<string, string>>
   cellClassName?: (columnId: string) => string | undefined
   rowClassName?: (row: TData) => string | undefined
+  onRowClick?: (row: TData) => void
+  rowActionLabel?: (row: TData) => string
   caption: string
 }
 
@@ -35,6 +37,8 @@ export function DataTable<TData extends RowData>({
   silentColumns = {},
   cellClassName,
   rowClassName,
+  onRowClick,
+  rowActionLabel,
   caption
 }: Props<TData>) {
   const rows = table.getRowModel().rows
@@ -122,9 +126,24 @@ export function DataTable<TData extends RowData>({
             rows.map((row) => (
               <tr
                 key={row.id}
+                // A <tr> gets no keyboard affordance from a click handler alone.
+                {...(onRowClick && {
+                  role: 'button',
+                  tabIndex: 0,
+                  'aria-label': rowActionLabel?.(row.original),
+                  onClick: () => onRowClick(row.original),
+                  onKeyDown: (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return
+                    // Space scrolls the table otherwise.
+                    event.preventDefault()
+                    onRowClick(row.original)
+                  }
+                })}
                 className={cn(
                   ROW_LAYOUT,
                   'hover:bg-accent/60 transition-colors',
+                  onRowClick &&
+                    'focus-visible:ring-ring cursor-pointer focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
                   gridTemplate,
                   rowClassName?.(row.original)
                 )}

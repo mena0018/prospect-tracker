@@ -12,6 +12,8 @@ import {
 } from '@/modules/opportunities/components/opportunities-panel'
 import { stagesQueryOptions } from '@/modules/stages/hooks/use-stages'
 import { customizationQueryOptions } from '@/modules/customization/use-customization'
+import { jobTypesQueryOptions } from '@/modules/job-types/use-job-types'
+import { experienceLevelsQueryOptions } from '@/modules/experience-levels/use-experience-levels'
 
 export const Route = createFileRoute('/_authed/app')({
   ssr: 'data-only',
@@ -19,6 +21,10 @@ export const Route = createFileRoute('/_authed/app')({
   search: { middlewares: [stripSearchParams(OPPORTUNITIES_SEARCH_DEFAULTS)] },
 
   loader: async ({ context: { queryClient } }) => {
+    // Only the table data below blocks the page; these load in the background.
+    queryClient.prefetchQuery(jobTypesQueryOptions())
+    queryClient.prefetchQuery(experienceLevelsQueryOptions())
+
     await Promise.all([
       queryClient.ensureQueryData(stagesQueryOptions()),
       queryClient.ensureQueryData(customizationQueryOptions())

@@ -22,7 +22,7 @@ function KpiCard({ label, value, unit, icon: Icon, isAlert = false }: Props) {
   return (
     <div className={cn(CARD_LAYOUT, isAlert ? 'border-destructive/25' : 'border-border')}>
       <div className="flex items-start justify-between gap-2">
-        <span className="text-secondary-foreground text-sm font-medium">{label}</span>
+        <span className="text-secondary-foreground font-medium">{label}</span>
         <span
           className={cn(
             'flex size-6.5 flex-none items-center justify-center rounded-lg',

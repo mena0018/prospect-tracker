@@ -1,10 +1,13 @@
 import { z } from 'zod/v4'
 
 import { m } from '@/i18n/paraglide/messages'
+import { toNumeric, toOptionalText } from '@/modules/opportunities/utils/form-values'
 import { tableSearchSchema } from '@/modules/table/table-schema'
 
 // See docs/reference/data-model.md for the nullable + optional rule
 const nullableText = z.string().trim().nullable().optional()
+
+export const NOTES_MAX_LENGTH = 500
 
 export const opportunityFieldsSchema = z.object({
   stageId: z.uuid({ error: () => m.validation_stageRequired() }),
@@ -44,10 +47,64 @@ export const opportunityFieldsSchema = z.object({
     .url({ error: () => m.validation_offerUrlInvalid() })
     .nullable()
     .optional(),
-  notes: nullableText,
+  notes: z
+    .string()
+    .trim()
+    .max(NOTES_MAX_LENGTH, { error: () => m.validation_notesTooLong() })
+    .nullable()
+    .optional(),
   isPinned: z.boolean().optional(),
   isArchived: z.boolean().optional()
 })
+
+// Every field is a string; the schema below converts back at the edge.
+// See docs/reference/opportunity-form.md
+export type OpportunityFormValues = {
+  stageId: string
+  jobTypeId: string | null
+  experienceId: string | null
+  recruiter: string
+  esn: string
+  endClient: string
+  need: string
+  dailyRate: string
+  // A select, so it clears to null rather than to an empty string.
+  onsiteDays: string | null
+  location: string
+  lastContactAt: string
+  nextReminderAt: string
+  phone: string
+  offerUrl: string
+  notes: string
+}
+
+const TEXT_FIELDS = [
+  'esn',
+  'endClient',
+  'need',
+  'location',
+  'lastContactAt',
+  'nextReminderAt',
+  'phone',
+  'offerUrl',
+  'notes'
+] as const
+
+const NUMERIC_FIELDS = ['dailyRate', 'onsiteDays'] as const
+
+// `z.custom` rather than a piped object schema — the variance check rejects the wider server
+// input type. See docs/reference/opportunity-form.md
+export const opportunityFormSchema = z
+  .custom<OpportunityFormValues>()
+  .transform((raw) => {
+    const values: Record<string, unknown> = { ...raw }
+
+    for (const key of TEXT_FIELDS) values[key] = toOptionalText(values[key])
+    for (const key of NUMERIC_FIELDS) values[key] = toNumeric(values[key])
+
+    return values
+  })
+  .pipe(opportunityFieldsSchema)
 
 export const createOpportunitySchema = opportunityFieldsSchema
 
@@ -113,7 +170,11 @@ export const listOpportunitiesSchema = z.object({
 
 export type ListOpportunitiesInput = z.infer<typeof listOpportunitiesSchema>
 
-export const opportunitiesSummarySchema = z.object({ today: z.iso.date() })
+// `q` narrows the tab counts only; the KPIs stay global. See docs/reference/kpis.md
+export const opportunitiesSummarySchema = z.object({
+  today: z.iso.date(),
+  q: z.string().trim().default('')
+})
 
 // Pipeline rules shared by the client calculations and their SQL counterparts. See docs/reference/kpis.md
 export const SAVED_POSITION = 0

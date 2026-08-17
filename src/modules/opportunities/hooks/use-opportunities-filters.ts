@@ -3,7 +3,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { APP_ROUTES } from '@/lib/routes'
 import { Route } from '@/routes/_authed/app'
 import { useTableSearch } from '@/modules/table/hooks/use-table-search'
-import type { StatusTab } from '@/modules/opportunities/opportunities-utils'
+import type { StatusTab } from '@/modules/opportunities/utils/rows'
 import {
   OPPORTUNITIES_SEARCH_DEFAULTS,
   type OpportunitiesSearch

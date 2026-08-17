@@ -21,7 +21,7 @@ import {
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
-import { stageColorVar } from '@/modules/stages/stages-utils'
+import { StageBadge } from '@/modules/stages/components/stage-badge'
 import { useStageCounts } from '@/modules/stages/hooks/use-stage-counts'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DEFAULT_STAGES } from '@/db/defaults'
@@ -87,13 +87,7 @@ export function AppSidebar() {
                     key={stage.id}
                     className="text-secondary-foreground flex items-center justify-between py-1.25 text-xs"
                   >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span
-                        className="size-2 flex-none rounded-full"
-                        style={{ backgroundColor: stageColorVar(stage.color) }}
-                      />
-                      <span className="truncate">{stage.name}</span>
-                    </span>
+                    <StageBadge variant="plain" name={stage.name} color={stage.color} />
                     <span className="text-muted-foreground font-medium tabular-nums">
                       {stage.count}
                     </span>

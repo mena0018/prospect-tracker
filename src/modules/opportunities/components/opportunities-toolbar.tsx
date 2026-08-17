@@ -2,11 +2,12 @@ import { Bell, FilterX, Search, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { DebouncedInput } from '@/components/debounced-input'
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { m } from '@/i18n/paraglide/messages'
 import { cn } from '@/lib/utils'
-import { isStatusTab } from '@/modules/opportunities/opportunities-utils'
+import { isStatusTab } from '@/modules/opportunities/utils/rows'
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
 
 // Container-driven, not viewport-driven: the sidebar makes viewport breakpoints lie.
@@ -65,7 +66,7 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
           <ToggleGroupItem
             value="active"
             variant="selected"
-            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 text-sm font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
           >
             {m.table_tabActive({ count: activeCount })}
             <TabCount value={activeCount} isSelected={statusTab === 'active'} />
@@ -73,7 +74,7 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
           <ToggleGroupItem
             value="archived"
             variant="selected"
-            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 text-sm font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
           >
             {m.table_tabArchived({ count: archivedCount })}
             <TabCount value={archivedCount} isSelected={statusTab === 'archived'} />
@@ -98,15 +99,16 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
       </div>
 
       <div className={SEARCH_LAYOUT}>
-        <div className="relative grow @2xl:max-w-57.5">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.75 size-3.75 -translate-y-1/2" />
+        <InputGroup className="bg-secondary h-9 grow @2xl:max-w-57.5">
+          <InputGroupAddon>
+            <Search className="size-3.75" />
+          </InputGroupAddon>
           <DebouncedInput
             value={search}
             onChange={setSearch}
             placeholder={m.table_searchPlaceholder()}
-            className="bg-secondary h-9 pl-8.5 text-sm"
           />
-        </div>
+        </InputGroup>
         <Button
           variant="outline"
           size="sm"

@@ -2,16 +2,16 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { OPPORTUNITIES_QUERY_KEY } from '@/modules/opportunities/hooks/use-opportunities'
 import { getStageCounts } from '@/modules/opportunities/opportunities-server'
-import { TODAY } from '@/modules/opportunities/opportunities-utils'
+import { useToday } from '@/hooks/use-today'
 
-const stageCountsQueryOptions = () =>
+const stageCountsQueryOptions = (today: string) =>
   queryOptions({
-    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'stage-counts', TODAY],
-    queryFn: () => getStageCounts({ data: { today: TODAY } })
+    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'stage-counts', today],
+    queryFn: () => getStageCounts({ data: { today } })
   })
 
 export function useStageCounts() {
-  const query = useQuery(stageCountsQueryOptions())
+  const query = useQuery(stageCountsQueryOptions(useToday()))
 
   return {
     stages: query.data?.stages ?? [],

@@ -27,19 +27,18 @@ counted as one too — a known rough edge).
 ## "Today" comes from the browser
 
 Every one of these rules is relative to a day, and the server never decides which day
-that is: `TODAY` is resolved client-side in
-[`opportunities-utils.ts`](../../src/modules/opportunities/opportunities-utils.ts) and
-travels as a parameter to each server function.
+that is: the date is resolved client-side by
+[`useToday()`](../../src/hooks/use-today.ts) and travels as a parameter to each server
+function.
 
 A server in UTC and a user in UTC+2 disagree for two hours every night. Deriving the
 date server-side would shift every follow-up for anyone checking their tracker after
 midnight — they would see yesterday's reminders. The same value also drives the
 table's `due` filter.
 
-It is resolved **once per page load**, not per render: it feeds React Query keys, and
-a value that changed identity between renders would refetch on every one. A session
-left open across midnight therefore keeps the stale date until the next navigation —
-accepted, given the alternative is a refetch loop.
+**It follows the clock across midnight**, so a tab left open overnight picks up the new
+day on its own — the date feeds React Query keys, so a new day changes the keys and
+everything refetches. How that is scheduled: [`today.md`](today.md).
 
 Opportunities still in the first stage (Sauvegardé) are excluded from the response
 rate entirely: nobody was contacted, so they would unfairly drag the ratio down.
