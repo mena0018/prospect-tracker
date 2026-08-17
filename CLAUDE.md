@@ -1,4 +1,4 @@
-# CLAUDE.md — MeetProspect
+# CLAUDE.md — ProspectTracker
 
 Prospecting-tracker SaaS for freelancers, work-study students and job seekers.
 Product reference: see `docs/PRD.md`.

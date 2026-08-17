@@ -1,4 +1,4 @@
-# PRD — MeetProspect
+# PRD — ProspectTracker
 
 ## Context
 

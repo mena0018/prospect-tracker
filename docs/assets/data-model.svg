@@ -1,5 +1,5 @@
 <svg width="680" height="640" viewBox="0 0 680 640" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>MeetProspect — data model (5 tables)</title>
+  <title>ProspectTracker — data model (5 tables)</title>
   <desc>The users table is central. Three per-user configuration tables (stages, job_types, experience_levels) and the opportunities table reference it. opportunities references stage_id (RESTRICT), job_type_id (SET NULL) and experience_id (SET NULL).</desc>
   <defs>
     <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
