@@ -1,24 +1,35 @@
 import { Bell, CalendarDays, Clock, Percent } from 'lucide-react'
 import type { ComponentType } from 'react'
 
+import { BorderBeam } from '@/components/ui/border-beam'
+import { NumberTicker } from '@/components/ui/number-ticker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { m } from '@/i18n/paraglide/messages'
 import { cn, formatValue } from '@/lib/utils'
 import type { Kpis } from '@/modules/opportunities/opportunities-server'
 
 const BAND_LAYOUT = 'mb-5.5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'
-const CARD_LAYOUT = 'bg-card min-h-30.5 rounded-xl border p-4.5 shadow-xs dark:shadow-none'
+const CARD_LAYOUT =
+  'bg-card relative min-h-30.5 overflow-hidden rounded-xl border p-4.5 shadow-xs dark:shadow-none'
 const CARD_COUNT = 4
 
 type Props = {
   label: string
-  value: string
+  value: number | null
+  suffix?: string
+  /** Only the lead KPI counts up — see docs/reference/number-ticker.md */
+  animated?: boolean
   unit?: string
   isAlert?: boolean
   icon: ComponentType<{ className?: string }>
 }
 
-function KpiCard({ label, value, unit, icon: Icon, isAlert = false }: Props) {
+function KpiCard({ label, value, suffix, animated, unit, icon: Icon, isAlert = false }: Props) {
+  const valueClassName = cn(
+    'text-3xl leading-none font-semibold tracking-tight tabular-nums',
+    isAlert ? 'text-destructive' : 'text-foreground'
+  )
+
   return (
     <div className={cn(CARD_LAYOUT, isAlert ? 'border-destructive/25' : 'border-border')}>
       <div className="flex items-start justify-between gap-2">
@@ -35,16 +46,14 @@ function KpiCard({ label, value, unit, icon: Icon, isAlert = false }: Props) {
         </span>
       </div>
       <div className="mt-4.5 flex items-baseline gap-2">
-        <span
-          className={cn(
-            'text-3xl leading-none font-semibold tracking-tight tabular-nums',
-            isAlert ? 'text-destructive' : 'text-foreground'
-          )}
-        >
-          {value}
-        </span>
+        {animated ? (
+          <NumberTicker value={value} suffix={suffix} className={valueClassName} />
+        ) : (
+          <span className={valueClassName}>{formatValue(value, suffix)}</span>
+        )}
         {unit && <span className="text-muted-foreground text-xs">{unit}</span>}
       </div>
+      {isAlert && <BorderBeam size={70} duration={12} borderWidth={1.5} />}
     </div>
   )
 }
@@ -53,29 +62,21 @@ export function KpiBand({ kpis }: { kpis: Kpis }) {
   return (
     <div className={BAND_LAYOUT}>
       <KpiCard
+        animated
         icon={Bell}
         isAlert={kpis.dueToday > 0}
         label={m.kpi_dueToday()}
-        value={formatValue(kpis.dueToday)}
+        value={kpis.dueToday}
         unit={m.kpi_dueTodayUnit()}
       />
-      <KpiCard
-        icon={Clock}
-        label={m.kpi_stale()}
-        value={formatValue(kpis.stale)}
-        unit={m.kpi_staleUnit()}
-      />
+      <KpiCard icon={Clock} label={m.kpi_stale()} value={kpis.stale} unit={m.kpi_staleUnit()} />
       <KpiCard
         icon={CalendarDays}
         label={m.kpi_interviews()}
-        value={formatValue(kpis.interviews)}
+        value={kpis.interviews}
         unit={m.kpi_interviewsUnit()}
       />
-      <KpiCard
-        icon={Percent}
-        label={m.kpi_responseRate()}
-        value={formatValue(kpis.responseRate, '%')}
-      />
+      <KpiCard icon={Percent} label={m.kpi_responseRate()} value={kpis.responseRate} suffix="%" />
     </div>
   )
 }
