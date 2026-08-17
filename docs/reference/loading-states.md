@@ -17,10 +17,15 @@ This covers `/_authed/app`, whose `pendingComponent` renders `OpportunitiesPanel
 
 The remaining blank window is the parents' `beforeLoad`, which runs before any layout exists:
 
-| Step                                                                     | Where                | Cost                              |
-| ------------------------------------------------------------------------ | -------------------- | --------------------------------- |
-| `fetchUser()` — `supabase.auth.getUser()`                                | `__root.beforeLoad`  | network round-trip, every request |
-| `provisionUser()` — insert user + stages + job types + experience levels | `_authed.beforeLoad` | one transaction, first login only |
+| Step                                                                     | Where                | Cost                                 |
+| ------------------------------------------------------------------------ | -------------------- | ------------------------------------ |
+| `fetchUser()` — `supabase.auth.getClaims()`                              | `__root.beforeLoad`  | local signature check, every request |
+| `provisionUser()` — insert user + stages + job types + experience levels | `_authed.beforeLoad` | one transaction, first login only    |
+
+`fetchUser` used to call `getUser()` and pay a network round-trip on every navigation — the
+search box's debounced keystrokes included. Verifying the signature locally took it from ~71 ms
+to ~3 ms (dev-local, same session), so the blank window below is now dominated by everything
+_but_ this row. See [`auth.md`](auth.md).
 
 Giving `_authed` a `pendingComponent` that renders `AppShell` looks like the fix. **It crashes.**
 

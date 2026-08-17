@@ -20,23 +20,28 @@ export type AuthUser = {
   provisioned: boolean
 }
 
-// Read-only by design: runs on every SSR request. Writes live in provisionUser.
+// Read-only by design: runs on every navigation, not just SSR. `getClaims()` rather than
+// `getUser()` — it verifies the JWT signature locally instead of calling the Auth server.
+// Why that is still verified, and what would silently undo it: docs/reference/auth.md
 export const fetchUser = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthUser | null> => {
     const supabase = getSupabaseServerClient()
-    const {
-      data: { user }
-    } = await supabase.auth.getUser()
+    const { data, error } = await supabase.auth.getClaims()
 
-    if (!user || !user.email) return null
+    if (error || !data) return null
+
+    const { claims } = data
+    const email = asString(claims.email)
+
+    if (!email) return null
 
     return {
-      id: user.id,
-      email: user.email,
-      fullName: asString(user.user_metadata?.full_name),
-      jobTitle: asString(user.user_metadata?.job_title),
-      avatarUrl: asString(user.user_metadata?.avatar_url),
-      provisioned: user.user_metadata?.provisioned === true
+      id: claims.sub,
+      email,
+      fullName: asString(claims.user_metadata?.full_name),
+      jobTitle: asString(claims.user_metadata?.job_title),
+      avatarUrl: asString(claims.user_metadata?.avatar_url),
+      provisioned: claims.user_metadata?.provisioned === true
     }
   }
 )
@@ -131,7 +136,13 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
     })
 
     // Set only after the DB succeeds, so a failed provisioning is retried.
-    await getSupabaseServerClient().auth.updateUser({ data: { provisioned: true } })
+    const client = getSupabaseServerClient()
+    await client.auth.updateUser({ data: { provisioned: true } })
+
+    // `updateUser` does not reissue the access token, and `fetchUser` reads the flag from the
+    // JWT's claims — so without this the stale `provisioned: false` would keep calling us back
+    // on every navigation until the token expired. See docs/reference/auth.md
+    await client.auth.refreshSession()
 
     return dbUser
   } catch (err) {

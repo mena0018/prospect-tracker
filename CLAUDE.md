@@ -140,8 +140,10 @@ pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
   (`drizzle-kit generate` → `drizzle-kit migrate`).
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` client-side.
 - Auth SSR: resolve the session in a `createServerFn` + `beforeLoad` (root for the current
-  user, `_authed.tsx` to protect the dashboard). Use `supabase.auth.getUser()` (verified) for
-  identity checks, not just `getSession()`.
+  user, `_authed.tsx` to protect the dashboard). Identity checks must use a **verified** token —
+  `getClaims()` (local signature check) or `getUser()` (Auth-server round-trip), **never**
+  `getSession()`, which decodes without verifying. Which one goes where, and the signing-key
+  assumption `getClaims()` depends on: `docs/reference/auth.md`.
 - **RLS**: enable Row Level Security on app tables; user access via the authenticated Supabase
   client. Service-role access (Drizzle admin, crons) bypasses RLS — server only, never client.
 - Email reminders run via a **Vercel cron** (server route) — never client-side.
