@@ -20,9 +20,7 @@ export type AuthUser = {
   provisioned: boolean
 }
 
-// Read-only by design: runs on every navigation, not just SSR. `getClaims()` rather than
-// `getUser()` — it verifies the JWT signature locally instead of calling the Auth server.
-// Why that is still verified, and what would silently undo it: docs/reference/auth.md
+// `getClaims()` verifies locally; why that is enough here: docs/reference/auth.md
 export const fetchUser = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthUser | null> => {
     const supabase = getSupabaseServerClient()
@@ -139,9 +137,7 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
     const client = getSupabaseServerClient()
     await client.auth.updateUser({ data: { provisioned: true } })
 
-    // `updateUser` does not reissue the access token, and `fetchUser` reads the flag from the
-    // JWT's claims — so without this the stale `provisioned: false` would keep calling us back
-    // on every navigation until the token expired. See docs/reference/auth.md
+    // `updateUser` alone leaves a stale claim in the token — see docs/reference/auth.md
     await client.auth.refreshSession()
 
     return dbUser

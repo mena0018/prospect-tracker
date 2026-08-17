@@ -14,17 +14,13 @@ export function DebouncedInput({ value, onChange, ...props }: Props) {
   const [draft, setDraft] = useState(value)
   const [lastValue, setLastValue] = useState(value)
 
-  // What we last handed to `onChange`. The parent round-trips it back through `value` (here via
-  // the URL) long after typing has moved on, and that late echo must not overwrite the draft —
-  // otherwise "jean" arriving mid-word rewrites an input the user has already retyped.
   const [emitted, setEmitted] = useState(value)
 
-  // Adjusting during render, not in an effect: an effect re-renders on our own emission.
-  // Both tests are load-bearing — see docs/reference/server-side-table.md
+  // Adjusted during render, and both tests are load-bearing — see
+  // docs/reference/server-side-table.md
   if (value !== lastValue) {
     setLastValue(value)
 
-    // Only a value we never emitted is a genuine external change (reset filters, back button).
     if (value !== emitted) {
       setEmitted(value)
       setDraft(value)

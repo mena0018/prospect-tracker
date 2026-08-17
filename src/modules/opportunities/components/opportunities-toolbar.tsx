@@ -21,8 +21,8 @@ const SEARCH_LAYOUT = 'flex grow basis-100 items-center justify-end gap-2.5 @2xl
 // Fixed so the skeleton matches exactly; `grow-0` stops `grow` overriding the width.
 const TOGGLE_WIDTH = '@2xl:w-70 @2xl:grow-0'
 
-// `isolate` keeps the indicator's negative z-index behind the label but inside the item, and the
-// `data-pressed` resets hand the selected background over to the travelling pill.
+// The `data-pressed` resets hand the selected background to the travelling pill, which the item
+// must not also paint — see docs/reference/toggle-indicator.md
 const TAB_ITEM =
   'relative isolate h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:bg-transparent data-pressed:shadow-none data-pressed:hover:bg-transparent dark:data-pressed:ring-0'
 
@@ -70,8 +70,6 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
             TOGGLE_WIDTH
           )}
         >
-          {/* The pill is one element travelling between the items, so it cannot be their own
-              background — `TAB_ITEM` drops `data-pressed:bg-card` and only keeps the text colour. */}
           <LayoutGroup id="opportunities-tabs">
             <ToggleGroupItem value="active" variant="selected" className={TAB_ITEM}>
               <ToggleIndicator groupId="opportunities-tabs" isSelected={statusTab === 'active'} />

@@ -62,17 +62,14 @@ const SEARCH_COLUMNS = [
   stages.name
 ]
 
-// Shared by the row list and the tab counts, so a search narrows both identically.
-// Terms are AND-ed, columns OR-ed, and both sides are unaccented — see
-// docs/reference/server-side-table.md
+// Terms AND-ed, columns OR-ed, both sides unaccented — see docs/reference/server-side-table.md
 function searchMatch(q: string) {
   const terms = q.split(/\s+/).filter(Boolean)
   if (terms.length === 0) return null
 
   const matchesSomeColumn = (term: string) =>
     or(
-      // `immutable_unaccent` on the column is what lets the expression indexes apply; matching
-      // the raw column here would silently fall back to a sequential scan.
+      // Unaccenting the column, not just the term, is what keeps the expression indexes in play.
       ...SEARCH_COLUMNS.map(
         (column) => sql`immutable_unaccent(${column}) ilike immutable_unaccent(${`%${term}%`})`
       )
@@ -126,9 +123,7 @@ export const listOpportunities = createServerFn({ method: 'GET' })
         .limit(perPage)
         .offset((targetPage - 1) * perPage)
 
-    // Run together on the optimistic assumption that `?page=` is in range, which it almost
-    // always is. A `count(*) over()` would fold these into one query but costs the LIMIT's
-    // top-N heapsort, sorting the whole result set to return one page.
+    // Two queries beat one `count(*) over()` — see docs/reference/server-side-table.md
     const [counted, requestedRows] = await Promise.all([
       db
         .select({ total: sql<number>`count(*)`.mapWith(Number) })

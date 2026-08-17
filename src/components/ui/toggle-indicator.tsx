@@ -19,7 +19,6 @@ export function ToggleIndicator({ groupId, isSelected, className }: Props) {
     <motion.span
       aria-hidden
       layoutId={`toggle-indicator-${groupId}`}
-      // Reduced motion still needs the element — only the travel between items is dropped.
       transition={
         prefersReducedMotion
           ? { duration: 0 }

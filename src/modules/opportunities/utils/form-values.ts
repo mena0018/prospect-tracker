@@ -19,9 +19,7 @@ export function toOptionalText(value: unknown) {
   return value.trim() === '' ? null : value.trim()
 }
 
-// `today` is passed in rather than read here so the mapping stays pure and the form keeps the
-// day it opened on. A new opportunity is contacted the day it is created, which also puts it on
-// the follow-up clock straight away instead of leaving it invisible to reminders.
+// `today` is injected to keep this pure — see docs/reference/opportunity-form.md
 export function toFormValues(row: OpportunityRow | null, fallbackStageId: string, today = '') {
   const text = (value: string | null | undefined) => value ?? ''
   const numeric = (value: number | null | undefined) =>
