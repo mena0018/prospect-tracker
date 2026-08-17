@@ -1,10 +1,12 @@
 import { Bell, FilterX, Search, X } from 'lucide-react'
+import { LayoutGroup } from 'motion/react'
 
 import { Button } from '@/components/ui/button'
 import { DebouncedInput } from '@/components/debounced-input'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { ToggleIndicator } from '@/components/ui/toggle-indicator'
 import { m } from '@/i18n/paraglide/messages'
 import { cn } from '@/lib/utils'
 import { isStatusTab } from '@/modules/opportunities/utils/rows'
@@ -18,6 +20,11 @@ const SEARCH_LAYOUT = 'flex grow basis-100 items-center justify-end gap-2.5 @2xl
 
 // Fixed so the skeleton matches exactly; `grow-0` stops `grow` overriding the width.
 const TOGGLE_WIDTH = '@2xl:w-70 @2xl:grow-0'
+
+// `isolate` keeps the indicator's negative z-index behind the label but inside the item, and the
+// `data-pressed` resets hand the selected background over to the travelling pill.
+const TAB_ITEM =
+  'relative isolate h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:bg-transparent data-pressed:shadow-none data-pressed:hover:bg-transparent dark:data-pressed:ring-0'
 
 type Props = {
   activeCount: number
@@ -63,22 +70,20 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
             TOGGLE_WIDTH
           )}
         >
-          <ToggleGroupItem
-            value="active"
-            variant="selected"
-            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
-          >
-            {m.table_tabActive({ count: activeCount })}
-            <TabCount value={activeCount} isSelected={statusTab === 'active'} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="archived"
-            variant="selected"
-            className="h-full flex-1 gap-1.5 rounded-[7px] px-3.25 font-semibold data-pressed:shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
-          >
-            {m.table_tabArchived({ count: archivedCount })}
-            <TabCount value={archivedCount} isSelected={statusTab === 'archived'} />
-          </ToggleGroupItem>
+          {/* The pill is one element travelling between the items, so it cannot be their own
+              background — `TAB_ITEM` drops `data-pressed:bg-card` and only keeps the text colour. */}
+          <LayoutGroup id="opportunities-tabs">
+            <ToggleGroupItem value="active" variant="selected" className={TAB_ITEM}>
+              <ToggleIndicator groupId="opportunities-tabs" isSelected={statusTab === 'active'} />
+              {m.table_tabActive({ count: activeCount })}
+              <TabCount value={activeCount} isSelected={statusTab === 'active'} />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="archived" variant="selected" className={TAB_ITEM}>
+              <ToggleIndicator groupId="opportunities-tabs" isSelected={statusTab === 'archived'} />
+              {m.table_tabArchived({ count: archivedCount })}
+              <TabCount value={archivedCount} isSelected={statusTab === 'archived'} />
+            </ToggleGroupItem>
+          </LayoutGroup>
         </ToggleGroup>
 
         {isDueOnly && (
