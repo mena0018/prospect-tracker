@@ -25,11 +25,17 @@ export function useOpportunitiesFilters() {
   // The due filter only scopes the active tab; archived rows are never due.
   const isDueOnly = search.due && search.tab === 'active'
 
+  // The raw `q` stays in the URL (and in the input's draft), but every consumer downstream —
+  // query keys included — must agree on one normalised form, or `"a"` and `"a "` become two
+  // cache entries for one result. See docs/reference/server-side-table.md
+  const query = search.q.trim()
+
   return {
     tab: search.tab,
     search: search.q,
+    query,
     isDueOnly,
-    hasFilters: search.q.trim().length > 0 || isDueOnly,
+    hasFilters: query.length > 0 || isDueOnly,
     sorting,
     pagination,
     setTab: (tab: StatusTab) => setSearchFromFirstPage({ tab }),

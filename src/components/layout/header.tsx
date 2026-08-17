@@ -10,7 +10,8 @@ import { useOpportunityEditorContext } from '@/modules/opportunities/components/
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function Header() {
-  const { data, isPending } = useOpportunitiesSummary('')
+  // Unfiltered on purpose: the header states the pipeline total, not what the table is showing.
+  const { data, isPending } = useOpportunitiesSummary()
   const { openCreate } = useOpportunityEditorContext()
 
   return (

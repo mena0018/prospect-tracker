@@ -31,7 +31,7 @@ const PANEL_CARD_LAYOUT =
 
 export function OpportunitiesPanel() {
   const listInput = useOpportunitiesListInput()
-  const { hasFilters, pagination, search } = useOpportunitiesFilters()
+  const { hasFilters, pagination, query } = useOpportunitiesFilters()
 
   const {
     data: customization,
@@ -60,7 +60,7 @@ export function OpportunitiesPanel() {
     isPending: isSummaryPending,
     isError: isSummaryError,
     refetch: refetchSummary
-  } = useOpportunitiesSummary(search)
+  } = useOpportunitiesSummary(query)
 
   const hasError = isPageError || isStagesError || isSummaryError || isCustomizationError
   const isPending = isPagePending || isStagesPending || isSummaryPending || isCustomizationPending

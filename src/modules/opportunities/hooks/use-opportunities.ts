@@ -31,6 +31,8 @@ const summaryQueryOptions = (today: string, q: string) =>
     placeholderData: (previous) => previous
   })
 
-export function useOpportunitiesSummary(q: string) {
+// Omit `q` for the unfiltered totals: the KPIs ignore it either way, and the tab counts then
+// describe the whole pipeline rather than the current search. See docs/reference/kpis.md
+export function useOpportunitiesSummary(q = '') {
   return useQuery(summaryQueryOptions(useToday(), q))
 }

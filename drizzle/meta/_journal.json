@@ -43,6 +43,13 @@
       "when": 1786053200000,
       "tag": "0005_search_trigram",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786910400000,
+      "tag": "0006_search_unaccent",
+      "breakpoints": true
     }
   ]
 }
