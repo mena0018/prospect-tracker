@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { ErrorState } from '@/components/error-state'
 import { m } from '@/i18n/paraglide/messages'
@@ -19,8 +19,8 @@ import {
 } from '@/modules/opportunities/hooks/use-opportunities'
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
 import { useOpportunitiesListInput } from '@/modules/opportunities/hooks/use-opportunities-list-input'
-import { useOpportunityMutations } from '@/modules/opportunities/hooks/use-opportunity-mutations'
-import { TODAY, toRows, type OpportunityRow } from '@/modules/opportunities/opportunities-utils'
+import { useOpportunityEditorContext } from '@/modules/opportunities/components/opportunity-editor-provider'
+import { toRows } from '@/modules/opportunities/utils/rows'
 import { indexStages } from '@/modules/stages/stages-utils'
 import { useStages } from '@/modules/stages/hooks/use-stages'
 import { useCustomization } from '@/modules/customization/use-customization'
@@ -31,7 +31,7 @@ const PANEL_CARD_LAYOUT =
 
 export function OpportunitiesPanel() {
   const listInput = useOpportunitiesListInput()
-  const { hasFilters, pagination } = useOpportunitiesFilters()
+  const { hasFilters, pagination, search } = useOpportunitiesFilters()
 
   const {
     data: customization,
@@ -60,24 +60,18 @@ export function OpportunitiesPanel() {
     isPending: isSummaryPending,
     isError: isSummaryError,
     refetch: refetchSummary
-  } = useOpportunitiesSummary()
+  } = useOpportunitiesSummary(search)
 
   const hasError = isPageError || isStagesError || isSummaryError || isCustomizationError
   const isPending = isPagePending || isStagesPending || isSummaryPending || isCustomizationPending
 
-  const { update } = useOpportunityMutations()
-  const { mutate: updateOpportunity } = update
+  const editor = useOpportunityEditorContext()
 
   const rows = useMemo(() => {
     if (!page || !stages) return []
 
-    return toRows(page.rows, indexStages(stages), TODAY)
+    return toRows(page.rows, indexStages(stages))
   }, [page, stages])
-
-  const togglePin = useCallback(
-    (row: OpportunityRow) => updateOpportunity({ id: row.id, isPinned: !row.isPinned }),
-    [updateOpportunity]
-  )
 
   const retry = () => {
     void refetchPage()
@@ -108,7 +102,10 @@ export function OpportunitiesPanel() {
           servedPage={page.page}
           pageCount={page.pageCount}
           isFetching={isPageFetching}
-          onTogglePin={togglePin}
+          onTogglePin={editor.togglePin}
+          onEdit={editor.openEdit}
+          onToggleArchive={editor.toggleArchive}
+          onDelete={editor.requestDelete}
           dailyRateReference={customization.dailyRateReference}
           emptyTitle={hasFilters ? m.table_noResults() : m.table_empty()}
           emptyHint={hasFilters ? m.table_noResultsHint() : m.table_emptyHint()}

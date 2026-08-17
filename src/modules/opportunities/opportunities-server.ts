@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { and, asc, desc, eq, ilike, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
 import { db } from '@/db/client'
-import { opportunities, stages, type Opportunity } from '@/db/schema'
+import { opportunities, stages } from '@/db/schema'
 import { appError } from '@/lib/error'
 import { requireUser } from '@/lib/supabase/server'
 import {
@@ -18,15 +18,20 @@ import {
   STALE_THRESHOLD_DAYS,
   type SortColumn
 } from '@/modules/opportunities/opportunities-schema'
+import type { OpportunityDueFlags } from '@/modules/opportunities/utils/rows'
 
 // A row is archived by its own flag or by sitting in an archived stage.
 const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArchived})`
 
-// Mirrors followUpDueDate() in opportunities-utils.ts — keep the two in step.
 const dueDate = sql`coalesce(
   ${opportunities.nextReminderAt},
   ${opportunities.lastContactAt} + ${stages.reminderDelayDays}
 )`
+
+// The single definition of "due for follow-up" — the client reads this, it never recomputes.
+// See docs/reference/data-model.md
+const isDueExpression = (today: string) =>
+  sql<boolean>`(not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date)`
 
 const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
   lastContactAt: opportunities.lastContactAt,
@@ -38,36 +43,42 @@ const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
   stage: stages.name
 }
 
-export type OpportunitiesPage = {
-  rows: Opportunity[]
+type OpportunitiesPage = {
+  rows: OpportunityDueFlags[]
   total: number
-  // Clamped; the URL keeps what was asked for. See docs/reference/server-side-table.md
   page: number
   pageCount: number
 }
 
 type RowFilters = Pick<ListOpportunitiesInput, 'tab' | 'q' | 'due' | 'today'>
 
-function buildWhere(userId: string, { tab, q, due, today }: RowFilters) {
-  const filters: SQL[] = [eq(opportunities.userId, userId)]
+// Shared by the row list and the tab counts, so a search narrows both identically.
+function searchMatch(q: string) {
+  if (!q) return null
 
-  filters.push(tab === 'archived' ? sql`${isArchivedRow}` : sql`not ${isArchivedRow}`)
+  const pattern = `%${q}%`
 
-  if (q) {
-    const pattern = `%${q}%`
-    const match = or(
+  return (
+    or(
       ilike(opportunities.recruiter, pattern),
       ilike(opportunities.esn, pattern),
       ilike(opportunities.endClient, pattern),
       ilike(opportunities.need, pattern),
       ilike(opportunities.location, pattern),
       ilike(stages.name, pattern)
-    )
-    if (match) filters.push(match)
-  }
+    ) ?? null
+  )
+}
 
-  // Archived rows are never due, so the tab filter above already excludes them.
-  if (due) filters.push(sql`${dueDate} is not null and ${dueDate} <= ${today}::date`)
+function buildWhere(userId: string, { tab, q, due, today }: RowFilters) {
+  const filters: SQL[] = [eq(opportunities.userId, userId)]
+
+  filters.push(tab === 'archived' ? sql`${isArchivedRow}` : sql`not ${isArchivedRow}`)
+
+  const match = searchMatch(q)
+  if (match) filters.push(match)
+
+  if (due) filters.push(isDueExpression(today))
 
   return and(...filters)
 }
@@ -92,7 +103,11 @@ export const listOpportunities = createServerFn({ method: 'GET' })
 
     const selectPage = (targetPage: number) =>
       db
-        .select({ opportunity: opportunities })
+        .select({
+          opportunity: opportunities,
+          isDue: isDueExpression(data.today),
+          isArchivedRow: sql<boolean>`${isArchivedRow}`
+        })
         .from(opportunities)
         .innerJoin(stages, eq(stages.id, opportunities.stageId))
         .where(where)
@@ -120,7 +135,11 @@ export const listOpportunities = createServerFn({ method: 'GET' })
     const rows = servedPage === page ? requestedRows : await selectPage(servedPage)
 
     return {
-      rows: rows.map((row) => row.opportunity),
+      rows: rows.map(({ opportunity, isDue, isArchivedRow }) => ({
+        ...opportunity,
+        isDue,
+        isArchivedRow
+      })),
       total,
       page: servedPage,
       pageCount
@@ -143,11 +162,15 @@ export type OpportunitiesSummary = {
 // Aggregates span every row, not the current page. See docs/reference/kpis.md
 export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
   .validator(opportunitiesSummarySchema)
-  .handler(async ({ data: { today } }): Promise<OpportunitiesSummary> => {
+  .handler(async ({ data: { today, q } }): Promise<OpportunitiesSummary> => {
     const { id: userId } = await requireUser()
 
-    const isDue = sql`not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date`
+    const isDue = isDueExpression(today)
     const awaitingReply = sql`${stages.position} not in (${INTERVIEW_POSITION}, ${OFFER_POSITION})`
+
+    // Only the tab counts follow the search; the KPIs describe the whole pipeline.
+    const match = searchMatch(q)
+    const matches = match ?? sql`true`
 
     const [row] = await db
       .select({
@@ -169,8 +192,12 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
             and (${stages.position} in (${INTERVIEW_POSITION}, ${OFFER_POSITION})
                  or ${stages.isArchived})
         )`.mapWith(Number),
-        activeCount: sql<number>`count(*) filter (where not ${isArchivedRow})`.mapWith(Number),
-        archivedCount: sql<number>`count(*) filter (where ${isArchivedRow})`.mapWith(Number)
+        activeCount: sql<number>`count(*) filter (
+          where not ${isArchivedRow} and ${matches}
+        )`.mapWith(Number),
+        archivedCount: sql<number>`count(*) filter (
+          where ${isArchivedRow} and ${matches}
+        )`.mapWith(Number)
       })
       .from(opportunities)
       .innerJoin(stages, eq(stages.id, opportunities.stageId))
@@ -190,7 +217,7 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
     }
   })
 
-export type StageCount = {
+type StageCount = {
   id: string
   name: string
   color: string
@@ -209,11 +236,7 @@ export const getStageCounts = createServerFn({ method: 'GET' })
         color: stages.color,
         position: stages.position,
         count: sql<number>`count(${opportunities.id})`.mapWith(Number),
-        dueCount: sql<number>`count(*) filter (
-          where not ${isArchivedRow}
-            and ${dueDate} is not null
-            and ${dueDate} <= ${today}::date
-        )`.mapWith(Number)
+        dueCount: sql<number>`count(*) filter (where ${isDueExpression(today)})`.mapWith(Number)
       })
       .from(stages)
       .leftJoin(opportunities, eq(opportunities.stageId, stages.id))

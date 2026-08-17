@@ -32,10 +32,13 @@ dashboard, `api/auth.$.tsx`) · `src/modules/<domain>/` (everything domain-speci
 · `drizzle/` (migrations). The Drizzle schema in `src/db/schema.ts` is the source of truth
 for the data model.
 
-- **`src/modules/<domain>/`** owns a whole domain: `components/` for its UI, plus flat
-  prefixed files for the rest (`auth-schema.ts`, `auth-server.ts`, `auth-utils.ts`,
-  `use-google-oauth.ts`). The prefix keeps editor tabs distinguishable — never bare
-  `schema.ts`.
+- **`src/modules/<domain>/`** owns a whole domain: flat prefixed files at its root
+  (`auth-schema.ts`, `auth-server.ts`, `auth-utils.ts`), **and a folder as soon as a kind of
+  file reaches two** — `components/`, `hooks/`, `utils/`. One hook stays flat
+  (`use-google-oauth.ts`); two move into `hooks/`. Files inside a folder drop the domain prefix
+  (`hooks/use-opportunities.ts`, not `hooks/use-opportunities-opportunities.ts`) — the folder
+  already says it. At the root the prefix stays, so editor tabs remain distinguishable: never a
+  bare `schema.ts`.
 - **`src/components/` is cross-cutting only** — reusable by any module, no domain knowledge
   (`ui/`, `layout/`, `error-state.tsx`). A component only one module uses belongs in that
   module.

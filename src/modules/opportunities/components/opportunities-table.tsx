@@ -3,30 +3,29 @@ import { createColumnHelper, useTable } from '@tanstack/react-table'
 import { m } from '@/i18n/paraglide/messages'
 import { cn, formatDate, formatValue } from '@/lib/utils'
 import { PinButton } from '@/modules/opportunities/components/pin-button'
+import { OpportunityRowActions } from '@/modules/opportunities/components/opportunity-row-actions'
 import { StageBadge } from '@/modules/stages/components/stage-badge'
 import { DataTable } from '@/modules/table/components/data-table'
 import { DataTablePagination } from '@/modules/table/components/data-table-pagination'
 import { tableModuleFeatures } from '@/modules/table/table-features'
 import { PAGE_SIZES } from '@/modules/opportunities/opportunities-schema'
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
-import {
-  formatDailyRate,
-  isAboveReference,
-  type OpportunityRow
-} from '@/modules/opportunities/opportunities-utils'
+import { formatDailyRate, isAboveReference } from '@/modules/opportunities/utils/display'
+import type { OpportunityRow } from '@/modules/opportunities/utils/rows'
 
 export const OPPORTUNITIES_GRID_TEMPLATE =
-  'grid-cols-[30px_150px_minmax(140px,1fr)_minmax(130px,0.9fr)_minmax(150px,1.15fr)_78px_156px_minmax(120px,0.95fr)]'
+  'grid-cols-[30px_150px_minmax(140px,1fr)_minmax(130px,0.9fr)_minmax(150px,1.15fr)_78px_156px_minmax(120px,0.95fr)_44px]'
 
 export const OPPORTUNITIES_COLUMN_COUNT = 7
 
 const PIN_COLUMN_ID = 'pin'
+const ACTIONS_COLUMN_ID = 'actions'
 const PIN_SORT = { id: PIN_COLUMN_ID, desc: true } as const
 
 const columnHelper = createColumnHelper<typeof tableModuleFeatures, OpportunityRow>()
 
 const cellClassName = (columnId: string) =>
-  columnId === PIN_COLUMN_ID
+  columnId === PIN_COLUMN_ID || columnId === ACTIONS_COLUMN_ID
     ? 'justify-center px-0'
     : columnId === 'dailyRate'
       ? 'justify-end'
@@ -41,6 +40,9 @@ type Props = {
   isFetching: boolean
   dailyRateReference: number
   onTogglePin: (row: OpportunityRow) => void
+  onEdit: (row: OpportunityRow) => void
+  onToggleArchive: (row: OpportunityRow) => void
+  onDelete: (row: OpportunityRow) => void
   emptyTitle: string
   emptyHint: string
 }
@@ -53,6 +55,9 @@ export function OpportunitiesTable({
   isFetching,
   dailyRateReference,
   onTogglePin,
+  onEdit,
+  onToggleArchive,
+  onDelete,
   emptyTitle,
   emptyHint
 }: Props) {
@@ -81,7 +86,7 @@ export function OpportunitiesTable({
       cell: ({ getValue, row }) => (
         <span
           className={cn(
-            'text-sm font-semibold',
+            'font-semibold',
             row.original.isDue ? 'text-destructive' : 'text-foreground'
           )}
         >
@@ -91,15 +96,15 @@ export function OpportunitiesTable({
     }),
     columnHelper.accessor('recruiter', {
       header: m.table_colRecruiter(),
-      cell: ({ getValue }) => <span className="truncate text-sm font-semibold">{getValue()}</span>
+      cell: ({ getValue }) => <span className="truncate font-semibold">{getValue()}</span>
     }),
     columnHelper.accessor('esn', {
       header: m.table_colEsn(),
-      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+      cell: ({ getValue }) => <span className="truncate">{formatValue(getValue())}</span>
     }),
     columnHelper.accessor('endClient', {
       header: m.table_colEndClient(),
-      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+      cell: ({ getValue }) => <span className="truncate">{formatValue(getValue())}</span>
     }),
     columnHelper.accessor('dailyRate', {
       header: m.table_colDailyRate(),
@@ -109,7 +114,7 @@ export function OpportunitiesTable({
         return (
           <span
             className={cn(
-              'text-sm font-semibold tabular-nums',
+              'font-semibold tabular-nums',
               dailyRate === null
                 ? 'text-muted-foreground'
                 : isAboveReference(dailyRate, dailyRateReference)
@@ -127,14 +132,24 @@ export function OpportunitiesTable({
       header: m.table_colStage(),
       cell: ({ row }) => {
         const stage = row.original.stage
-        if (!stage) return <span className="text-muted-foreground text-sm">—</span>
-
+        if (!stage) return <span className="text-muted-foreground">—</span>
         return <StageBadge name={stage.name} color={stage.color} />
       }
     }),
     columnHelper.accessor('location', {
       header: m.table_colLocation(),
-      cell: ({ getValue }) => <span className="truncate text-sm">{formatValue(getValue())}</span>
+      cell: ({ getValue }) => <span className="truncate">{formatValue(getValue())}</span>
+    }),
+    columnHelper.display({
+      id: ACTIONS_COLUMN_ID,
+      cell: ({ row }) => (
+        <OpportunityRowActions
+          row={row.original}
+          onEdit={() => onEdit(row.original)}
+          onToggleArchive={() => onToggleArchive(row.original)}
+          onDelete={() => onDelete(row.original)}
+        />
+      )
     })
   ])
 
@@ -171,9 +186,14 @@ export function OpportunitiesTable({
         isFetching={isFetching}
         emptyTitle={emptyTitle}
         emptyHint={emptyHint}
-        silentColumns={{ [PIN_COLUMN_ID]: m.table_colPinned() }}
+        silentColumns={{
+          [PIN_COLUMN_ID]: m.table_colPinned(),
+          [ACTIONS_COLUMN_ID]: m.table_rowActions()
+        }}
         cellClassName={cellClassName}
         rowClassName={(row) => (row.isPinned ? 'bg-accent/35' : undefined)}
+        onRowClick={onEdit}
+        rowActionLabel={(row) => m.table_editRow({ recruiter: row.recruiter })}
         caption={m.table_caption()}
       />
       <DataTablePagination table={table} pageSizes={PAGE_SIZES} labels={paginationLabels} />

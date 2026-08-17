@@ -6,10 +6,12 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { LocaleSwitcher } from '@/components/layout/locale-switcher'
 import { m } from '@/i18n/paraglide/messages'
 import { useOpportunitiesSummary } from '@/modules/opportunities/hooks/use-opportunities'
+import { useOpportunityEditorContext } from '@/modules/opportunities/components/opportunity-editor-provider'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function Header() {
-  const { data, isPending } = useOpportunitiesSummary()
+  const { data, isPending } = useOpportunitiesSummary('')
+  const { openCreate } = useOpportunityEditorContext()
 
   return (
     <header className="border-border bg-card flex flex-none items-center justify-between gap-4 border-b px-6.5 py-3.5">
@@ -36,7 +38,11 @@ export function Header() {
       <div className="flex flex-none items-center gap-2.25">
         <LocaleSwitcher />
         <ThemeToggle />
-        <Button size="md" className="font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+        <Button
+          size="md"
+          onClick={openCreate}
+          className="font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+        >
           <Plus />
           <span className="max-sm:sr-only">{m.header_newOpportunity()}</span>
         </Button>

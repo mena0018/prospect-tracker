@@ -184,12 +184,21 @@ and the stage's delay (or a user-forced date):
 
 ```
 à_relancer(opp) =
-      opp.next_reminder_at <= today                      (manual override, if set)
-  OR (opp.next_reminder_at IS NULL
-      AND opp.last_contact_at + stage.reminder_delay_days <= today)
-  AND opp.is_archived = false
+      opp.is_archived = false
   AND opp.stage.is_archived = false
+  AND coalesce(opp.next_reminder_at,                     (manual override, if set)
+               opp.last_contact_at + stage.reminder_delay_days) <= today
 ```
+
+**One implementation only: SQL.** `isDueExpression()` in `opportunities-server.ts` is the
+sole definition — the row list, the "à relancer" filter, the KPI and the per-stage counts all
+call it, and the server ships the resulting `isDue` flag on every row. The client never
+recomputes it. This used to be mirrored by a TypeScript `isDueForFollowUp()`, and the two
+had already drifted: the filter and the badge disagreed on archived rows, so the KPI could
+read 3 while the table highlighted 4.
+
+The archived checks come **first**, and are `AND`-ed over the whole expression: an archived
+opportunity is never due, whatever its dates say.
 
 - The **KPI** "À relancer aujourd'hui" counts opportunities matching this. The
   dashboard KPI band is documented in [`kpis.md`](kpis.md).

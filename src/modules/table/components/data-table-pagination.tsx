@@ -48,7 +48,7 @@ export function DataTablePagination<TData extends RowData>({
 
   return (
     <div className={PAGINATION_LAYOUT}>
-      <div className="text-secondary-foreground flex items-center gap-3.5 text-sm">
+      <div className="text-secondary-foreground flex items-center gap-3.5">
         <span className="tabular-nums">{labels.range({ from, to, total })}</span>
         <div className="flex items-center gap-1.75">
           {labels.perPage}
@@ -56,7 +56,7 @@ export function DataTablePagination<TData extends RowData>({
             value={String(pageSize)}
             onValueChange={(value) => table.setPageSize(Number(value))}
           >
-            <SelectTrigger size="sm" aria-label={labels.perPage} className="text-sm">
+            <SelectTrigger size="sm" aria-label={labels.perPage}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -89,7 +89,7 @@ export function DataTablePagination<TData extends RowData>({
         >
           <ChevronLeft />
         </Button>
-        <span className="text-secondary-foreground px-1.5 text-sm tabular-nums">
+        <span className="text-secondary-foreground px-1.5 tabular-nums">
           {labels.pageOf({ page: pageIndex + 1, total: pageCount })}
         </span>
         <Button
