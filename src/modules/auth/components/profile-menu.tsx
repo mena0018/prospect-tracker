@@ -35,7 +35,7 @@ export function ProfileMenu() {
       <DropdownMenuTrigger className="hover:bg-muted flex w-full items-center gap-2.5 rounded-lg px-2.75 py-2 text-left">
         <Avatar avatarUrl={avatarUrl} initials={initials} className="size-8 text-xs" />
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-sm font-semibold">{name}</span>
+          <span className="truncate font-semibold">{name}</span>
           <span className="text-muted-foreground truncate text-xs">{subtitle}</span>
         </span>
         <ChevronUp className="text-muted-foreground size-3.5 flex-none" />
