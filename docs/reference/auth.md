@@ -35,21 +35,75 @@ here and must never be `VITE_`-prefixed.
 
 ## Session resolution & provisioning
 
-- **`fetchUser`** (`src/modules/auth/auth-server.ts`) runs in the root `beforeLoad` on every
-  SSR request. Read-only: it verifies the token with `getUser()` and exposes the
-  identity — including a `provisioned` flag read from `user_metadata` — via router
-  context.
+- **`fetchUser`** (`src/modules/auth/auth-server.ts`) runs in the root `beforeLoad`. Read-only:
+  it verifies the token with `getClaims()` and exposes the identity — including a `provisioned`
+  flag read from `user_metadata` — via router context. Why `getClaims()` and not `getUser()`:
+  see below.
 - **`provisionUser`** creates the `users` row and copies the default pipeline
   (stages / job types / experience levels), then sets `provisioned: true` in the
   Supabase `user_metadata`. The `_authed` `beforeLoad` calls it only when
   `context.user.provisioned` is false, so it runs once per account rather than on
   every protected load. The flag is written **after** the DB transaction commits,
   so a failed provisioning is retried on the next load. It is an optimization
-  only, never an access decision (that stays `getUser()`-verified), and lives in
+  only, never an access decision (that stays signature-verified), and lives in
   server-side `user_metadata` — not a client-forgeable cookie.
+
+  It then calls **`refreshSession()`**. `updateUser` writes the metadata but does not reissue
+  the access token, and `fetchUser` reads the flag out of the JWT's claims — so without the
+  refresh the token would keep carrying `provisioned: false` until it expired (an hour by
+  default), and every navigation in between would call `provisionUser` again. The transaction
+  is idempotent (`if (existing) return existing`), so this was never a correctness problem —
+  it was a wasted DB round-trip per navigation, which is exactly what the `getClaims()` switch
+  set out to remove.
+
 - Auth is re-checked **inside** every server function handler. Route guards
   (`beforeLoad`) protect the UI, not the data: server functions are independently
   reachable RPC endpoints.
+
+## Why `getClaims()` and not `getUser()`
+
+`fetchUser` runs in the **root** `beforeLoad`, and `beforeLoad` is not cached. TanStack Router
+re-runs it on every navigation — including every debounced keystroke in the table's search box —
+and the router's own internals doc is explicit that it "is not a cache mechanism". `staleTime`
+does not apply: that is a **loader** option, and the loader path is the only one that consults
+staleness. So whatever `fetchUser` does, it does once per navigation.
+
+With `getUser()` that meant an HTTP round-trip to `/auth/v1/user` each time — a median of 71 ms,
+against 3 ms once verified locally (dev-local, same machine and session, so treat the ratio as
+the result rather than the absolute numbers).
+
+`getClaims()` removes the round-trip **without weakening the check**, because this project uses
+asymmetric JWT signing keys:
+
+```
+GET https://<project>.supabase.co/auth/v1/.well-known/jwks.json
+→ {"alg":"ES256","kty":"EC","use":"sig", ...}
+```
+
+With an asymmetric algorithm, `getClaims()` verifies the JWT signature locally via WebCrypto.
+A forged or tampered cookie fails that verification exactly as it would fail server-side — this
+is a real cryptographic check, **not** a cache of a previous answer and not a decode-and-trust.
+The public key is fetched from the JWKS endpoint and held in a module-global cache with a
+10-minute TTL, so the network cost is amortised across requests on a warm server rather than
+paid per navigation.
+
+### What would silently undo this
+
+Two project-level changes turn `getClaims()` back into a per-call round-trip, and **neither
+breaks anything visibly** — the app stays correct and secure, it just quietly gets slower:
+
+- **Switching back to the legacy symmetric JWT secret.** `getClaims()` sees an `HS*` algorithm
+  and falls back to `getUser()` internally.
+- **Running where WebCrypto is unavailable.** Same fallback.
+
+If the search path ever feels sluggish again, check the signing key type before anything else.
+
+### What did not change
+
+`requireUser()` still calls `getUser()`, and that is deliberate. Server functions are
+independently reachable RPC endpoints — they are the real security boundary, not the route
+guards — and they run once per mutation rather than once per keystroke. A verified round-trip
+is worth it there.
 
 ## Flows
 

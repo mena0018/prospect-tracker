@@ -48,7 +48,8 @@ Two things make this safe:
    (`requireUser()` in [`src/lib/supabase/server.ts`](../../src/lib/supabase/server.ts)
    calls `supabase.auth.getUser()`, which validates the JWT server-side). Zod
    schemas deliberately omit `user_id`, so a client that sends one has it
-   stripped.
+   stripped. This path keeps the Auth-server round-trip on purpose even though the
+   route guard now verifies locally — see [`auth.md`](auth.md).
 2. **It filters rather than checks.** Rows belonging to other users are invisible
    to the query, so there is no "is this mine?" branch that could be forgotten or
    get the comparison backwards.
