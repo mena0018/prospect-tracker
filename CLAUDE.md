@@ -134,6 +134,21 @@ pnpm typecheck && pnpm lint:ci && pnpm format:check && pnpm test
 
 `pnpm routes:gen` regenerates the gitignored `routeTree.gen.ts` (also runs on `pretypecheck`).
 
+### Browser checks go through Orca, not a separate Chrome
+
+Verify UI in **Orca's own browser** (`orca tab list --json`, `orca goto`, `orca snapshot`,
+`orca eval`), never by opening an external Chrome tab. Two reasons, both load-bearing:
+
+- That session already carries the auth cookies, so `/app` renders logged in. A fresh Chrome
+  tab lands on `/login` and proves nothing.
+- `orca eval --expression` runs JavaScript **inside the page**, which is the only way to test
+  anything faster than a human click. The search debounce is 300 ms and a driven click costs
+  more than that, so click-driven checks silently miss the race conditions that matter — see
+  `docs/reference/server-side-table.md`.
+
+React ignores `input.value = x`; drive inputs through the native setter plus an `input` event,
+or the component never sees the change.
+
 ## Critical rules
 
 - Never change `src/db/schema.ts` without generating a migration

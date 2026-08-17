@@ -5,12 +5,12 @@ import type { ListOpportunitiesInput } from '@/modules/opportunities/opportuniti
 
 // See docs/reference/server-side-table.md
 export function useOpportunitiesListInput(): ListOpportunitiesInput {
-  const { tab, search, isDueOnly, sorting, pagination } = useOpportunitiesFilters()
+  const { tab, query, isDueOnly, sorting, pagination } = useOpportunitiesFilters()
   const today = useToday()
 
   return {
     tab,
-    q: search.trim(),
+    q: query,
     due: isDueOnly,
     sortBy: sorting[0] ? toSortColumn(sorting[0].id) : null,
     sortDesc: sorting[0]?.desc ?? false,

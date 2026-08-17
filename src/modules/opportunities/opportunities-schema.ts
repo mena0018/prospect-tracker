@@ -157,9 +157,13 @@ export const opportunitiesSearchSchema = z.object({
 
 export type OpportunitiesSearch = z.infer<typeof opportunitiesSearchSchema>
 
+// Every whitespace-separated term becomes its own OR-group over six columns, so the length cap
+// is also a cap on generated SQL. See docs/reference/server-side-table.md
+const searchQuery = z.string().trim().max(200)
+
 export const listOpportunitiesSchema = z.object({
   tab: z.enum(['active', 'archived']),
-  q: z.string().trim().max(200),
+  q: searchQuery,
   due: z.boolean(),
   sortBy: z.enum(SORT_COLUMNS).nullable(),
   sortDesc: z.boolean(),
@@ -173,7 +177,13 @@ export type ListOpportunitiesInput = z.infer<typeof listOpportunitiesSchema>
 // `q` narrows the tab counts only; the KPIs stay global. See docs/reference/kpis.md
 export const opportunitiesSummarySchema = z.object({
   today: z.iso.date(),
-  q: z.string().trim().default('')
+  q: searchQuery.default('')
+})
+
+// Aggregates that depend on the date and nothing else — "due" is relative to the browser's
+// today, which is why even a search-independent count still takes a parameter.
+export const todayOnlySchema = z.object({
+  today: z.iso.date()
 })
 
 // Pipeline rules shared by the client calculations and their SQL counterparts. See docs/reference/kpis.md

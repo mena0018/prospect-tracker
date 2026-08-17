@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
 
-import { InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
-import { m } from '@/i18n/paraglide/messages'
+import { InputGroupInput } from '@/components/ui/input-group'
 import { useDebouncer } from '@tanstack/react-pacer/debouncer'
 
 const DEBOUNCE_MS = 300
@@ -10,48 +8,44 @@ const DEBOUNCE_MS = 300
 type Props = Omit<React.ComponentProps<typeof InputGroupInput>, 'value' | 'onChange'> & {
   value: string
   onChange: (value: string) => void
-  clearable?: boolean
 }
 
-export function DebouncedInput({ value, onChange, clearable = false, ...props }: Props) {
+export function DebouncedInput({ value, onChange, ...props }: Props) {
   const [draft, setDraft] = useState(value)
   const [lastValue, setLastValue] = useState(value)
 
+  // What we last handed to `onChange`. The parent round-trips it back through `value` (here via
+  // the URL) long after typing has moved on, and that late echo must not overwrite the draft —
+  // otherwise "jean" arriving mid-word rewrites an input the user has already retyped.
+  const [emitted, setEmitted] = useState(value)
+
   // Adjusting during render, not in an effect: an effect re-renders on our own emission.
+  // Both tests are load-bearing — see docs/reference/server-side-table.md
   if (value !== lastValue) {
     setLastValue(value)
-    setDraft(value)
+
+    // Only a value we never emitted is a genuine external change (reset filters, back button).
+    if (value !== emitted) {
+      setEmitted(value)
+      setDraft(value)
+    }
   }
 
-  const debouncer = useDebouncer(onChange, { wait: DEBOUNCE_MS })
+  const emit = (next: string) => {
+    setEmitted(next)
+    onChange(next)
+  }
+
+  const debouncer = useDebouncer(emit, { wait: DEBOUNCE_MS })
 
   return (
-    <>
-      <InputGroupInput
-        {...props}
-        value={draft}
-        onChange={(event) => {
-          setDraft(event.target.value)
-          debouncer.maybeExecute(event.target.value)
-        }}
-      />
-      {clearable && draft ? (
-        <InputGroupAddon align="inline-end">
-          <InputGroupButton
-            size="icon-xs"
-            aria-label={m.common_clear()}
-            onClick={() => {
-              debouncer.cancel()
-              setDraft('')
-              setLastValue('')
-              onChange('')
-            }}
-            className="text-muted-foreground hover:text-foreground rounded-full"
-          >
-            <X />
-          </InputGroupButton>
-        </InputGroupAddon>
-      ) : null}
-    </>
+    <InputGroupInput
+      {...props}
+      value={draft}
+      onChange={(event) => {
+        setDraft(event.target.value)
+        debouncer.maybeExecute(event.target.value)
+      }}
+    />
   )
 }

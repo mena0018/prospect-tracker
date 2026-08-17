@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { and, asc, desc, eq, ilike, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
+import { and, asc, desc, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
 import { db } from '@/db/client'
 import { opportunities, stages } from '@/db/schema'
@@ -11,6 +11,7 @@ import {
   listOpportunitiesSchema,
   type ListOpportunitiesInput,
   opportunitiesSummarySchema,
+  todayOnlySchema,
   updateOpportunitySchema,
   INTERVIEW_POSITION,
   OFFER_POSITION,
@@ -52,22 +53,32 @@ type OpportunitiesPage = {
 
 type RowFilters = Pick<ListOpportunitiesInput, 'tab' | 'q' | 'due' | 'today'>
 
+const SEARCH_COLUMNS = [
+  opportunities.recruiter,
+  opportunities.esn,
+  opportunities.endClient,
+  opportunities.need,
+  opportunities.location,
+  stages.name
+]
+
 // Shared by the row list and the tab counts, so a search narrows both identically.
+// Terms are AND-ed, columns OR-ed, and both sides are unaccented — see
+// docs/reference/server-side-table.md
 function searchMatch(q: string) {
-  if (!q) return null
+  const terms = q.split(/\s+/).filter(Boolean)
+  if (terms.length === 0) return null
 
-  const pattern = `%${q}%`
-
-  return (
+  const matchesSomeColumn = (term: string) =>
     or(
-      ilike(opportunities.recruiter, pattern),
-      ilike(opportunities.esn, pattern),
-      ilike(opportunities.endClient, pattern),
-      ilike(opportunities.need, pattern),
-      ilike(opportunities.location, pattern),
-      ilike(stages.name, pattern)
-    ) ?? null
-  )
+      // `immutable_unaccent` on the column is what lets the expression indexes apply; matching
+      // the raw column here would silently fall back to a sequential scan.
+      ...SEARCH_COLUMNS.map(
+        (column) => sql`immutable_unaccent(${column}) ilike immutable_unaccent(${`%${term}%`})`
+      )
+    )
+
+  return and(...terms.map(matchesSomeColumn)) ?? null
 }
 
 function buildWhere(userId: string, { tab, q, due, today }: RowFilters) {
@@ -225,7 +236,7 @@ type StageCount = {
 }
 
 export const getStageCounts = createServerFn({ method: 'GET' })
-  .validator(opportunitiesSummarySchema)
+  .validator(todayOnlySchema)
   .handler(async ({ data: { today } }): Promise<{ stages: StageCount[]; dueCount: number }> => {
     const { id: userId } = await requireUser()
 
