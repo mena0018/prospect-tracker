@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { OPPORTUNITIES_QUERY_KEY } from '@/modules/opportunities/hooks/use-opportunities'
-import { getStageCounts } from '@/modules/opportunities/opportunities-server'
+import { getStageCounts } from '@/modules/stages/stages-server'
 import { useToday } from '@/hooks/use-today'
 
 const stageCountsQueryOptions = (today: string) =>
