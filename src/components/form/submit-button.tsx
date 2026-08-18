@@ -5,10 +5,7 @@ type Props = {
   label: string
   busy?: boolean
   formId?: string
-  // Opt-in: with nothing changed there is nothing to save, so the request is skipped. Forms
-  // whose defaults are already a valid submission (sign-in) leave it off. `isDefaultValue`
-  // compares against the current defaults rather than latching like `isDirty`, so typing a
-  // character and deleting it disables the button again.
+  // Opt-in — off for forms whose defaults already submit. See docs/reference/opportunity-form.md
   requiresChanges?: boolean
   className?: string
 }

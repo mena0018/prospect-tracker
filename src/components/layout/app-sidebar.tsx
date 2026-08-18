@@ -5,6 +5,7 @@ import { BrandMark } from '@/components/icons/brand-mark'
 import { ProfileMenu } from '@/modules/auth/components/profile-menu'
 import { AppSidebarFooter } from '@/components/layout/app-sidebar-footer'
 import { Button } from '@/components/ui/button'
+import { NumberTicker } from '@/components/ui/number-ticker'
 import { Separator } from '@/components/ui/separator'
 import {
   Sidebar,
@@ -107,7 +108,11 @@ export function AppSidebar() {
                 <div className="min-w-0 leading-tight">
                   <div className="flex items-baseline gap-1.5">
                     <span className="tracking-page-title text-lg font-semibold tabular-nums">
-                      {dueCount}
+                      {dueCount === undefined ? (
+                        <Skeleton className="inline-block h-[1em] w-5 translate-y-[0.1em] rounded-sm" />
+                      ) : (
+                        <NumberTicker value={dueCount} />
+                      )}
                     </span>
                     <span className="text-muted-foreground text-xs">{m.followUp_toContact()}</span>
                   </div>

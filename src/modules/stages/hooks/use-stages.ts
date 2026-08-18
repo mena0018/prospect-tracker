@@ -1,12 +1,12 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { listStages } from '@/modules/stages/stages-server'
+import { getStages } from '@/modules/stages/stages-server'
 
 const STAGES_QUERY_KEY = ['stages']
 
 export const stagesQueryOptions = () =>
   queryOptions({
     queryKey: STAGES_QUERY_KEY,
-    queryFn: () => listStages()
+    queryFn: () => getStages()
   })
 
 export function useStages() {

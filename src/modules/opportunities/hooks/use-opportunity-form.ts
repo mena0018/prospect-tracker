@@ -26,9 +26,7 @@ export function useOpportunityForm({ open, row, fallbackStageId, onSubmit }: Par
     onSubmit: async ({ value }) => {
       await onSubmit(opportunityFormSchema.parse(value))
 
-      // Only reached once the row is saved — a failed submit rejects above. The create draft
-      // survives an ordinary close (only an explicit discard clears it), but a saved row is no
-      // longer a draft.
+      // Only the create draft is cleared, and only once saved — a failed submit rejects above.
       if (!row) form.reset(valuesFor(null))
     }
   })

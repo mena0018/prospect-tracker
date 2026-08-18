@@ -5,7 +5,7 @@ import { db } from '@/db/client'
 import { jobTypes, type JobType } from '@/db/schema'
 import { requireUser } from '@/lib/supabase/server'
 
-export const listJobTypes = createServerFn({ method: 'GET' }).handler(
+export const getJobTypes = createServerFn({ method: 'GET' }).handler(
   async (): Promise<JobType[]> => {
     const { id: userId } = await requireUser()
 

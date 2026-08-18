@@ -5,7 +5,7 @@ import { db } from '@/db/client'
 import { experienceLevels, type ExperienceLevel } from '@/db/schema'
 import { requireUser } from '@/lib/supabase/server'
 
-export const listExperienceLevels = createServerFn({ method: 'GET' }).handler(
+export const getExperienceLevels = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ExperienceLevel[]> => {
     const { id: userId } = await requireUser()
 

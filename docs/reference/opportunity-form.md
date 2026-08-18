@@ -93,6 +93,22 @@ a number. `opportunityFormSchema` converts at the edge — blank strings become 
 strings become numbers — then pipes into `opportunityFieldsSchema`, the same schema the server
 validates with. Field rules are never duplicated.
 
+The two directions are reciprocal, and each has one entry point:
+
+```
+row (DB types)                                     payload (DB types)
+  │                                                       ▲
+  │ toFormValues(row, fallbackStageId, today)             │ opportunityFormSchema.parse(values)
+  │ utils/form-values.ts                                  │ opportunities-schema.ts
+  ▼                                                       │
+OpportunityFormValues ──────────── the form ──────────────┘
+(every field a string)
+```
+
+They are deliberately **not** grouped into a single codec object. Only `toFormValues` is a
+function; the other direction is a Zod schema that also runs as the form's live `onChange`
+validator, so an object pairing the two would present as symmetric something that is not.
+
 Both schemas live in `opportunities-schema.ts`, next to each other: the form schema is a
 normalising front end for the server one, and splitting the pair across files only hid that.
 The coercion it runs on the way through (`toNumeric`, `toOptionalText`) and its inverse
@@ -101,9 +117,12 @@ not field rules.
 
 Two details worth keeping:
 
-- **Non-numeric input stays a string** rather than becoming `NaN`. `Number('abc')` is `NaN` and
-  `Number(' ')` is `0`; both would either pass silently or fail with a confusing message.
-  Leaving `'abc'` as-is makes `z.int()` reject it with `validation_dailyRateInt`.
+- **Non-numeric input stays a string** rather than becoming `NaN`. The load-bearing half is
+  `Number(' ')`, which is `0` — a blank field would silently save as a rate of zero, so
+  `toNumeric` returns `null` on an empty string before any parsing. `'abc'` is a belt-and-braces
+  case: `z.int()` rejects the string and `NaN` alike, with the same `validation_dailyRateInt`
+  message either way (verified by `opportunities-schema.test.ts`), so the `Number.isFinite`
+  guard changes nothing the user can observe. Keep it for intent, not for behaviour.
 - The schema starts from `z.custom<OpportunityFormValues>()` rather than a `z.object({...})`
   piped into the server schema. The server shape marks optional fields as `.optional()`, so its
   input type accepts `undefined`, which is wider than what the form ever produces — Zod v4 rejects

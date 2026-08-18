@@ -18,7 +18,7 @@ import {
   useOpportunitiesSummary
 } from '@/modules/opportunities/hooks/use-opportunities'
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
-import { useOpportunitiesListInput } from '@/modules/opportunities/hooks/use-opportunities-list-input'
+import { useOpportunitiesInput } from '@/modules/opportunities/hooks/use-opportunities-input'
 import { useOpportunityEditorContext } from '@/modules/opportunities/components/opportunity-editor-provider'
 import { toRows } from '@/modules/opportunities/utils/rows'
 import { indexStages } from '@/modules/stages/stages-utils'
@@ -30,7 +30,7 @@ const PANEL_CARD_LAYOUT =
   'bg-card border-border flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border'
 
 export function OpportunitiesPanel() {
-  const listInput = useOpportunitiesListInput()
+  const input = useOpportunitiesInput()
   const { hasFilters, pagination, query } = useOpportunitiesFilters()
 
   const {
@@ -53,7 +53,7 @@ export function OpportunitiesPanel() {
     isFetching: isPageFetching,
     isError: isPageError,
     refetch: refetchPage
-  } = useOpportunities(listInput)
+  } = useOpportunities(input)
 
   const {
     data: summary,
