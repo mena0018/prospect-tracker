@@ -80,8 +80,6 @@ export const signUpWithPassword = createServerFn({ method: 'POST' })
 
 export const provisionUser = createServerFn({ method: 'POST' }).handler(async (): Promise<User> => {
   const user = await requireUser()
-
-  // An account without email can't be provisioned: send them back rather than half-creating a row.
   if (!user.email) throw redirect({ to: APP_ROUTES.login })
 
   const authUser = { id: user.id, email: user.email }
