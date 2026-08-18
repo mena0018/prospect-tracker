@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { and, asc, desc, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
+import { and, asc, desc, eq, sql } from 'drizzle-orm'
 
 import { db } from '@/db/client'
 import { opportunities, stages } from '@/db/schema'
@@ -8,41 +8,22 @@ import { requireUser } from '@/lib/supabase/server'
 import {
   createOpportunitySchema,
   deleteOpportunitySchema,
-  listOpportunitiesSchema,
-  type ListOpportunitiesInput,
+  getOpportunitiesSchema,
   opportunitiesSummarySchema,
-  todayOnlySchema,
   updateOpportunitySchema,
   INTERVIEW_POSITION,
   OFFER_POSITION,
   SAVED_POSITION,
-  STALE_THRESHOLD_DAYS,
-  type SortColumn
+  STALE_THRESHOLD_DAYS
 } from '@/modules/opportunities/opportunities-schema'
+import {
+  buildWhere,
+  isArchivedRow,
+  isDueExpression,
+  searchMatch,
+  SORT_EXPRESSIONS
+} from '@/modules/opportunities/opportunities-sql'
 import type { OpportunityDueFlags } from '@/modules/opportunities/utils/rows'
-
-// A row is archived by its own flag or by sitting in an archived stage.
-const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArchived})`
-
-const dueDate = sql`coalesce(
-  ${opportunities.nextReminderAt},
-  ${opportunities.lastContactAt} + ${stages.reminderDelayDays}
-)`
-
-// The single definition of "due for follow-up" — the client reads this, it never recomputes.
-// See docs/reference/data-model.md
-const isDueExpression = (today: string) =>
-  sql<boolean>`(not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date)`
-
-const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
-  lastContactAt: opportunities.lastContactAt,
-  recruiter: opportunities.recruiter,
-  esn: opportunities.esn,
-  endClient: opportunities.endClient,
-  dailyRate: opportunities.dailyRate,
-  location: opportunities.location,
-  stage: stages.name
-}
 
 type OpportunitiesPage = {
   rows: OpportunityDueFlags[]
@@ -51,48 +32,8 @@ type OpportunitiesPage = {
   pageCount: number
 }
 
-type RowFilters = Pick<ListOpportunitiesInput, 'tab' | 'q' | 'due' | 'today'>
-
-const SEARCH_COLUMNS = [
-  opportunities.recruiter,
-  opportunities.esn,
-  opportunities.endClient,
-  opportunities.need,
-  opportunities.location,
-  stages.name
-]
-
-// Terms AND-ed, columns OR-ed, both sides unaccented — see docs/reference/server-side-table.md
-function searchMatch(q: string) {
-  const terms = q.split(/\s+/).filter(Boolean)
-  if (terms.length === 0) return null
-
-  const matchesSomeColumn = (term: string) =>
-    or(
-      // Unaccenting the column, not just the term, is what keeps the expression indexes in play.
-      ...SEARCH_COLUMNS.map(
-        (column) => sql`immutable_unaccent(${column}) ilike immutable_unaccent(${`%${term}%`})`
-      )
-    )
-
-  return and(...terms.map(matchesSomeColumn)) ?? null
-}
-
-function buildWhere(userId: string, { tab, q, due, today }: RowFilters) {
-  const filters: SQL[] = [eq(opportunities.userId, userId)]
-
-  filters.push(tab === 'archived' ? sql`${isArchivedRow}` : sql`not ${isArchivedRow}`)
-
-  const match = searchMatch(q)
-  if (match) filters.push(match)
-
-  if (due) filters.push(isDueExpression(today))
-
-  return and(...filters)
-}
-
-export const listOpportunities = createServerFn({ method: 'GET' })
-  .validator(listOpportunitiesSchema)
+export const getOpportunities = createServerFn({ method: 'GET' })
+  .validator(getOpportunitiesSchema)
   .handler(async ({ data }): Promise<OpportunitiesPage> => {
     const { id: userId } = await requireUser()
     const { sortBy, sortDesc, page, perPage } = data
@@ -159,7 +100,7 @@ export type Kpis = {
   responseRate: number | null
 }
 
-export type OpportunitiesSummary = {
+type OpportunitiesSummary = {
   kpis: Kpis
   activeCount: number
   archivedCount: number
@@ -174,7 +115,6 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
     const isDue = isDueExpression(today)
     const awaitingReply = sql`${stages.position} not in (${INTERVIEW_POSITION}, ${OFFER_POSITION})`
 
-    // Only the tab counts follow the search; the KPIs describe the whole pipeline.
     const match = searchMatch(q)
     const matches = match ?? sql`true`
 
@@ -220,39 +160,6 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
       },
       activeCount: row?.activeCount ?? 0,
       archivedCount: row?.archivedCount ?? 0
-    }
-  })
-
-type StageCount = {
-  id: string
-  name: string
-  color: string
-  count: number
-}
-
-export const getStageCounts = createServerFn({ method: 'GET' })
-  .validator(todayOnlySchema)
-  .handler(async ({ data: { today } }): Promise<{ stages: StageCount[]; dueCount: number }> => {
-    const { id: userId } = await requireUser()
-
-    const rows = await db
-      .select({
-        id: stages.id,
-        name: stages.name,
-        color: stages.color,
-        position: stages.position,
-        count: sql<number>`count(${opportunities.id})`.mapWith(Number),
-        dueCount: sql<number>`count(*) filter (where ${isDueExpression(today)})`.mapWith(Number)
-      })
-      .from(stages)
-      .leftJoin(opportunities, eq(opportunities.stageId, stages.id))
-      .where(eq(stages.userId, userId))
-      .groupBy(stages.id, stages.name, stages.color, stages.position)
-      .orderBy(asc(stages.position))
-
-    return {
-      stages: rows.map(({ id, name, color, count }) => ({ id, name, color, count })),
-      dueCount: rows.reduce((sum, row) => sum + row.dueCount, 0)
     }
   })
 
