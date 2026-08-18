@@ -4,7 +4,8 @@ import {
   toAuthErrorCode,
   toDisplayName,
   toInitials,
-  toProfileSubtitle
+  toProfileSubtitle,
+  toSafeRedirect
 } from '@/modules/auth/auth-utils'
 
 describe('toAuthErrorCode', () => {
@@ -106,5 +107,47 @@ describe('toProfileSubtitle', () => {
     expect(toProfileSubtitle(null, email)).toBe(email)
     expect(toProfileSubtitle('', email)).toBe(email)
     expect(toProfileSubtitle('   ', email)).toBe(email)
+  })
+})
+
+describe('toSafeRedirect', () => {
+  const fallback = '/app'
+
+  it('keeps a relative path, query and hash included', () => {
+    expect(toSafeRedirect('/app', fallback)).toBe('/app')
+    expect(toSafeRedirect('/app/opportunities?stage=won', fallback)).toBe(
+      '/app/opportunities?stage=won'
+    )
+    expect(toSafeRedirect('/app#top', fallback)).toBe('/app#top')
+  })
+
+  it('rejects an absolute URL pointing off-origin', () => {
+    expect(toSafeRedirect('https://evil.com', fallback)).toBe(fallback)
+    expect(toSafeRedirect('http://evil.com/app', fallback)).toBe(fallback)
+  })
+
+  it('rejects a protocol-relative URL, which resolves off-origin', () => {
+    expect(toSafeRedirect('//evil.com', fallback)).toBe(fallback)
+    expect(toSafeRedirect('//evil.com/app', fallback)).toBe(fallback)
+  })
+
+  it('rejects a backslash authority, which browsers read as //', () => {
+    expect(toSafeRedirect('/\\evil.com', fallback)).toBe(fallback)
+  })
+
+  it('rejects a non-http scheme', () => {
+    expect(toSafeRedirect('javascript:alert(1)', fallback)).toBe(fallback)
+    expect(toSafeRedirect('data:text/html,<script>', fallback)).toBe(fallback)
+  })
+
+  it('falls back when there is no target', () => {
+    expect(toSafeRedirect(undefined, fallback)).toBe(fallback)
+    expect(toSafeRedirect('', fallback)).toBe(fallback)
+    // searchParams.get() returns null for a missing param
+    expect(toSafeRedirect(null, fallback)).toBe(fallback)
+  })
+
+  it('passes the fallback through as given', () => {
+    expect(toSafeRedirect('https://evil.com', undefined)).toBeUndefined()
   })
 })

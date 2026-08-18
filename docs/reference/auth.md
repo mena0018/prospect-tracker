@@ -142,3 +142,31 @@ These headers forbid caching the response. Supabase provides them as the second
 argument to `setAll`; our job is only to apply them to the outgoing response.
 
 See `getSupabaseServerClient` in `src/lib/supabase/server.ts`.
+
+## Why the post-login redirect is validated
+
+`/login` accepts a `redirect` search param, forwarded to the OAuth callback as
+`?next=`. It travels through the URL, so it is attacker-controlled: a link like
+`/login?redirect=https://evil.com` reaches the callback untouched.
+
+The callback builds its response with `new URL(next, url.origin)`. An **absolute**
+target overrides the base entirely, so `next=https://evil.com` resolves to
+`https://evil.com` — an open redirect that fires _after_ the session cookies are
+set. The Supabase redirect allowlist does not catch this: the URL Supabase sees
+is our own `/api/auth/callback`, and the off-origin hop is the second one, made
+by our code.
+
+`toSafeRedirect` (`src/modules/auth/auth-utils.ts`) keeps only same-origin
+relative paths. Three shapes are rejected:
+
+- absolute URLs (`https://evil.com`) and non-http schemes (`javascript:`)
+- protocol-relative URLs (`//evil.com`) — `new URL()` resolves these off-origin
+- backslash authorities (`/\evil.com`) — browsers normalise `\` to `/`
+
+It is applied twice, on both paths the value can take:
+
+- **server** — in `src/routes/api/auth.$.tsx`, before the callback redirect. This
+  is the one that matters: it runs with a valid session in hand.
+- **client** — as a `transform` on `redirect` in `loginSearchSchema`, so every
+  `router.navigate({ to: next })` and the `beforeLoad` of `/login` get a
+  sanitised value without repeating the guard at each call site.

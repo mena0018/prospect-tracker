@@ -51,3 +51,14 @@ export function toProfileSubtitle(jobTitle: string | null, email: string) {
   const trimmed = jobTitle?.trim()
   return trimmed ? trimmed : email
 }
+
+// A caller-supplied redirect must stay on our origin — see docs/reference/auth.md
+export function toSafeRedirect<T extends string | undefined>(
+  target: string | null | undefined,
+  fallback: T
+) {
+  if (!target?.startsWith('/') || target.startsWith('//') || target.startsWith('/\\')) {
+    return fallback
+  }
+  return target
+}

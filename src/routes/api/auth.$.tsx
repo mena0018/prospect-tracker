@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { APP_ROUTES } from '@/lib/routes'
+import { toSafeRedirect } from '@/modules/auth/auth-utils'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 
 function redirectTo(origin: string, path: string): Response {
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/api/auth/$')({
 
         if (action === 'callback') {
           const code = url.searchParams.get('code')
-          const next = url.searchParams.get('next') ?? APP_ROUTES.dashboard
+          const next = toSafeRedirect(url.searchParams.get('next'), APP_ROUTES.dashboard)
 
           if (code) {
             const supabase = getSupabaseServerClient()
