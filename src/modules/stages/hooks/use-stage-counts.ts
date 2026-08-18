@@ -15,7 +15,9 @@ export function useStageCounts() {
 
   return {
     stages: query.data?.stages ?? [],
-    dueCount: query.data?.dueCount ?? 0,
+    // Undefined until loaded, so the ticker animates from the real value instead of from a
+    // placeholder zero — see docs/reference/number-ticker.md
+    dueCount: query.data?.dueCount,
     ...query
   }
 }
