@@ -1,12 +1,12 @@
 import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
 import { useToday } from '@/hooks/use-today'
 import { toSortColumn } from '@/modules/opportunities/utils/display'
-import type { ListOpportunitiesInput } from '@/modules/opportunities/opportunities-schema'
+import type { GetOpportunitiesInput } from '@/modules/opportunities/opportunities-schema'
 
 // See docs/reference/server-side-table.md
-export function useOpportunitiesListInput(): ListOpportunitiesInput {
-  const { tab, query, isDueOnly, sorting, pagination } = useOpportunitiesFilters()
+export function useOpportunitiesInput(): GetOpportunitiesInput {
   const today = useToday()
+  const { tab, query, isDueOnly, sorting, pagination } = useOpportunitiesFilters()
 
   return {
     tab,

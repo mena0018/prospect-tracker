@@ -161,7 +161,7 @@ export type OpportunitiesSearch = z.infer<typeof opportunitiesSearchSchema>
 // is also a cap on generated SQL. See docs/reference/server-side-table.md
 const searchQuery = z.string().trim().max(200)
 
-export const listOpportunitiesSchema = z.object({
+export const getOpportunitiesSchema = z.object({
   tab: z.enum(['active', 'archived']),
   q: searchQuery,
   due: z.boolean(),
@@ -172,7 +172,7 @@ export const listOpportunitiesSchema = z.object({
   today: z.iso.date()
 })
 
-export type ListOpportunitiesInput = z.infer<typeof listOpportunitiesSchema>
+export type GetOpportunitiesInput = z.infer<typeof getOpportunitiesSchema>
 
 // `q` narrows the tab counts only; the KPIs stay global. See docs/reference/kpis.md
 export const opportunitiesSummarySchema = z.object({
