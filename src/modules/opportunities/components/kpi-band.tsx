@@ -1,7 +1,6 @@
 import { Bell, CalendarDays, Clock, Percent } from 'lucide-react'
 import type { ComponentType } from 'react'
 
-import { BorderBeam } from '@/components/ui/border-beam'
 import { NumberTicker } from '@/components/ui/number-ticker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { m } from '@/i18n/paraglide/messages'
@@ -9,8 +8,7 @@ import { cn, formatValue } from '@/lib/utils'
 import type { Kpis } from '@/modules/opportunities/opportunities-server'
 
 const BAND_LAYOUT = 'mb-5.5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'
-const CARD_LAYOUT =
-  'bg-card relative min-h-30.5 overflow-hidden rounded-xl border p-4.5 shadow-xs dark:shadow-none'
+const CARD_LAYOUT = 'bg-card min-h-30.5 rounded-xl border p-4.5 shadow-xs dark:shadow-none'
 const CARD_COUNT = 4
 
 type Props = {
@@ -53,7 +51,6 @@ function KpiCard({ label, value, suffix, animated, unit, icon: Icon, isAlert = f
         )}
         {unit && <span className="text-muted-foreground text-xs">{unit}</span>}
       </div>
-      {isAlert && <BorderBeam size={70} duration={12} borderWidth={1.5} />}
     </div>
   )
 }

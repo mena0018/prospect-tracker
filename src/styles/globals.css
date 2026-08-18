@@ -161,17 +161,6 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-
-  --animate-border-beam: border-beam linear infinite;
-
-  @keyframes border-beam {
-    from {
-      offset-distance: 0%;
-    }
-    to {
-      offset-distance: 100%;
-    }
-  }
 }
 
 @layer base {
@@ -183,10 +172,5 @@
   }
   html {
     @apply font-sans antialiased;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .animate-border-beam {
-      animation: none;
-    }
   }
 }
