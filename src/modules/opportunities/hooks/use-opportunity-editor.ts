@@ -20,8 +20,7 @@ export function useOpportunityEditor() {
     async (values: CreateOpportunityInput) => {
       const editing = editor?.row
 
-      // Rethrows so the form can tell a saved row from a failed one; the sheet stays open on
-      // failure with whatever was typed. The toast comes from the mutation's onError.
+      // Rethrows on purpose: the sheet stays open with whatever was typed, toast via onError.
       if (editing) {
         await update.mutateAsync({ id: editing.id, ...values })
       } else {

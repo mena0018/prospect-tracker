@@ -22,8 +22,7 @@ export function NumberTicker({ value, suffix = '', className }: Props) {
     if (isAnimatable) motionValue.set(value)
   }, [motionValue, value, isAnimatable])
 
-  // The spring writes textContent directly, so React never reconciles it back — a value
-  // turning null (or reduced motion) has to restore the text by hand
+  // The spring writes textContent directly, so React never reconciles it back by itself.
   useEffect(() => {
     if (!isAnimatable) {
       if (ref.current) ref.current.textContent = formatValue(value, suffix)

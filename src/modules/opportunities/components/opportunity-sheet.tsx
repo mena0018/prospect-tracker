@@ -49,8 +49,7 @@ export function OpportunitySheet({
   })
 
   const requestClose = () => {
-    // Same signal as the save button, so the two can never disagree: `isDirty` latches once a
-    // field is edited, which warned about losing changes that had been typed and undone.
+    // Same signal as the save button, so the two can never disagree — `isDirty` would latch.
     const needsConfirm = !form.state.isDefaultValue && !form.state.isSubmitting
 
     if (needsConfirm) setConfirmingDiscard(true)
