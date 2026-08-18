@@ -1,9 +1,14 @@
 import { z } from 'zod/v4'
 
 import { m } from '@/i18n/paraglide/messages'
+import { toSafeRedirect } from '@/modules/auth/auth-utils'
 
 export const loginSearchSchema = z.object({
-  redirect: z.string().optional(),
+  // Drop off-origin redirects at the edge rather than at each navigate site
+  redirect: z
+    .string()
+    .optional()
+    .transform((value) => toSafeRedirect(value, undefined)),
   error: z.string().optional(),
   mode: z.enum(['signin', 'signup']).default('signin')
 })
