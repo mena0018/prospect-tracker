@@ -188,7 +188,4 @@ export const todayOnlySchema = z.object({
 })
 
 // Pipeline rules shared by the client calculations and their SQL counterparts. See docs/reference/kpis.md
-export const SAVED_POSITION = 0
-export const INTERVIEW_POSITION = 3
-export const OFFER_POSITION = 4
 export const STALE_THRESHOLD_DAYS = 7

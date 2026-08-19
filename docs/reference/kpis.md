@@ -45,24 +45,38 @@ rate entirely: nobody was contacted, so they would unfairly drag the ratio down.
 When no opportunity has been contacted, the rate is `null` and the card renders
 `—` rather than a misleading `0%`.
 
-## Why stage positions, not names
+## Why `system_key`, not names or positions
 
 Stages are user-renamable (see
 [0001-user-configurable-pipeline.md](../decisions/0001-user-configurable-pipeline.md)),
-so matching on the string `'Entretien'` would break the moment someone renames it —
-and never work at all for an English-speaking user. The KPIs therefore key off the
-seeded `position` values: 0 Sauvegardé, 3 Entretien, 4 Offre.
+so matching on the string `'Entretien'` breaks the moment someone renames it — and
+never works for an English-speaking user. Matching on `position` survives a rename but
+breaks on a reorder, silently: the "interviews" card would count CVs sent, with no
+error anywhere.
 
-This trades one fragility for another, deliberately:
+The KPIs therefore key off `stages.system_key`, a stable identity written once at seed
+and immutable afterwards (a trigger rejects any rewrite). It survives both a rename and
+a reorder.
 
-- **Renaming a stage** keeps the KPIs correct — the common case.
-- **Reordering or deleting** a seeded stage silently changes what they count — the
-  rarer case, and the one the user is more likely to connect to their own edit.
+Two kinds of stage follow from this:
 
-The real fix is an explicit semantic marker on the stage row (a `kind` column, or a
-nullable `semantic` enum) so the meaning survives any rename _and_ any reorder. That
-is a schema change, deferred to the Customize ticket (DEV-26) which owns stage
-editing.
+- **System stages** — the seven seeded ones (`saved`, `contacted`, `cv_sent`,
+  `interview`, `offer`, `rejected`, `ghosted`). Renameable, recolourable,
+  delay-configurable, hideable — but **not deletable**, because a KPI depends on each.
+- **Free stages** — anything the user adds on top, with `system_key = null`. Fully
+  editable and **neutral**: they count as contacted and as still awaiting a reply, but
+  never as an interview, an offer, or the entry stage.
+
+That neutrality is what keeps the aggregates answerable. If "Entretien technique" and
+"Entretien RH" were both free stages, "how many interviews this month" would have no
+single answer — so reaching an interview is recorded by the system stage, and the free
+stages a user invents around it stay out of the count.
+
+**In SQL, a null `system_key` needs `is not true`, not `not (...)`.** A free stage makes
+`system_key = 'saved'` evaluate to `null`, and `not null` is `null`, which fails a
+`filter (where ...)` clause — the row would drop out of the count instead of being
+counted as neutral. See `getOpportunitiesSummary` in
+[`opportunities-server.ts`](../../src/modules/opportunities/opportunities-server.ts).
 
 ## Response-rate trend
 

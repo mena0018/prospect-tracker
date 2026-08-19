@@ -23,11 +23,10 @@ import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-oppor
 import { StageBadge } from '@/modules/stages/components/stage-badge'
 import { useStageCounts } from '@/modules/stages/hooks/use-stage-counts'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DEFAULT_STAGES } from '@/db/defaults'
 import { FollowUpCard } from '@/components/layout/follow-up-card'
 
 export function AppSidebar() {
-  const { stages, dueCount, doneToday, hasPipeline } = useStageCounts()
+  const { stages, dueCount, doneToday, hasPipeline, isPending, skeletonCount } = useStageCounts()
   const { setTab, setDueOnly } = useOpportunitiesFilters()
 
   // Due rows only exist on the active tab.
@@ -73,8 +72,8 @@ export function AppSidebar() {
         <SidebarGroup className="mt-5.5 min-h-0 shrink-0 px-2.75 py-0">
           <SidebarGroupLabel>{m.nav_pipeline()}</SidebarGroupLabel>
           <SidebarGroupContent className="min-h-0">
-            {stages.length === 0
-              ? Array.from({ length: DEFAULT_STAGES.length }, (_, index) => (
+            {isPending
+              ? Array.from({ length: skeletonCount }, (_, index) => (
                   <Skeleton key={index} className="my-1.5 h-5 w-53 rounded-sm" />
                 ))
               : stages.map((stage) => (

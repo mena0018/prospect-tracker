@@ -50,6 +50,13 @@
       "when": 1786910400000,
       "tag": "0006_search_unaccent",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787162067205,
+      "tag": "0007_stages_system_key",
+      "breakpoints": true
     }
   ]
 }

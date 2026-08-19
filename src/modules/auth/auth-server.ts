@@ -109,6 +109,7 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
           userId: inserted.id,
           name: s.name,
           color: s.color,
+          systemKey: s.systemKey,
           position: s.position,
           isArchived: s.isArchived,
           reminderDelayDays: s.reminderDelayDays

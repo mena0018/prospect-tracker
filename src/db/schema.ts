@@ -12,6 +12,7 @@ import {
   smallint,
   text,
   timestamp,
+  uniqueIndex,
   uuid
 } from 'drizzle-orm/pg-core'
 import { authUsers } from 'drizzle-orm/supabase'
@@ -37,6 +38,21 @@ export const STAGE_COLOR_TOKENS = [
 ] as const
 
 export type StageColorToken = (typeof STAGE_COLOR_TOKENS)[number]
+
+// null = free stage, neutral in every KPI — see docs/reference/kpis.md
+export const STAGE_SYSTEM_KEY = {
+  SAVED: 'saved',
+  CONTACTED: 'contacted',
+  CV_SENT: 'cv_sent',
+  INTERVIEW: 'interview',
+  OFFER: 'offer',
+  REJECTED: 'rejected',
+  GHOSTED: 'ghosted'
+} as const
+
+export type StageSystemKey = (typeof STAGE_SYSTEM_KEY)[keyof typeof STAGE_SYSTEM_KEY]
+
+const STAGE_SYSTEM_KEYS = Object.values(STAGE_SYSTEM_KEY)
 
 export const users = pgTable(
   'users',
@@ -70,6 +86,7 @@ export const stages = pgTable(
     name: text('name').notNull(),
     color: text('color').notNull().default('slate'),
     position: integer('position').notNull(),
+    systemKey: text('system_key').$type<StageSystemKey>(),
     reminderDelayDays: integer('reminder_delay_days').notNull().default(7),
     isArchived: boolean('is_archived').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
@@ -79,6 +96,13 @@ export const stages = pgTable(
       'stages_color_token',
       sql`${table.color} in (${sql.raw(STAGE_COLOR_TOKENS.map((t) => `'${t}'`).join(','))})`
     ),
+    check(
+      'stages_system_key_token',
+      sql`${table.systemKey} is null or ${table.systemKey} in (${sql.raw(STAGE_SYSTEM_KEYS.map((k) => `'${k}'`).join(','))})`
+    ),
+    uniqueIndex('stages_user_system_key_idx')
+      .on(table.userId, table.systemKey)
+      .where(sql`${table.systemKey} is not null`),
     index('stages_user_position_idx').on(table.userId, table.position)
   ]
 )

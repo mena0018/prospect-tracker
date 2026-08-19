@@ -1,4 +1,4 @@
-import type { StageColorToken } from './schema'
+import type { StageColorToken, StageSystemKey } from './schema'
 
 // Not a global seed — copied per user on first login. See
 // docs/decisions/0001-user-configurable-pipeline.md
@@ -7,6 +7,7 @@ import type { StageColorToken } from './schema'
 type DefaultStage = {
   name: string
   color: StageColorToken
+  systemKey: StageSystemKey
   position: number
   isArchived: boolean
   reminderDelayDays: number
@@ -19,6 +20,7 @@ const DEFAULT_REMINDER_DELAY_DAYS = 7
 export const DEFAULT_STAGES: readonly DefaultStage[] = [
   {
     name: 'Sauvegardé',
+    systemKey: 'saved',
     color: 'slate',
     position: 0,
     isArchived: false,
@@ -26,6 +28,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'Contacté',
+    systemKey: 'contacted',
     color: 'blue',
     position: 1,
     isArchived: false,
@@ -33,6 +36,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'CV Envoyé',
+    systemKey: 'cv_sent',
     color: 'amber',
     position: 2,
     isArchived: false,
@@ -40,6 +44,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'Entretien',
+    systemKey: 'interview',
     color: 'violet',
     position: 3,
     isArchived: false,
@@ -47,6 +52,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'Offre',
+    systemKey: 'offer',
     color: 'green',
     position: 4,
     isArchived: false,
@@ -54,6 +60,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'Refusé',
+    systemKey: 'rejected',
     color: 'red',
     position: 5,
     isArchived: true,
@@ -61,6 +68,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
   },
   {
     name: 'Ghosté',
+    systemKey: 'ghosted',
     color: 'rose',
     position: 6,
     isArchived: true,
