@@ -9,6 +9,7 @@ export function makeStage(overrides: Partial<Stage> = {}): Stage {
     userId: 'user-1',
     name: 'Contacté',
     color: 'blue',
+    systemKey: 'contacted',
     position: 1,
     reminderDelayDays: 7,
     isArchived: false,

@@ -11,13 +11,14 @@ import {
   getOpportunitiesSchema,
   opportunitiesSummarySchema,
   updateOpportunitySchema,
-  INTERVIEW_POSITION,
-  OFFER_POSITION,
-  SAVED_POSITION,
   STALE_THRESHOLD_DAYS
 } from '@/modules/opportunities/opportunities-schema'
 import {
+  awaitingReply,
   buildWhere,
+  hasReplied,
+  inInterview,
+  notSaved,
   rescheduledReminder,
   isArchivedRow,
   isDueExpression,
@@ -114,7 +115,6 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
     const { id: userId } = await requireUser()
 
     const isDue = isDueExpression(today)
-    const awaitingReply = sql`${stages.position} not in (${INTERVIEW_POSITION}, ${OFFER_POSITION})`
 
     const match = searchMatch(q)
     // Tab counts carry every active filter — see docs/reference/kpis.md
@@ -130,15 +130,13 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
             and (${today}::date - ${opportunities.lastContactAt}) > ${STALE_THRESHOLD_DAYS}
         )`.mapWith(Number),
         interviews: sql<number>`count(*) filter (
-          where not ${isArchivedRow} and ${stages.position} = ${INTERVIEW_POSITION}
+          where not ${isArchivedRow} and ${inInterview}
         )`.mapWith(Number),
         contacted: sql<number>`count(*) filter (
-          where ${stages.position} <> ${SAVED_POSITION}
+          where ${notSaved}
         )`.mapWith(Number),
         replied: sql<number>`count(*) filter (
-          where ${stages.position} <> ${SAVED_POSITION}
-            and (${stages.position} in (${INTERVIEW_POSITION}, ${OFFER_POSITION})
-                 or ${stages.isArchived})
+          where ${notSaved} and (${hasReplied} or ${stages.isArchived})
         )`.mapWith(Number),
         activeCount: sql<number>`count(*) filter (
           where not ${isArchivedRow} and ${matches}

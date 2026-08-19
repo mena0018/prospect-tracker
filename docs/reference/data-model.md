@@ -62,12 +62,26 @@ archive). `reminder_delay_days` drives the computed "à relancer" state.
 | `name`                | text, not null                   | e.g. "CV Envoyé"                            |
 | `color`               | text, not null, **`slate`**      | fixed-palette token, DB `CHECK` enforced    |
 | `position`            | integer, not null                | kanban column order                         |
+| `system_key`          | text, nullable                   | stable identity; `null` = free stage        |
 | `reminder_delay_days` | integer, not null, **7**         | days after last contact before "à relancer" |
 | `is_archived`         | boolean, not null, false         | Active/Archivée status                      |
 | `created_at`          | timestamptz, `now()`             |                                             |
 
 **Default seed** (`position` 0→6): Sauvegardé, Contacté, CV Envoyé, Entretien,
 Offre, Refusé, Ghosté. Refusé and Ghosté are seeded with `is_archived = true`.
+
+`system_key` splits stages in two. The seven seeded rows are **system stages**, each
+carrying one of `saved`, `contacted`, `cv_sent`, `interview`, `offer`, `rejected`,
+`ghosted`; anything the user adds later is a **free stage** with `system_key = null`.
+The key is written once at seed and never rewritten — a `BEFORE UPDATE` trigger raises
+on any change, so it survives a rename and a reorder. That is what the KPIs match on:
+[kpis.md](kpis.md).
+
+System stages are **not deletable**. The `deleteStage` server fn filters on
+`system_key is null`, and the `stages_delete_own` RLS policy carries the same
+restriction so the rule holds if the table is ever reached by an authenticated client
+rather than the service-role connection. A partial unique index on
+`(user_id, system_key)` keeps one row per key per account.
 
 `color` stores a **fixed-palette token**, not a free hex. The MVP uses a set of ~10
 swatches instead of a color picker, so a stable token lets us restyle the palette
@@ -236,3 +250,10 @@ never import it from client code.
 RLS therefore guards the public Supabase API, **not** our own server functions;
 those are protected by a `user_id` predicate in every query. See
 [`data-access-security.md`](data-access-security.md) for why both are needed.
+
+**The `authenticated` role currently holds no grants on any app table**, so those
+policies never actually fire: the browser client is used for auth only (Google OAuth,
+sign-out) and never selects from a table. That is deliberate belt-and-braces — a
+leaked anon key gets `permission denied` before RLS is even consulted. Granting
+`authenticated` access to "make RLS work" would open a direct client path that does
+not exist today; the policies are there for the day one does.

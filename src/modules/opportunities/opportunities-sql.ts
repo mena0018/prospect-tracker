@@ -1,6 +1,6 @@
 import { and, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
-import { opportunities, stages } from '@/db/schema'
+import { opportunities, stages, STAGE_SYSTEM_KEY, type StageSystemKey } from '@/db/schema'
 import type {
   GetOpportunitiesInput,
   SortColumn,
@@ -9,6 +9,15 @@ import type {
 
 // A row is archived by its own flag or by sitting in an archived stage.
 export const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArchived})`
+
+// Reaching either stage is itself the reply — see docs/reference/kpis.md
+const REPLIED: readonly StageSystemKey[] = [STAGE_SYSTEM_KEY.INTERVIEW, STAGE_SYSTEM_KEY.OFFER]
+
+export const inInterview = sql`${stages.systemKey} = ${STAGE_SYSTEM_KEY.INTERVIEW}`
+// `is not true`, not `not (...)`: a null system_key would drop the row — see docs/reference/kpis.md
+export const notSaved = sql`(${stages.systemKey} = ${STAGE_SYSTEM_KEY.SAVED}) is not true`
+export const hasReplied = sql`(${stages.systemKey} in ${REPLIED}) is true`
+export const awaitingReply = sql`(${stages.systemKey} in ${REPLIED}) is not true`
 
 const dueDate = sql`coalesce(
   ${opportunities.nextReminderAt},

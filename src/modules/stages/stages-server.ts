@@ -1,11 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
-import { asc, eq, sql } from 'drizzle-orm'
+import { and, asc, eq, isNull, sql } from 'drizzle-orm'
 
 import { db } from '@/db/client'
 import { opportunities, stages, type Stage } from '@/db/schema'
+import { appError } from '@/lib/error'
 import { requireUser } from '@/lib/supabase/server'
 import { todayOnlySchema } from '@/modules/opportunities/opportunities-schema'
 import { isDoneTodayExpression, isDueExpression } from '@/modules/opportunities/opportunities-sql'
+import { deleteStageSchema } from '@/modules/stages/stages-schema'
 
 export const getStages = createServerFn({ method: 'GET' }).handler(async (): Promise<Stage[]> => {
   const { id: userId } = await requireUser()
@@ -54,4 +56,27 @@ export const getStageCounts = createServerFn({ method: 'GET' })
       dueCount: rows.reduce((sum, row) => sum + row.dueCount, 0),
       doneToday: rows.reduce((sum, row) => sum + row.doneToday, 0)
     }
+  })
+
+export const deleteStage = createServerFn({ method: 'POST' })
+  .validator(deleteStageSchema)
+  .handler(async ({ data: { id } }) => {
+    const { id: userId } = await requireUser()
+
+    const [target] = await db
+      .select({ systemKey: stages.systemKey })
+      .from(stages)
+      .where(and(eq(stages.id, id), eq(stages.userId, userId)))
+
+    if (!target) throw appError('NOT_FOUND')
+    if (target.systemKey !== null) throw appError('FORBIDDEN')
+
+    const [deleted] = await db
+      .delete(stages)
+      .where(and(eq(stages.id, id), eq(stages.userId, userId), isNull(stages.systemKey)))
+      .returning({ id: stages.id })
+
+    if (!deleted) throw appError('NOT_FOUND')
+
+    return deleted
   })
