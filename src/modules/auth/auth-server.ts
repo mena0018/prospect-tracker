@@ -110,7 +110,8 @@ export const provisionUser = createServerFn({ method: 'POST' }).handler(async ()
           name: s.name,
           color: s.color,
           position: s.position,
-          isArchived: s.isArchived
+          isArchived: s.isArchived,
+          reminderDelayDays: s.reminderDelayDays
         }))
       )
       await tx.insert(jobTypes).values(
