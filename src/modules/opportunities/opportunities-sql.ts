@@ -3,7 +3,8 @@ import { and, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 import { opportunities, stages } from '@/db/schema'
 import type {
   GetOpportunitiesInput,
-  SortColumn
+  SortColumn,
+  UpdateOpportunityInput
 } from '@/modules/opportunities/opportunities-schema'
 
 // A row is archived by its own flag or by sitting in an archived stage.
@@ -18,6 +19,16 @@ const dueDate = sql`coalesce(
 // See docs/reference/data-model.md
 export const isDueExpression = (today: string) =>
   sql<boolean>`(not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date)`
+
+// Deliberately disjoint from isDueExpression, and excludes rows created today.
+// See docs/reference/kpis.md
+export const isDoneTodayExpression = (today: string) =>
+  sql<boolean>`(
+    not ${isArchivedRow}
+    and ${opportunities.lastContactAt} = ${today}::date
+    and ${opportunities.createdAt} < ${today}::date
+    and not (${dueDate} is not null and ${dueDate} <= ${today}::date)
+  )`
 
 export const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
   lastContactAt: opportunities.lastContactAt,
@@ -67,4 +78,31 @@ export function buildWhere(userId: string, { tab, q, due, today }: RowFilters) {
   if (due) filters.push(isDueExpression(today))
 
   return and(...filters)
+}
+
+// Logging a contact past a forced reminder pushes that reminder to the stage's next slot rather
+// than leaving the row stuck in the due list — see docs/reference/data-model.md
+export function rescheduledReminder(fields: Partial<UpdateOpportunityInput>) {
+  if (!fields.lastContactAt) return {}
+
+  // The reminder this write lands on: what the form submitted, or the stored one when the field
+  // was left alone. Reading the column here would compare against the value being replaced.
+  const target =
+    fields.nextReminderAt === undefined
+      ? sql`${opportunities.nextReminderAt}`
+      : sql`${fields.nextReminderAt}::date`
+
+  // The stage this write lands on, for the same reason as the reminder above.
+  const targetStage = fields.stageId ? sql`${fields.stageId}::uuid` : sql`${opportunities.stageId}`
+
+  return {
+    nextReminderAt: sql`case
+      when ${target} is null or ${target} > ${fields.lastContactAt}::date
+      then ${target}
+      else ${fields.lastContactAt}::date + (
+        select ${stages.reminderDelayDays} from ${stages}
+        where ${stages.id} = ${targetStage}
+      )
+    end`
+  }
 }

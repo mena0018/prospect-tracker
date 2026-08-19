@@ -9,17 +9,63 @@ type DefaultStage = {
   color: StageColorToken
   position: number
   isArchived: boolean
+  reminderDelayDays: number
 }
+
+// Per-stage from day one, so Personnaliser only has to write it — see docs/reference/data-model.md
+const DEFAULT_REMINDER_DELAY_DAYS = 7
 
 // Refusé/Ghosté are seeded archived so they stay out of the active kanban.
 export const DEFAULT_STAGES: readonly DefaultStage[] = [
-  { name: 'Sauvegardé', color: 'slate', position: 0, isArchived: false },
-  { name: 'Contacté', color: 'blue', position: 1, isArchived: false },
-  { name: 'CV Envoyé', color: 'amber', position: 2, isArchived: false },
-  { name: 'Entretien', color: 'violet', position: 3, isArchived: false },
-  { name: 'Offre', color: 'green', position: 4, isArchived: false },
-  { name: 'Refusé', color: 'red', position: 5, isArchived: true },
-  { name: 'Ghosté', color: 'rose', position: 6, isArchived: true }
+  {
+    name: 'Sauvegardé',
+    color: 'slate',
+    position: 0,
+    isArchived: false,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'Contacté',
+    color: 'blue',
+    position: 1,
+    isArchived: false,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'CV Envoyé',
+    color: 'amber',
+    position: 2,
+    isArchived: false,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'Entretien',
+    color: 'violet',
+    position: 3,
+    isArchived: false,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'Offre',
+    color: 'green',
+    position: 4,
+    isArchived: false,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'Refusé',
+    color: 'red',
+    position: 5,
+    isArchived: true,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  },
+  {
+    name: 'Ghosté',
+    color: 'rose',
+    position: 6,
+    isArchived: true,
+    reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
+  }
 ] as const
 
 export const DEFAULT_JOB_TYPES = [

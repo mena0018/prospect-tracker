@@ -15,11 +15,13 @@ import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-oppor
 // Container-driven, not viewport-driven: the sidebar makes viewport breakpoints lie.
 const TOOLBAR_LAYOUT =
   'border-border-soft @container flex flex-none flex-wrap items-center justify-between gap-4 border-b px-4.5 py-3.75'
-const TABS_LAYOUT = 'flex grow basis-100 flex-wrap items-center gap-3 @2xl:basis-auto'
-const SEARCH_LAYOUT = 'flex grow basis-100 items-center justify-end gap-2.5 @2xl:basis-auto'
+const TABS_LAYOUT = 'flex grow basis-100 flex-wrap items-center gap-3 @4xl:basis-auto'
+// Wraps until the toolbar can hold the tabs, the due chip and the search on one row.
+const SEARCH_LAYOUT =
+  'flex grow basis-100 items-center gap-2.5 justify-start @4xl:justify-end @4xl:basis-auto'
 
 // Fixed so the skeleton matches exactly; `grow-0` stops `grow` overriding the width.
-const TOGGLE_WIDTH = '@2xl:w-70 @2xl:grow-0'
+const TOGGLE_WIDTH = '@4xl:w-70 @4xl:grow-0'
 
 // The `data-pressed` resets hand the selected background to the travelling pill, which the item
 // must not also paint — see docs/reference/toggle-indicator.md
@@ -102,7 +104,7 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
       </div>
 
       <div className={SEARCH_LAYOUT}>
-        <InputGroup className="bg-secondary h-9 grow @2xl:max-w-57.5">
+        <InputGroup className="bg-secondary h-9 grow @4xl:max-w-57.5">
           <InputGroupAddon>
             <Search className="size-3.75" />
           </InputGroupAddon>
@@ -134,7 +136,7 @@ export function OpportunitiesToolbarSkeleton() {
         <Skeleton className={cn('h-8.75 grow rounded-[9px]', TOGGLE_WIDTH)} />
       </div>
       <div className={SEARCH_LAYOUT}>
-        <Skeleton className="h-9 grow @2xl:max-w-57.5" />
+        <Skeleton className="h-9 grow @4xl:max-w-57.5" />
         <Skeleton className="h-9 w-21 flex-none" />
       </div>
     </div>

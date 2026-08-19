@@ -44,7 +44,7 @@
   "opportunity_dailyRateUnit": "€ / j",
   "opportunity_fullRemote": "Full remote",
   "opportunity_onsiteDaysValue": "{days} j/sem",
-  "opportunity_nextReminderHint": "Laisser vide pour utiliser le délai de l'étape",
+  "opportunity_nextReminderHint": "Laisser vide pour utiliser le délai de l’étape",
   "opportunity_createSubmit": "Ajouter l'opportunité",
   "opportunity_editTitle": "Modifier l'opportunité",
   "opportunity_editDescription": "Mettez à jour les informations de ce prospect",
@@ -105,8 +105,12 @@
   "nav_giveFeedback": "Donner un feedback",
   "nav_more": "Plus",
   "followUp_toContact": "à relancer",
-  "followUp_tagline": "c’est là que ça se joue.",
-  "followUp_weeklyGoal": "Objectif de la semaine",
+  "followUp_progressToday": "{done}/{total} aujourd’hui",
+  "followUp_allDone": "Objectif atteint",
+  "followUp_upToDate": "Tout est à jour",
+  "followUp_noneTodayTagline": "Aucune relance en attente.",
+  "followUp_emptyPipeline": "Rien à relancer",
+  "followUp_emptyPipelineTagline": "Le suivi démarre ici.",
   "followUp_start": "Lancer les relances",
   "header_toggleSidebar": "Replier / déplier la barre latérale",
   "header_newOpportunity": "Nouvelle opportunité",
@@ -217,5 +221,7 @@
   "table_previousPage": "Page précédente",
   "table_nextPage": "Page suivante",
   "table_lastPage": "Dernière page",
-  "opportunity_nextReminderSet": "Relance planifiée"
+  "opportunity_nextReminderSet": "Relance planifiée",
+  "opportunity_nextReminderAuto": "Relance auto · {days} j après le dernier contact",
+  "followUp_trackFirstContact": "Suivre un contact"
 }

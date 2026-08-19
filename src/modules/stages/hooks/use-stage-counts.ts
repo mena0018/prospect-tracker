@@ -12,12 +12,15 @@ const stageCountsQueryOptions = (today: string) =>
 
 export function useStageCounts() {
   const query = useQuery(stageCountsQueryOptions(useToday()))
+  const stages = query.data?.stages ?? []
 
   return {
-    stages: query.data?.stages ?? [],
+    stages,
+    hasPipeline: stages.some((stage) => stage.count > 0),
     // Undefined until loaded, so the ticker animates from the real value instead of from a
     // placeholder zero — see docs/reference/number-ticker.md
     dueCount: query.data?.dueCount,
+    doneToday: query.data?.doneToday,
     ...query
   }
 }

@@ -18,6 +18,7 @@ import {
 } from '@/modules/opportunities/opportunities-schema'
 import {
   buildWhere,
+  rescheduledReminder,
   isArchivedRow,
   isDueExpression,
   searchMatch,
@@ -109,14 +110,15 @@ type OpportunitiesSummary = {
 // Aggregates span every row, not the current page. See docs/reference/kpis.md
 export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
   .validator(opportunitiesSummarySchema)
-  .handler(async ({ data: { today, q } }): Promise<OpportunitiesSummary> => {
+  .handler(async ({ data: { today, q, due } }): Promise<OpportunitiesSummary> => {
     const { id: userId } = await requireUser()
 
     const isDue = isDueExpression(today)
     const awaitingReply = sql`${stages.position} not in (${INTERVIEW_POSITION}, ${OFFER_POSITION})`
 
     const match = searchMatch(q)
-    const matches = match ?? sql`true`
+    // Tab counts carry every active filter — see docs/reference/kpis.md
+    const matches = and(match ?? sql`true`, due ? isDue : sql`true`)
 
     const [row] = await db
       .select({
@@ -186,7 +188,7 @@ export const updateOpportunity = createServerFn({ method: 'POST' })
     // Drizzle bypasses RLS. See docs/reference/data-access-security.md.
     const [updated] = await db
       .update(opportunities)
-      .set({ ...fields, updatedAt: new Date() })
+      .set({ ...fields, ...rescheduledReminder(fields), updatedAt: new Date() })
       .where(and(eq(opportunities.id, id), eq(opportunities.userId, userId)))
       .returning()
 

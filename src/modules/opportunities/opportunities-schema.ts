@@ -174,10 +174,11 @@ export const getOpportunitiesSchema = z.object({
 
 export type GetOpportunitiesInput = z.infer<typeof getOpportunitiesSchema>
 
-// `q` narrows the tab counts only; the KPIs stay global. See docs/reference/kpis.md
+// `q` and `due` narrow the tab counts only; the KPIs stay global. See docs/reference/kpis.md
 export const opportunitiesSummarySchema = z.object({
   today: z.iso.date(),
-  q: searchQuery.default('')
+  q: searchQuery.default(''),
+  due: z.boolean().default(false)
 })
 
 // Aggregates that depend on the date and nothing else — "due" is relative to the browser's

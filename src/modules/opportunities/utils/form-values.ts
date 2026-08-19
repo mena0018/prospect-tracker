@@ -19,8 +19,40 @@ export function toOptionalText(value: unknown) {
   return value.trim() === '' ? null : value.trim()
 }
 
+// A form-side convenience; the server still resolves the real due date with coalesce().
+// See docs/reference/opportunity-form.md
+export function suggestedReminder(today: string, delayDays: number) {
+  const date = new Date(`${today}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return ''
+
+  date.setDate(date.getDate() + delayDays)
+
+  // Formatted from the local parts, never toISOString(): the date was built at local midnight, and
+  // converting to UTC shifts it a day back for anyone east of Greenwich.
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+// Drives the hint only — see docs/reference/opportunity-form.md
+export function isAutomaticReminder(
+  nextReminderAt: string,
+  lastContactAt: string,
+  delayDays: number
+) {
+  if (!nextReminderAt || !lastContactAt) return false
+
+  return nextReminderAt === suggestedReminder(lastContactAt, delayDays)
+}
+
 // `today` is injected to keep this pure — see docs/reference/opportunity-form.md
-export function toFormValues(row: OpportunityRow | null, fallbackStageId: string, today = '') {
+export function toFormValues(
+  row: OpportunityRow | null,
+  fallbackStageId: string,
+  today = '',
+  reminderDelayDays = 0
+) {
   const text = (value: string | null | undefined) => value ?? ''
   const numeric = (value: number | null | undefined) =>
     value === null || value === undefined ? '' : String(value)
@@ -39,7 +71,11 @@ export function toFormValues(row: OpportunityRow | null, fallbackStageId: string
       row?.onsiteDays === null || row?.onsiteDays === undefined ? null : String(row.onsiteDays),
     location: text(row?.location),
     lastContactAt: row ? text(row.lastContactAt) : today,
-    nextReminderAt: text(row?.nextReminderAt),
+    nextReminderAt: row
+      ? text(row.nextReminderAt)
+      : today && reminderDelayDays > 0
+        ? suggestedReminder(today, reminderDelayDays)
+        : '',
     phone: text(row?.phone),
     offerUrl: text(row?.offerUrl),
     notes: text(row?.notes)

@@ -1,11 +1,9 @@
-import { ArrowRight, Bell, ListFilter } from 'lucide-react'
+import { ListFilter } from 'lucide-react'
 
 import { CustomizeIcon } from '@/components/icons/customize'
 import { BrandMark } from '@/components/icons/brand-mark'
 import { ProfileMenu } from '@/modules/auth/components/profile-menu'
 import { AppSidebarFooter } from '@/components/layout/app-sidebar-footer'
-import { Button } from '@/components/ui/button'
-import { NumberTicker } from '@/components/ui/number-ticker'
 import { Separator } from '@/components/ui/separator'
 import {
   Sidebar,
@@ -26,14 +24,10 @@ import { StageBadge } from '@/modules/stages/components/stage-badge'
 import { useStageCounts } from '@/modules/stages/hooks/use-stage-counts'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DEFAULT_STAGES } from '@/db/defaults'
-
-// The weekly goal has no data source yet — it lands with the follow-ups section (DEV-30).
-const WEEKLY_GOAL = 15
-const WEEKLY_DONE = 6
-const WEEKLY_PCT = Math.min(100, Math.round((WEEKLY_DONE / WEEKLY_GOAL) * 100))
+import { FollowUpCard } from '@/components/layout/follow-up-card'
 
 export function AppSidebar() {
-  const { stages, dueCount } = useStageCounts()
+  const { stages, dueCount, doneToday, hasPipeline } = useStageCounts()
   const { setTab, setDueOnly } = useOpportunitiesFilters()
 
   // Due rows only exist on the active tab.
@@ -100,49 +94,12 @@ export function AppSidebar() {
         <SidebarGroup className="mt-6.5 shrink-0 px-2.75 py-0">
           <SidebarGroupLabel>{m.nav_followUps()}</SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="border-primary/15 bg-sidebar-accent rounded-xl border px-3.25 pt-3.25 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="bg-primary text-primary-foreground flex size-8 flex-none items-center justify-center rounded-lg">
-                  <Bell className="size-4" />
-                </div>
-                <div className="min-w-0 leading-tight">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="tracking-page-title text-lg font-semibold tabular-nums">
-                      {dueCount === undefined ? (
-                        <Skeleton className="inline-block h-[1em] w-5 translate-y-[0.1em] rounded-sm" />
-                      ) : (
-                        <NumberTicker value={dueCount} />
-                      )}
-                    </span>
-                    <span className="text-muted-foreground text-xs">{m.followUp_toContact()}</span>
-                  </div>
-                  <div className="text-muted-foreground text-xs">{m.followUp_tagline()}</div>
-                </div>
-              </div>
-              <div className="mt-3.25">
-                <div className="mb-1.5 flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">{m.followUp_weeklyGoal()}</span>
-                  <span className="font-semibold tabular-nums">
-                    {WEEKLY_DONE}/{WEEKLY_GOAL}
-                  </span>
-                </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-black/6 dark:bg-white/12">
-                  <div
-                    className="bg-primary animate-grow h-full rounded-full"
-                    style={{ width: `${WEEKLY_PCT}%` }}
-                  />
-                </div>
-              </div>
-              <Button
-                type="button"
-                size="sm"
-                onClick={startFollowUps}
-                className="mt-3.25 h-9 w-full font-semibold"
-              >
-                {m.followUp_start()}
-                <ArrowRight />
-              </Button>
-            </div>
+            <FollowUpCard
+              dueCount={dueCount}
+              doneToday={doneToday}
+              hasPipeline={hasPipeline}
+              onStart={startFollowUps}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

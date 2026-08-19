@@ -44,7 +44,10 @@ export function OpportunitySheet({
   const { form, discard } = useOpportunityForm({
     open,
     row,
+    // Both come from the same stage — the one a new opportunity starts in. Picking another stage
+    // re-derives the reminder from that stage's own delay.
     fallbackStageId: stages[0]?.id ?? '',
+    reminderDelayDays: stages[0]?.reminderDelayDays ?? 0,
     onSubmit
   })
 
