@@ -190,6 +190,21 @@ and the stage's delay (or a user-forced date):
                opp.last_contact_at + stage.reminder_delay_days) <= today
 ```
 
+### Logging a contact reschedules a stale forced reminder
+
+`next_reminder_at` overrides the computed date, which means a forced reminder left in the past
+kept a row in the due list however recently it had been contacted — the user logged a call, the
+row did not move, and nothing on screen explained why.
+
+`updateOpportunity` now pushes that reminder forward whenever a contact is logged past it:
+`next_reminder_at = last_contact_at + stage.reminder_delay_days`. A reminder still in the
+**future** is left untouched — "call back on 15 September" is an intention that a contact today
+does not invalidate.
+
+The comparison is against the reminder _this write lands on_: the submitted value when the form
+sent one, the stored column otherwise. Reading the column unconditionally compares against the
+value being replaced, which silently overwrote future dates the user had just typed.
+
 **One implementation only: SQL.** `isDueExpression()` in `opportunities-server.ts` is the
 sole definition — the row list, the "à relancer" filter, the KPI and the per-stage counts all
 call it, and the server ships the resulting `isDue` flag on every row. The client never

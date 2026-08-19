@@ -296,3 +296,51 @@ It rethrows rather than swallowing because success and failure have to be distin
 create reset above hangs off that same promise. TanStack Form rethrows out of `handleSubmit`
 after clearing `isSubmitting`, so the sheet's `onSubmit` catches it — the toast is already
 handled, and the `catch` exists only to keep the rejection from going unhandled.
+
+## The suggested follow-up date
+
+Creating an opportunity prefills **both** dates: `last_contact_at` with today, and
+`next_reminder_at` with today plus the stage's `reminder_delay_days`. The user sees the real date
+in the field instead of an abstract promise, and can move it before saving.
+
+This is a form convenience, not the rule. The server still resolves the due date with
+`coalesce(next_reminder_at, last_contact_at + stage.reminder_delay_days)`, so anything writing
+outside this form — an import, the Chrome extension, the reminder cron — still gets a correct due
+date without having to replicate the calculation.
+
+The hint reflects which side is in charge: while the value still equals what the delay would
+produce ([`isAutomaticReminder`](../../src/modules/opportunities/utils/form-values.ts)) it reads
+_"Relance auto · 7 j après le dernier contact"_; move the date off that and it switches to how to hand
+control back. That check drives the hint only — it no longer gates the re-derivation below.
+
+**The delay always comes from the selected stage**, never a constant: `reminder_delay_days` is a
+per-stage column whose `7` is only a database default, so whatever the Personnaliser screen writes
+takes effect everywhere at once. Because each stage carries its own delay, changing the stage
+re-derives the suggested date — 7 days becomes 14 the moment the row moves to a stage configured
+that way, and the hint follows.
+
+**The reminder always follows the last contact**, on create and on edit alike:
+
+| Action                                        | Reminder                       |
+| --------------------------------------------- | ------------------------------ |
+| Logging a contact 3 days in (stage unchanged) | new contact date + stage delay |
+| Moving to a stage with a different delay      | contact date + the new delay   |
+| Either of the above, after typing a date      | recomputed, overwriting it     |
+
+Note the first row: the reminder is recomputed from the **new** contact date, not shifted by the
+delay from where it already sat. Following up early therefore pulls the next reminder earlier
+rather than stacking onto the old one.
+
+The third row is a deliberate reversal. The field used to be left alone once its value stopped
+matching the derived one, on the theory that a mismatch meant the user had chosen it. On a stored
+row that reasoning collapses: `next_reminder_at` almost never equals `last_contact_at + delay` by
+the time the sheet reopens — a forced date, a past reschedule, or a plain `coalesce()` all break
+the equality — so the guard read every existing row as user-picked and froze the field exactly
+where updating it mattered most. A date that silently contradicts the contact it hangs off is
+worse than one rewritten in plain sight, so the rule is now unconditional and the rewrite is
+[highlighted](../../src/modules/opportunities/components/sheet/tracking-section.tsx) for a beat
+instead of hidden.
+
+The date is assembled from local parts rather than `toISOString()`. The value is built at local
+midnight, and converting it to UTC shifts it a day back for anyone east of Greenwich — the same
+trap [`today.md`](today.md) documents for `useToday()`.
