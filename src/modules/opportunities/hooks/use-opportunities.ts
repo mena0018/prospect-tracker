@@ -22,15 +22,15 @@ export function useOpportunities(input: GetOpportunitiesInput) {
   return useQuery(opportunitiesQueryOptions(input))
 }
 
-const summaryQueryOptions = (today: string, q: string) =>
+const summaryQueryOptions = (today: string, q: string, due: boolean) =>
   queryOptions({
-    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'summary', today, q],
-    queryFn: () => getOpportunitiesSummary({ data: { today, q } }),
+    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'summary', today, q, due],
+    queryFn: () => getOpportunitiesSummary({ data: { today, q, due } }),
 
     placeholderData: (previous) => previous
   })
 
-// Omitting `q` gives tab counts over the whole pipeline — see docs/reference/kpis.md
-export function useOpportunitiesSummary(q = '') {
-  return useQuery(summaryQueryOptions(useToday(), q))
+// Omitting the filters gives tab counts over the whole pipeline — see docs/reference/kpis.md
+export function useOpportunitiesSummary(q = '', due = false) {
+  return useQuery(summaryQueryOptions(useToday(), q, due))
 }

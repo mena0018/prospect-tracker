@@ -5,6 +5,11 @@ import type { Stage } from '@/db/schema'
 import { EMPTY_FORM_VALUES, GRID } from '@/modules/opportunities/components/sheet/form-layout'
 import { StagePicker } from '@/modules/stages/components/stage-picker'
 import { NOTES_MAX_LENGTH } from '@/modules/opportunities/opportunities-schema'
+import { isAutomaticReminder, suggestedReminder } from '@/modules/opportunities/utils/form-values'
+import {
+  highlightClasses,
+  useFieldHighlight
+} from '@/modules/opportunities/hooks/use-field-highlight'
 import {
   notesRemaining,
   notesRemainingHint,
@@ -16,10 +21,26 @@ export const TrackingSection = withForm({
   defaultValues: EMPTY_FORM_VALUES,
   props: { stages: [] as Stage[] },
   render: function Render({ form, stages }) {
+    const { isHighlighted, highlight } = useFieldHighlight()
+
+    // Always re-derived, even over a stored date — see docs/reference/opportunity-form.md
+    const syncReminder = (stageId: string, lastContactAt: string) => {
+      const delay = stages.find((stage) => stage.id === stageId)?.reminderDelayDays
+      if (!delay || !lastContactAt) return
+
+      form.setFieldValue('nextReminderAt', suggestedReminder(lastContactAt, delay))
+      highlight()
+    }
+
     return (
       <SheetFormSection title={m.opportunity_sectionTracking()}>
         <div className="flex flex-col gap-3.5">
-          <form.AppField name="stageId">
+          <form.AppField
+            name="stageId"
+            listeners={{
+              onChange: ({ value }) => syncReminder(value, form.state.values.lastContactAt)
+            }}
+          >
             {(field) => (
               <field.RadioGroupField label={m.opportunity_stageLabel()}>
                 {(control) => <StagePicker {...control} stages={stages} />}
@@ -28,7 +49,12 @@ export const TrackingSection = withForm({
           </form.AppField>
 
           <div className={GRID}>
-            <form.AppField name="lastContactAt">
+            <form.AppField
+              name="lastContactAt"
+              listeners={{
+                onChange: ({ value }) => syncReminder(form.state.values.stageId, value)
+              }}
+            >
               {(field) => (
                 <field.TextInputField
                   size="form"
@@ -38,20 +64,35 @@ export const TrackingSection = withForm({
               )}
             </form.AppField>
 
-            <form.AppField name="nextReminderAt">
-              {(field) => (
-                <field.TextInputField
-                  size="form"
-                  label={m.opportunity_nextReminderLabel()}
-                  type="date"
-                  hint={
-                    field.state.value
-                      ? m.opportunity_nextReminderSet()
-                      : m.opportunity_nextReminderHint()
-                  }
-                />
-              )}
-            </form.AppField>
+            <form.Subscribe
+              selector={(state) => [state.values.stageId, state.values.lastContactAt] as const}
+            >
+              {([stageId, lastContactAt]) => {
+                const delayDays = stages.find((stage) => stage.id === stageId)?.reminderDelayDays
+
+                return (
+                  <form.AppField name="nextReminderAt">
+                    {(field) => (
+                      <field.TextInputField
+                        size="form"
+                        label={m.opportunity_nextReminderLabel()}
+                        type="date"
+                        className={cn(
+                          '[&_input]:transition-[box-shadow,background-color,border-color]',
+                          highlightClasses(isHighlighted)
+                        )}
+                        hint={
+                          delayDays &&
+                          isAutomaticReminder(field.state.value, lastContactAt, delayDays)
+                            ? m.opportunity_nextReminderAuto({ days: delayDays })
+                            : m.opportunity_nextReminderHint()
+                        }
+                      />
+                    )}
+                  </form.AppField>
+                )
+              }}
+            </form.Subscribe>
           </div>
 
           <form.AppField name="notes">

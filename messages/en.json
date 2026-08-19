@@ -199,5 +199,6 @@
   "opportunity_fullRemote": "Full remote",
   "opportunity_onsiteDaysValue": "{days} d/wk",
   "opportunity_nextReminderHint": "Leave empty to use the stage delay",
-  "opportunity_nextReminderSet": "Follow-up scheduled"
+  "opportunity_nextReminderSet": "Follow-up scheduled",
+  "opportunity_nextReminderAuto": "Auto follow-up · {days} days after last contact"
 }

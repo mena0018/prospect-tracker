@@ -44,7 +44,7 @@
   "opportunity_dailyRateUnit": "€ / j",
   "opportunity_fullRemote": "Full remote",
   "opportunity_onsiteDaysValue": "{days} j/sem",
-  "opportunity_nextReminderHint": "Laisser vide pour utiliser le délai de l'étape",
+  "opportunity_nextReminderHint": "Laisser vide pour utiliser le délai de l’étape",
   "opportunity_createSubmit": "Ajouter l'opportunité",
   "opportunity_editTitle": "Modifier l'opportunité",
   "opportunity_editDescription": "Mettez à jour les informations de ce prospect",
@@ -217,5 +217,6 @@
   "table_previousPage": "Page précédente",
   "table_nextPage": "Page suivante",
   "table_lastPage": "Dernière page",
-  "opportunity_nextReminderSet": "Relance planifiée"
+  "opportunity_nextReminderSet": "Relance planifiée",
+  "opportunity_nextReminderAuto": "Relance auto · {days} j après le dernier contact"
 }

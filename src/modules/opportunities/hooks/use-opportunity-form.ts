@@ -10,15 +10,23 @@ type Params = {
   open: boolean
   row: OpportunityRow | null
   fallbackStageId: string
+  reminderDelayDays: number
   onSubmit: (values: ReturnType<typeof opportunityFormSchema.parse>) => Promise<void>
 }
 
-export function useOpportunityForm({ open, row, fallbackStageId, onSubmit }: Params) {
+export function useOpportunityForm({
+  open,
+  row,
+  fallbackStageId,
+  reminderDelayDays,
+  onSubmit
+}: Params) {
   const today = useToday()
 
   // Every site must map identically: the save button compares the values against these defaults,
   // so a reset that disagreed with them would read as an unsaved change.
-  const valuesFor = (source: OpportunityRow | null) => toFormValues(source, fallbackStageId, today)
+  const valuesFor = (source: OpportunityRow | null) =>
+    toFormValues(source, fallbackStageId, today, reminderDelayDays)
 
   const form = useAppForm({
     defaultValues: valuesFor(row),
