@@ -203,5 +203,15 @@ or the component never sees the change.
   DEV-41 · App shell, sidebar and profile menu
   ```
 
-- In the PR description, explain any new reusable pattern or new dependency (why, rejected
-  alternative). Note mobile/dark states when UI.
+- **PR description: an overview, not a technical write-up.** Aim for ~15 lines: a short paragraph
+  on what changes for the user, then a handful of bullets. The reviewer reads the diff for the
+  how — the description exists to say what to expect and where to look. Rules of thumb:
+
+  - **No code blocks, no SQL, no timing tables, no before/after measurements.** A rationale that
+    needs a paragraph belongs in `docs/reference/`; link it instead of inlining it.
+  - **Name a new dependency or reusable pattern in one line** (what, and the rejected
+    alternative in a half-sentence). If it deserves more, it deserves a doc.
+  - **One line for mobile/dark** when the change is UI, one line for what was verified.
+  - Anything deliberately left out or deferred to another ticket goes in a final short note.
+
+  If the description no longer fits in a screen, the excess is documentation looking for a home.
