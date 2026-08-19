@@ -88,8 +88,12 @@
   "nav_giveFeedback": "Give feedback",
   "nav_more": "More",
   "followUp_toContact": "to follow up",
-  "followUp_tagline": "that's where it counts.",
-  "followUp_weeklyGoal": "Weekly goal",
+  "followUp_progressToday": "{done}/{total} today",
+  "followUp_allDone": "Goal reached",
+  "followUp_upToDate": "All caught up",
+  "followUp_noneTodayTagline": "No follow-up pending.",
+  "followUp_emptyPipeline": "Nothing to follow up",
+  "followUp_emptyPipelineTagline": "Start here.",
   "followUp_start": "Start follow-ups",
   "header_toggleSidebar": "Collapse / expand sidebar",
   "header_newOpportunity": "New opportunity",
@@ -200,5 +204,6 @@
   "opportunity_onsiteDaysValue": "{days} d/wk",
   "opportunity_nextReminderHint": "Leave empty to use the stage delay",
   "opportunity_nextReminderSet": "Follow-up scheduled",
-  "opportunity_nextReminderAuto": "Auto follow-up · {days} days after last contact"
+  "opportunity_nextReminderAuto": "Auto follow-up · {days} days after last contact",
+  "followUp_trackFirstContact": "Track a first contact"
 }

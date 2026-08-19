@@ -12,17 +12,68 @@ The custom clip-path animation drives the reveal, so the default cross-fade is d
   z-index: 2;
 }
 
-/* Grows a bar from 0 to its inline width. */
-@keyframes grow-from-zero {
-  from {
-    width: 0;
+/* Follow-up card celebration — timings and easings come from the design handoff,
+   see docs/reference/kpis.md */
+@keyframes follow-up-fly {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 0.22), calc(var(--ty) * 0.22)) scale(1);
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.9);
+    opacity: 0;
   }
 }
-
-@utility animate-grow {
-  animation: grow-from-zero 700ms cubic-bezier(0, 0, 0.2, 1);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
+@keyframes follow-up-pop {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  62% {
+    transform: scale(1.14);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes follow-up-halo {
+  0% {
+    box-shadow: 0 0 0 0 var(--halo);
+  }
+  100% {
+    box-shadow: 0 0 0 15px transparent;
+  }
+}
+@keyframes follow-up-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes follow-up-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.016);
+  }
+}
+@keyframes follow-up-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
