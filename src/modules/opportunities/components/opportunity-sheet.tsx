@@ -6,7 +6,7 @@ import {
   SheetFormDiscardDialog,
   SheetFormFooter,
   SheetFormHeader
-} from '@/components/ui/sheet-form'
+} from '@/components/sheet-form'
 import type { ExperienceLevel, JobType, Stage } from '@/db/schema'
 import { m } from '@/i18n/paraglide/messages'
 import { ContactSection } from '@/modules/opportunities/components/sheet/contact-section'

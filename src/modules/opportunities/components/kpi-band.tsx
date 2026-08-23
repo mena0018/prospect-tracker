@@ -1,7 +1,7 @@
 import { Bell, CalendarDays, Clock, Percent } from 'lucide-react'
 import type { ComponentType } from 'react'
 
-import { NumberTicker } from '@/components/ui/number-ticker'
+import { NumberTicker } from '@/components/number-ticker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { m } from '@/i18n/paraglide/messages'
 import { cn, formatValue } from '@/lib/utils'

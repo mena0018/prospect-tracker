@@ -1,6 +1,6 @@
-# The table module
+# The table mechanism
 
-`src/modules/table/` holds everything about tables that carries **no domain knowledge**:
+`src/shared/table/` holds everything about tables that carries **no domain knowledge**:
 URL-backed sorting and paging, the TanStack Table feature set, and the rendering shell.
 A domain module supplies its columns, its own filters and its labels — nothing else.
 

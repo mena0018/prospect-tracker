@@ -5,8 +5,8 @@ import {
   parseSort,
   serializeSort,
   toPaginationState
-} from '@/modules/table/table-utils'
-import type { TableSearch } from '@/modules/table/table-schema'
+} from '@/shared/table/table-utils'
+import type { TableSearch } from '@/shared/table/table-schema'
 
 type Options<TSearch extends TableSearch> = {
   search: TSearch

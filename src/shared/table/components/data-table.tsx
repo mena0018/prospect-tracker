@@ -3,13 +3,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { PaginatedTableFeatures } from '@/modules/table/table-features'
+import type { PaginatedTableFeatures } from '@/shared/table/table-features'
 import {
   CELL_LAYOUT,
   HEADER_ROW_LAYOUT,
   ROW_LAYOUT,
   TABLE_LAYOUT
-} from '@/modules/table/table-layout'
+} from '@/shared/table/table-layout'
 
 const SORT_CHEVRON = 'size-2.5'
 const SORT_IDLE = 'text-muted-foreground/30'

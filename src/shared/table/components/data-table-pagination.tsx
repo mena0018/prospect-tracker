@@ -1,7 +1,7 @@
 import type { ReactTable, RowData } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
-import type { PaginatedTableFeatures } from '@/modules/table/table-features'
+import type { PaginatedTableFeatures } from '@/shared/table/table-features'
 
 import { Button } from '@/components/ui/button'
 import {
