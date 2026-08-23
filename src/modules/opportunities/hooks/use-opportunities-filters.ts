@@ -1,7 +1,6 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 
-import { APP_ROUTES } from '@/lib/routes'
-import { Route } from '@/routes/_authed/app'
+import { Route } from '@/routes/_authed/app.index'
 import { useTableSearch } from '@/shared/table/hooks/use-table-search'
 import type { StatusTab } from '@/modules/opportunities/utils/rows'
 import {
@@ -11,7 +10,7 @@ import {
 
 export function useOpportunitiesFilters() {
   const search = useSearch({ from: Route.id })
-  const navigate = useNavigate({ from: APP_ROUTES.dashboard })
+  const navigate = useNavigate({ from: Route.fullPath })
 
   const { sorting, pagination, setSearchFromFirstPage, setSorting, setPagination } =
     useTableSearch<OpportunitiesSearch>({

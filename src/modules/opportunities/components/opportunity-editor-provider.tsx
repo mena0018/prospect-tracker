@@ -2,8 +2,8 @@ import { createContext, use, useState, type PropsWithChildren } from 'react'
 
 import { DeleteOpportunityDialog } from '@/modules/opportunities/components/delete-opportunity-dialog'
 import { OpportunitySheet } from '@/modules/opportunities/components/opportunity-sheet'
-import { useExperienceLevels } from '@/modules/experience-levels/use-experience-levels'
-import { useJobTypes } from '@/modules/job-types/use-job-types'
+import { useExperienceLevels } from '@/modules/experience-levels/hooks/use-experience-levels'
+import { useJobTypes } from '@/modules/job-types/hooks/use-job-types'
 import { useOpportunityEditor } from '@/modules/opportunities/hooks/use-opportunity-editor'
 import { useStages } from '@/modules/stages/hooks/use-stages'
 

@@ -9,7 +9,7 @@ type Props = Partial<{
   title: string
   description: string
   showHomeLink: boolean
-  variant: 'page' | 'section'
+  variant: 'page' | 'section' | 'slot'
   onRetry: () => void
 }>
 
@@ -24,7 +24,9 @@ export function ErrorState({
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-4 p-8 text-center',
-        variant === 'page' ? 'min-h-screen' : 'size-full min-h-70'
+        variant === 'page' ? 'min-h-screen' : 'size-full min-h-70',
+        variant === 'slot' &&
+          'border-border bg-card rounded-xl border shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
       )}
     >
       <p
@@ -43,7 +45,9 @@ export function ErrorState({
       >
         {title}
       </h2>
+
       <p className="text-muted-foreground max-w-sm">{description}</p>
+
       <div className="mt-2 flex gap-3">
         {onRetry ? (
           <Button type="button" onClick={onRetry}>
