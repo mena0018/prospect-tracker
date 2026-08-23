@@ -9,6 +9,7 @@ type Props<T extends readonly UseQueryResult[]> = {
   children: (data: Loaded<T>) => React.ReactNode
 }
 
+// Opens only once every query it gates has data — see docs/reference/customization.md
 export function QueryGate<const T extends readonly UseQueryResult[]>({
   queries,
   skeleton,

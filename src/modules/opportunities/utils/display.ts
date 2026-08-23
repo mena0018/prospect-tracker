@@ -1,4 +1,5 @@
 import { m } from '@/i18n/paraglide/messages'
+import { CONFIG } from '@/lib/config'
 import { formatValue } from '@/lib/utils'
 import { NOTES_MAX_LENGTH, SORT_COLUMNS } from '@/modules/opportunities/opportunities-schema'
 import type { SortColumn } from '@/modules/opportunities/opportunities-schema'
@@ -8,7 +9,7 @@ export function toSortColumn(value: string): SortColumn | null {
 }
 
 export function formatDailyRate(dailyRate: number | null) {
-  return formatValue(dailyRate, ' €')
+  return formatValue(dailyRate, ` ${CONFIG.currencySymbol}`)
 }
 
 export function isAboveReference(dailyRate: number | null, reference: number) {

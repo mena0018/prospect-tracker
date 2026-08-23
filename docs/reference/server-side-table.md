@@ -212,6 +212,6 @@ client.
 
 ## Related
 
-- Generic table plumbing and markup: [`table-module.md`](table-module.md)
+- Generic table plumbing and markup: [`table-mechanism.md`](table-mechanism.md)
 - Follow-up and archive rules: [`data-model.md`](data-model.md)
 - Aggregate cards: [`kpis.md`](kpis.md)

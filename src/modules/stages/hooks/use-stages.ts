@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { getStages } from '@/modules/stages/stages-server'
 
-const STAGES_QUERY_KEY = ['stages']
+export const STAGES_QUERY_KEY = ['stages']
 
 export const stagesQueryOptions = () =>
   queryOptions({

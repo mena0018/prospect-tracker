@@ -22,31 +22,19 @@ export function useOpportunityMutations() {
   const create = useMutation({
     mutationFn: (data: CreateOpportunityInput) => createOpportunity({ data }),
     onSettled: invalidateList,
-    onError: (error, data) =>
-      showErrorToast(error, {
-        title: m.opportunity_createFailed(),
-        onRetry: () => create.mutate(data)
-      })
+    onError: (error) => showErrorToast(error, { title: m.opportunity_createFailed() })
   })
 
   const update = useMutation({
     mutationFn: (data: UpdateOpportunityInput) => updateOpportunity({ data }),
     onSettled: invalidateList,
-    onError: (error, data) =>
-      showErrorToast(error, {
-        title: m.opportunity_updateFailed(),
-        onRetry: () => update.mutate(data)
-      })
+    onError: (error) => showErrorToast(error, { title: m.opportunity_updateFailed() })
   })
 
   const remove = useMutation({
     mutationFn: (id: string) => deleteOpportunity({ data: { id } }),
     onSettled: invalidateList,
-    onError: (error, id) =>
-      showErrorToast(error, {
-        title: m.opportunity_deleteFailed(),
-        onRetry: () => remove.mutate(id)
-      })
+    onError: (error) => showErrorToast(error, { title: m.opportunity_deleteFailed() })
   })
 
   return { create, update, remove }

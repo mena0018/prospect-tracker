@@ -19,7 +19,7 @@ edited row. In exchange, `form.AppField name="…"` is checked against the actua
 inside each section, and the old `OpportunityForm = ReturnType<…>` alias is gone.
 
 The two fixed bars, the submit button and the discard confirm are **not** here: `SheetFormHeader`,
-`SheetFormFooter` and `SheetFormDiscardDialog` live in `components/ui/sheet-form.tsx`, and the
+`SheetFormFooter` and `SheetFormDiscardDialog` live in `components/sheet-form.tsx`, and the
 CTA is the shared `SubmitButton` form component. Nothing about a bordered header bar, a
 "discard changes?" alert or a submit button is specific to opportunities. What is specific are
 the strings, which the sheet passes in, and the rule for when to show the confirm, below.
@@ -227,7 +227,7 @@ Section titles are centred between two rules rather than sitting left of a singl
 gives the blocks a clearer rhythm down a tall panel. **The contact section carries no title** —
 the sheet header already says "Nouvelle opportunité" two lines above, so a heading there only
 repeated it. `SheetFormSection` takes an optional `title` for that reason — it lives in
-`components/ui/sheet-form.tsx` with the rest of the sheet chrome, not under `components/form/`:
+`components/sheet-form.tsx` with the rest of the sheet chrome, not under `components/form/`:
 it is a layout block with no TanStack Form involvement, and the sheet is its only caller.
 
 The header pairs the title with an icon in a tinted square — `Plus` on create, `Pencil` on edit —

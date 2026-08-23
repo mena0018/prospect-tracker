@@ -223,5 +223,142 @@
   "table_lastPage": "Dernière page",
   "opportunity_nextReminderSet": "Relance planifiée",
   "opportunity_nextReminderAuto": "Relance auto · {days} j après le dernier contact",
-  "followUp_trackFirstContact": "Suivre un contact"
+  "followUp_trackFirstContact": "Suivre un contact",
+  "validation_stageNameRequired": "Indiquez le nom de l'étape.",
+  "validation_stageNameTooLong": "Nom d'étape trop long (60 max).",
+  "validation_stageColorInvalid": "Couleur d'étape invalide.",
+  "validation_reminderDelayInt": "Le délai doit être un nombre entier.",
+  "validation_reminderDelayNegative": "Le délai ne peut pas être négatif.",
+  "validation_reminderDelayTooHigh": "Délai trop long (90 jours max).",
+  "validation_configNameRequired": "Indiquez un nom.",
+  "validation_configNameTooLong": "Nom trop long (60 max).",
+  "customize_title": "Personnaliser",
+  "customize_subtitle": [
+    {
+      "declarations": ["input activeCount", "local activePlural = activeCount: plural"],
+      "selectors": ["activePlural"],
+      "match": {
+        "activePlural=one": "{activeCount} étape",
+        "activePlural=other": "{activeCount} étapes"
+      }
+    }
+  ],
+  "customize_dailyRateSectionTitle": "TJM de référence",
+  "customize_dailyRateSectionHint": "Seuil de coloration",
+  "customize_dailyRateAbove": "≥ référence → affiché en vert",
+  "customize_dailyRateBelow": "< référence → affiché en rouge",
+  "customize_dailyRateLabel": "TJM de référence",
+  "customize_stagesSectionTitle": "Étapes du pipeline",
+  "customize_stagesSectionHint": "Renommez, recolorez, réglez le délai",
+  "customize_stageNameLabel": "Nom de l'étape",
+  "customize_stageDelayLabel": "Délai de relance",
+  "customize_stageDelayUnit": "jours",
+  "customize_stageDelayHelp": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Relancer {count} jour après le dernier contact",
+        "countPlural=other": "Relancer {count} jours après le dernier contact"
+      }
+    }
+  ],
+  "customize_stageCount": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité",
+        "countPlural=other": "{count} opportunités"
+      }
+    }
+  ],
+  "customize_stageColorTitle": "Couleur de l'étape",
+  "customize_stageColorChange": "Changer la couleur",
+  "customize_stageColorAvailable": "10 couleurs disponibles",
+  "sortable_moveUp": "Monter",
+  "sortable_moveDown": "Descendre",
+  "sortable_reorderGroupLabel": "Réordonner",
+  "sortable_moveToTop": "Placer en premier",
+  "sortable_moveToBottom": "Placer en dernier",
+  "sortable_dragHandle": "Glissez pour réordonner — ou utilisez le menu",
+  "sortable_reorderAnnounce": "{name} déplacé en position {position} sur {total}",
+  "customize_moreActions": "Plus d'actions",
+  "customize_archive": "Archiver",
+  "customize_restore": "Restaurer",
+  "customize_addStage": "Ajouter une étape",
+  "customize_newStageName": "Nouvelle étape",
+  "customize_archivedSectionTitle": "Étapes archivées",
+  "customize_archivedSectionHint": "Hors du kanban actif",
+  "customize_liveChanges": "Les modifications s'appliquent en direct",
+  "customize_delayDrivesDue": "Le délai pilote « À relancer aujourd'hui »",
+  "customize_jobTypesSectionTitle": "Types de poste",
+  "customize_jobTypesSectionHint": "Utilisés dans le formulaire d'opportunité",
+  "customize_addJobType": "Ajouter un type de poste",
+  "customize_newJobTypeName": "Nouveau type",
+  "customize_levelsSectionTitle": "Niveaux d'expérience",
+  "customize_levelsSectionHint": "Du plus junior au plus senior",
+  "customize_addLevel": "Ajouter un niveau",
+  "customize_newLevelName": "Nouveau niveau",
+  "customize_deleteStageBlockedTitle": "Impossible de supprimer « {name} »",
+  "customize_deleteStageBlockedBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité est encore à cette étape. Déplacez-la vers une autre étape, ou archivez celle-ci : elle sort du kanban actif sans rien perdre.",
+        "countPlural=other": "{count} opportunités sont encore à cette étape. Déplacez-les vers une autre étape, ou archivez celle-ci : elle sort du kanban actif sans rien perdre."
+      }
+    }
+  ],
+  "customize_deleteStageBlockedConfirm": "Archiver l'étape",
+  "customize_deleteJobTypeTitle": "Supprimer « {name} » ?",
+  "customize_deleteJobTypeBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité utilise ce type. Elle sera conservée, son champ « Type de poste » sera simplement vidé.",
+        "countPlural=other": "{count} opportunités utilisent ce type. Elles seront conservées, leur champ « Type de poste » sera simplement vidé."
+      }
+    }
+  ],
+  "customize_deleteLevelTitle": "Supprimer « {name} » ?",
+  "customize_deleteLevelBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunité utilise ce niveau. Elle sera conservée, son champ « Niveau d'expérience » sera simplement vidé.",
+        "countPlural=other": "{count} opportunités utilisent ce niveau. Elles seront conservées, leur champ « Niveau d'expérience » sera simplement vidé."
+      }
+    }
+  ],
+  "customize_stageCreateFailed": "Impossible d'ajouter l'étape",
+  "customize_stageUpdateFailed": "Impossible de modifier l'étape",
+  "customize_stageDeleteFailed": "Impossible de supprimer l'étape",
+  "customize_stageReorderFailed": "Impossible de réordonner les étapes",
+  "customize_itemCreateFailed": "Impossible d'ajouter l'élément",
+  "customize_itemUpdateFailed": "Impossible de modifier l'élément",
+  "customize_itemDeleteFailed": "Impossible de supprimer l'élément",
+  "customize_dailyRateUpdateFailed": "Impossible de modifier le TJM de référence",
+  "customize_delayShort": "{days} j",
+  "error_stageSystemLocked": "Les étapes par défaut ne peuvent pas être supprimées. Archivez-la pour la sortir du kanban actif.",
+  "customize_subtitleArchived": [
+    {
+      "declarations": [
+        "input activeCount",
+        "input archivedCount",
+        "local activePlural = activeCount: plural",
+        "local archivedPlural = archivedCount: plural"
+      ],
+      "selectors": ["activePlural", "archivedPlural"],
+      "match": {
+        "activePlural=one, archivedPlural=one": "{activeCount} étape · {archivedCount} archivée",
+        "activePlural=one, archivedPlural=other": "{activeCount} étape · {archivedCount} archivées",
+        "activePlural=other, archivedPlural=one": "{activeCount} étapes · {archivedCount} archivée",
+        "activePlural=other, archivedPlural=other": "{activeCount} étapes · {archivedCount} archivées"
+      }
+    }
+  ]
 }

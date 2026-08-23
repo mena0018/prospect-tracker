@@ -205,5 +205,142 @@
   "opportunity_nextReminderHint": "Leave empty to use the stage delay",
   "opportunity_nextReminderSet": "Follow-up scheduled",
   "opportunity_nextReminderAuto": "Auto follow-up · {days} days after last contact",
-  "followUp_trackFirstContact": "Track a first contact"
+  "followUp_trackFirstContact": "Track a first contact",
+  "validation_stageNameRequired": "Enter the stage name.",
+  "validation_stageNameTooLong": "Stage name too long (60 max).",
+  "validation_stageColorInvalid": "Invalid stage color.",
+  "validation_reminderDelayInt": "The delay must be a whole number.",
+  "validation_reminderDelayNegative": "The delay cannot be negative.",
+  "validation_reminderDelayTooHigh": "Delay too long (90 days max).",
+  "validation_configNameRequired": "Enter a name.",
+  "validation_configNameTooLong": "Name too long (60 max).",
+  "customize_title": "Customize",
+  "customize_subtitle": [
+    {
+      "declarations": ["input activeCount", "local activePlural = activeCount: plural"],
+      "selectors": ["activePlural"],
+      "match": {
+        "activePlural=one": "{activeCount} stage",
+        "activePlural=other": "{activeCount} stages"
+      }
+    }
+  ],
+  "customize_dailyRateSectionTitle": "Reference day rate",
+  "customize_dailyRateSectionHint": "Coloring threshold",
+  "customize_dailyRateAbove": "≥ reference → shown in green",
+  "customize_dailyRateBelow": "< reference → shown in red",
+  "customize_dailyRateLabel": "Reference day rate",
+  "customize_stagesSectionTitle": "Pipeline stages",
+  "customize_stagesSectionHint": "Rename, recolor, set the delay",
+  "customize_stageNameLabel": "Stage name",
+  "customize_stageDelayLabel": "Follow-up delay",
+  "customize_stageDelayUnit": "days",
+  "customize_stageDelayHelp": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Follow up {count} day after the last contact",
+        "countPlural=other": "Follow up {count} days after the last contact"
+      }
+    }
+  ],
+  "customize_stageCount": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunity",
+        "countPlural=other": "{count} opportunities"
+      }
+    }
+  ],
+  "customize_stageColorTitle": "Stage color",
+  "customize_stageColorChange": "Change color",
+  "customize_stageColorAvailable": "10 colors available",
+  "sortable_moveUp": "Move up",
+  "sortable_moveDown": "Move down",
+  "sortable_reorderGroupLabel": "Reorder",
+  "sortable_moveToTop": "Move to top",
+  "sortable_moveToBottom": "Move to bottom",
+  "sortable_dragHandle": "Drag to reorder — or use the menu",
+  "sortable_reorderAnnounce": "{name} moved to position {position} of {total}",
+  "customize_moreActions": "More actions",
+  "customize_archive": "Archive",
+  "customize_restore": "Restore",
+  "customize_addStage": "Add a stage",
+  "customize_newStageName": "New stage",
+  "customize_archivedSectionTitle": "Archived stages",
+  "customize_archivedSectionHint": "Outside the active kanban",
+  "customize_liveChanges": "Changes apply live",
+  "customize_delayDrivesDue": "The delay drives “Due today”",
+  "customize_jobTypesSectionTitle": "Job types",
+  "customize_jobTypesSectionHint": "Used in the opportunity form",
+  "customize_addJobType": "Add a job type",
+  "customize_newJobTypeName": "New type",
+  "customize_levelsSectionTitle": "Experience levels",
+  "customize_levelsSectionHint": "From most junior to most senior",
+  "customize_addLevel": "Add a level",
+  "customize_newLevelName": "New level",
+  "customize_deleteStageBlockedTitle": "Cannot delete “{name}”",
+  "customize_deleteStageBlockedBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunity is still at this stage. Move it to another stage, or archive this one: it leaves the active kanban without losing anything.",
+        "countPlural=other": "{count} opportunities are still at this stage. Move them to another stage, or archive this one: it leaves the active kanban without losing anything."
+      }
+    }
+  ],
+  "customize_deleteStageBlockedConfirm": "Archive the stage",
+  "customize_deleteJobTypeTitle": "Delete “{name}”?",
+  "customize_deleteJobTypeBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunity uses this type. It will be kept, its “Job type” field will simply be cleared.",
+        "countPlural=other": "{count} opportunities use this type. They will be kept, their “Job type” field will simply be cleared."
+      }
+    }
+  ],
+  "customize_deleteLevelTitle": "Delete “{name}”?",
+  "customize_deleteLevelBody": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} opportunity uses this level. It will be kept, its “Experience level” field will simply be cleared.",
+        "countPlural=other": "{count} opportunities use this level. They will be kept, their “Experience level” field will simply be cleared."
+      }
+    }
+  ],
+  "customize_stageCreateFailed": "Could not add the stage",
+  "customize_stageUpdateFailed": "Could not update the stage",
+  "customize_stageDeleteFailed": "Could not delete the stage",
+  "customize_stageReorderFailed": "Could not reorder the stages",
+  "customize_itemCreateFailed": "Could not add the item",
+  "customize_itemUpdateFailed": "Could not update the item",
+  "customize_itemDeleteFailed": "Could not delete the item",
+  "customize_dailyRateUpdateFailed": "Could not update the reference day rate",
+  "customize_delayShort": "{days}d",
+  "error_stageSystemLocked": "Default stages cannot be deleted. Archive it to take it out of the active kanban.",
+  "customize_subtitleArchived": [
+    {
+      "declarations": [
+        "input activeCount",
+        "input archivedCount",
+        "local activePlural = activeCount: plural",
+        "local archivedPlural = archivedCount: plural"
+      ],
+      "selectors": ["activePlural", "archivedPlural"],
+      "match": {
+        "activePlural=one, archivedPlural=one": "{activeCount} stage · {archivedCount} archived",
+        "activePlural=one, archivedPlural=other": "{activeCount} stage · {archivedCount} archived",
+        "activePlural=other, archivedPlural=one": "{activeCount} stages · {archivedCount} archived",
+        "activePlural=other, archivedPlural=other": "{activeCount} stages · {archivedCount} archived"
+      }
+    }
+  ]
 }
