@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { DataTablePaginationSkeleton } from '@/modules/table/components/data-table-pagination'
-import { CELL_LAYOUT, HEADER_ROW_LAYOUT, ROW_LAYOUT } from '@/modules/table/table-layout'
+import { DataTablePaginationSkeleton } from '@/shared/table/components/data-table-pagination'
+import { CELL_LAYOUT, HEADER_ROW_LAYOUT, ROW_LAYOUT } from '@/shared/table/table-layout'
 
 type Props = {
   gridTemplate: string

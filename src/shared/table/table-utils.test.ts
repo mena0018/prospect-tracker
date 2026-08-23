@@ -5,7 +5,7 @@ import {
   parseSort,
   serializeSort,
   toPaginationState
-} from '@/modules/table/table-utils'
+} from '@/shared/table/table-utils'
 
 describe('parseSort', () => {
   it('maps a normalised value to the table sorting state', () => {

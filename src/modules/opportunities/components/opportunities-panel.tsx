@@ -8,7 +8,7 @@ import {
   OPPORTUNITIES_COLUMN_COUNT,
   OPPORTUNITIES_GRID_TEMPLATE
 } from '@/modules/opportunities/components/opportunities-table'
-import { DataTableSkeleton } from '@/modules/table/components/data-table-skeleton'
+import { DataTableSkeleton } from '@/shared/table/components/data-table-skeleton'
 import {
   OpportunitiesToolbar,
   OpportunitiesToolbarSkeleton

@@ -1,5 +1,5 @@
 import { withForm } from '@/components/form/form-hook'
-import { SheetFormSection } from '@/components/ui/sheet-form'
+import { SheetFormSection } from '@/components/sheet-form'
 import { m } from '@/i18n/paraglide/messages'
 import type { Stage } from '@/db/schema'
 import { EMPTY_FORM_VALUES, GRID } from '@/modules/opportunities/components/sheet/form-layout'

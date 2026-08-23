@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 
 import { m } from '@/i18n/paraglide/messages'
 import { toNumeric, toOptionalText } from '@/modules/opportunities/utils/form-values'
-import { tableSearchSchema } from '@/modules/table/table-schema'
+import { tableSearchSchema } from '@/shared/table/table-schema'
 
 // See docs/reference/data-model.md for the nullable + optional rule
 const nullableText = z.string().trim().nullable().optional()

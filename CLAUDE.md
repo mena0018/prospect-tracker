@@ -27,10 +27,11 @@ Locked decisions (don't revisit without a strong reason):
 
 `src/routes/` (file-based routing: `__root.tsx`, public LP routes, `_authed/*` protected
 dashboard, `api/auth.$.tsx`) · `src/modules/<domain>/` (everything domain-specific:
-`createServerFn` handlers, schemas, hooks, components) · `src/components/{ui,layout,icons,theme}`
-(cross-cutting only) · `src/db/{schema.ts,client.ts}` · `src/lib/{supabase,resend,stripe}.ts`
-· `drizzle/` (migrations). The Drizzle schema in `src/db/schema.ts` is the source of truth
-for the data model.
+`createServerFn` handlers, schemas, hooks, components) · `src/shared/<mechanism>/`
+(domain-free mechanisms with their own hooks and utils: `table/`) ·
+`src/components/{ui,layout,icons,theme}` (cross-cutting only) · `src/db/{schema.ts,client.ts}`
+· `src/lib/{supabase,resend,stripe}.ts` · `drizzle/` (migrations). The Drizzle schema in
+`src/db/schema.ts` is the source of truth for the data model.
 
 - **`src/modules/<domain>/`** owns a whole domain: flat prefixed files at its root
   (`auth-schema.ts`, `auth-server.ts`, `auth-utils.ts`), **and a folder as soon as a kind of
@@ -39,9 +40,19 @@ for the data model.
   (`hooks/use-opportunities.ts`, not `hooks/use-opportunities-opportunities.ts`) — the folder
   already says it. At the root the prefix stays, so editor tabs remain distinguishable: never a
   bare `schema.ts`.
+- **`src/shared/<mechanism>/` is for what carries no domain at all** — tables, and the like. Same
+  internal layout as a module (`components/`, `hooks/`, prefixed files at the root), but nothing
+  inside knows what a stage or an opportunity is; a domain module supplies the data and the
+  handlers. The test: if it needs a domain type to compile, it is a module, not a mechanism. Use
+  it only when the thing is more than a component — a lone cross-cutting component belongs in
+  `src/components/`.
 - **`src/components/` is cross-cutting only** — reusable by any module, no domain knowledge
   (`ui/`, `layout/`, `error-state.tsx`). A component only one module uses belongs in that
   module.
+- **`src/components/ui/` is the shadcn registry, nothing else.** Anything `pnpm dlx shadcn add`
+  could overwrite lives there; our own compositions built _on top_ of it (`number-ticker`,
+  `sheet-form`, `progress-ring`) sit at the root of `src/components/`. The test: could the CLI
+  regenerate this file? If not, it does not belong in `ui/`.
 - **`<domain>-server.ts` is a bundler boundary**: TanStack Start strips `createServerFn`
   handlers from the client bundle. Keep those files free of anything the client imports (Zod
   schemas belong in `<domain>-schema.ts`) — a shared const in a `-server.ts` file gets
@@ -89,7 +100,8 @@ after login. Rules: `docs/reference/guest-mode.md`.
   paths rarely do. Update the doc, not the comment, when the reasoning evolves.
 
 - **Never hand-roll a UI primitive.** Before writing a `<button>`, `<select>`, `<input>`, a
-  tab bar, a dialog, a tooltip…, check `src/components/ui/`, then the shadcn registry
+  tab bar, a dialog, a tooltip…, check `src/components/` and `src/components/ui/`, then the
+  shadcn registry
   (`pnpm dlx shadcn@latest add <name>`). The project is on the **Base UI** style
   (`components.json` → `style: base-nova`), so the CLI installs the Base UI variant, not
   Radix — no new dependency. Hand-rolled controls lose focus rings, `disabled` semantics,
