@@ -1,7 +1,8 @@
 export const APP_ROUTES = {
   home: '/',
   login: '/login',
-  dashboard: '/app'
+  dashboard: '/app',
+  customize: '/app/customize'
 } as const
 
 export const API_ROUTES = {

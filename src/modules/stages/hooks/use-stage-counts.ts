@@ -6,9 +6,12 @@ import { OPPORTUNITIES_QUERY_KEY } from '@/modules/opportunities/hooks/use-oppor
 import { getStageCounts } from '@/modules/stages/stages-server'
 import { useToday } from '@/hooks/use-today'
 
-const stageCountsQueryOptions = (today: string) =>
+// Under the opportunities key so an opportunity write refreshes the counts through the parent.
+export const STAGE_COUNTS_QUERY_KEY = [...OPPORTUNITIES_QUERY_KEY, 'stage-counts']
+
+export const stageCountsQueryOptions = (today: string) =>
   queryOptions({
-    queryKey: [...OPPORTUNITIES_QUERY_KEY, 'stage-counts', today],
+    queryKey: [...STAGE_COUNTS_QUERY_KEY, today],
     queryFn: () => getStageCounts({ data: { today } })
   })
 
@@ -18,6 +21,9 @@ export function useStageCounts() {
 
   return {
     stages,
+
+    // The sidebar shows the working pipeline; archived stages sit outside the active kanban.
+    activeStages: stages.filter((stage) => !stage.isArchived),
     skeletonCount: DEFAULT_STAGES.length,
     hasPipeline: stages.some((stage) => stage.count > 0),
 

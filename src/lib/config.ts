@@ -1,4 +1,5 @@
-// Product name, never translated — see docs/reference/i18n.md
+// Product name and currency, never translated — see docs/reference/i18n.md
 export const CONFIG = {
-  brand: 'ProspectTracker'
+  brand: 'ProspectTracker',
+  currencySymbol: '€'
 } as const

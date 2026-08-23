@@ -28,7 +28,7 @@ Locked decisions (don't revisit without a strong reason):
 `src/routes/` (file-based routing: `__root.tsx`, public LP routes, `_authed/*` protected
 dashboard, `api/auth.$.tsx`) · `src/modules/<domain>/` (everything domain-specific:
 `createServerFn` handlers, schemas, hooks, components) · `src/shared/<mechanism>/`
-(domain-free mechanisms with their own hooks and utils: `table/`) ·
+(domain-free mechanisms with their own hooks and utils: `table/`, `sortable/`) ·
 `src/components/{ui,layout,icons,theme}` (cross-cutting only) · `src/db/{schema.ts,client.ts}`
 · `src/lib/{supabase,resend,stripe}.ts` · `drizzle/` (migrations). The Drizzle schema in
 `src/db/schema.ts` is the source of truth for the data model.
@@ -40,7 +40,7 @@ dashboard, `api/auth.$.tsx`) · `src/modules/<domain>/` (everything domain-speci
   (`hooks/use-opportunities.ts`, not `hooks/use-opportunities-opportunities.ts`) — the folder
   already says it. At the root the prefix stays, so editor tabs remain distinguishable: never a
   bare `schema.ts`.
-- **`src/shared/<mechanism>/` is for what carries no domain at all** — tables, and the like. Same
+- **`src/shared/<mechanism>/` is for what carries no domain at all** — reordering, tables. Same
   internal layout as a module (`components/`, `hooks/`, prefixed files at the root), but nothing
   inside knows what a stage or an opportunity is; a domain module supplies the data and the
   handlers. The test: if it needs a domain type to compile, it is a module, not a mechanism. Use
@@ -50,8 +50,8 @@ dashboard, `api/auth.$.tsx`) · `src/modules/<domain>/` (everything domain-speci
   (`ui/`, `layout/`, `error-state.tsx`). A component only one module uses belongs in that
   module.
 - **`src/components/ui/` is the shadcn registry, nothing else.** Anything `pnpm dlx shadcn add`
-  could overwrite lives there; our own compositions built _on top_ of it (`number-ticker`,
-  `sheet-form`, `progress-ring`) sit at the root of `src/components/`. The test: could the CLI
+  could overwrite lives there; our own compositions built _on top_ of it (`confirm-delete-dialog`,
+  `animated-list`, `number-ticker`) sit at the root of `src/components/`. The test: could the CLI
   regenerate this file? If not, it does not belong in `ui/`.
 - **`<domain>-server.ts` is a bundler boundary**: TanStack Start strips `createServerFn`
   handlers from the client bundle. Keep those files free of anything the client imports (Zod

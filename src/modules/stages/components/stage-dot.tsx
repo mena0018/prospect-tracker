@@ -1,13 +1,13 @@
 import { cn } from '@/lib/utils'
 
-type Props = {
+type Props = React.ComponentProps<'span'> & {
   size?: 'sm' | 'md'
-  className?: string
 }
 
-export function StageDot({ size = 'sm', className }: Props) {
+export function StageDot({ size = 'sm', className, ...props }: Props) {
   return (
     <span
+      {...props}
       data-icon="inline-start"
       className={cn(
         'flex-none rounded-full bg-(--stage-dot)',

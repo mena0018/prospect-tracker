@@ -12,9 +12,8 @@ type Props = Omit<React.ComponentProps<typeof InputGroupInput>, 'value' | 'onCha
 
 export function DebouncedInput({ value, onChange, ...props }: Props) {
   const [draft, setDraft] = useState(value)
-  const [lastValue, setLastValue] = useState(value)
-
   const [emitted, setEmitted] = useState(value)
+  const [lastValue, setLastValue] = useState(value)
 
   // Adjusted during render, and both tests are load-bearing — see
   // docs/reference/server-side-table.md

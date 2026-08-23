@@ -1,4 +1,5 @@
 import { ListFilter } from 'lucide-react'
+import { Link, useMatchRoute } from '@tanstack/react-router'
 
 import { CustomizeIcon } from '@/components/icons/customize'
 import { BrandMark } from '@/components/icons/brand-mark'
@@ -15,25 +16,33 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from '@/components/ui/sidebar'
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
-import { useOpportunitiesFilters } from '@/modules/opportunities/hooks/use-opportunities-filters'
+import { APP_ROUTES } from '@/lib/routes'
+import { OPPORTUNITIES_SEARCH_DEFAULTS } from '@/modules/opportunities/opportunities-schema'
+import { useStartFollowUps } from '@/modules/opportunities/hooks/use-start-follow-ups'
 import { StageBadge } from '@/modules/stages/components/stage-badge'
 import { useStageCounts } from '@/modules/stages/hooks/use-stage-counts'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FollowUpCard } from '@/components/layout/follow-up-card'
+import { AppSidebarFollowUp } from '@/components/layout/app-sidebar-follow-up'
 
 export function AppSidebar() {
-  const { stages, dueCount, doneToday, hasPipeline, isPending, skeletonCount } = useStageCounts()
-  const { setTab, setDueOnly } = useOpportunitiesFilters()
+  const { activeStages, dueCount, doneToday, hasPipeline, isPending, skeletonCount } =
+    useStageCounts()
+  const startFollowUps = useStartFollowUps()
+  const { isMobile, setOpenMobile } = useSidebar()
 
-  // Due rows only exist on the active tab.
-  const startFollowUps = () => {
-    setTab('active')
-    setDueOnly(true)
+  // On mobile the sidebar is a drawer: anything that navigates or starts an action has to close it
+  const closeDrawer = () => {
+    if (isMobile) setOpenMobile(false)
   }
+
+  // Exact match on the tracker: /app/customize would otherwise light both entries.
+  const isCustomize = useMatchRoute()({ to: APP_ROUTES.customize }) !== false
+  const isTracker = useMatchRoute()({ to: APP_ROUTES.dashboard }) !== false && !isCustomize
 
   return (
     <Sidebar>
@@ -55,13 +64,21 @@ export function AppSidebar() {
         <SidebarGroup className="shrink-0 p-0">
           <SidebarMenu className="gap-0.75">
             <SidebarMenuItem>
-              <SidebarMenuButton isActive render={<a href="#" />}>
+              <SidebarMenuButton
+                isActive={isTracker}
+                onClick={closeDrawer}
+                render={<Link to={APP_ROUTES.dashboard} search={OPPORTUNITIES_SEARCH_DEFAULTS} />}
+              >
                 <ListFilter />
                 {m.nav_tracker()}
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton render={<a href="#" />}>
+              <SidebarMenuButton
+                isActive={isCustomize}
+                onClick={closeDrawer}
+                render={<Link to={APP_ROUTES.customize} search={OPPORTUNITIES_SEARCH_DEFAULTS} />}
+              >
                 <CustomizeIcon />
                 {m.nav_customize()}
               </SidebarMenuButton>
@@ -76,7 +93,7 @@ export function AppSidebar() {
               ? Array.from({ length: skeletonCount }, (_, index) => (
                   <Skeleton key={index} className="my-1.5 h-5 w-53 rounded-sm" />
                 ))
-              : stages.map((stage) => (
+              : activeStages.map((stage) => (
                   <div
                     key={stage.id}
                     className="text-secondary-foreground flex items-center justify-between py-1.25 text-xs"
@@ -93,11 +110,14 @@ export function AppSidebar() {
         <SidebarGroup className="mt-6.5 shrink-0 px-2.75 py-0">
           <SidebarGroupLabel>{m.nav_followUps()}</SidebarGroupLabel>
           <SidebarGroupContent>
-            <FollowUpCard
+            <AppSidebarFollowUp
               dueCount={dueCount}
               doneToday={doneToday}
               hasPipeline={hasPipeline}
-              onStart={startFollowUps}
+              onStart={() => {
+                closeDrawer()
+                startFollowUps()
+              }}
             />
           </SidebarGroupContent>
         </SidebarGroup>

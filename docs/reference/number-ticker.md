@@ -1,6 +1,6 @@
 # Number ticker
 
-`src/components/ui/number-ticker.tsx` — a KPI figure that counts up to its value instead of
+`src/components/number-ticker.tsx` — a KPI figure that counts up to its value instead of
 appearing at it.
 
 **Only the lead card uses it** (`kpi-band.tsx` passes `animated` to "à relancer aujourd'hui"); the

@@ -143,7 +143,7 @@ export const OPPORTUNITIES_SEARCH_DEFAULTS = {
   perPage: 8
 }
 
-// Own filters + the sort/page slice every table shares. See docs/reference/table-module.md
+// Own filters + the sort/page slice every table shares. See docs/reference/table-mechanism.md
 export const opportunitiesSearchSchema = z.object({
   tab: z.enum(['active', 'archived']).catch(OPPORTUNITIES_SEARCH_DEFAULTS.tab),
   q: z.string().catch(OPPORTUNITIES_SEARCH_DEFAULTS.q),

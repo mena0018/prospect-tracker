@@ -6,6 +6,7 @@ const ERROR_MESSAGES = {
   FORBIDDEN: m.error_forbidden,
   VALIDATION: m.error_validation,
   CONFLICT: m.error_conflict,
+  STAGE_SYSTEM_LOCKED: m.error_stageSystemLocked,
   RATE_LIMITED: m.error_rateLimited,
   SERVER: m.error_server,
   AUTH_EMAIL_TAKEN: m.error_authEmailTaken,

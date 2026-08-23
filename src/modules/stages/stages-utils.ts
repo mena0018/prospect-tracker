@@ -1,5 +1,8 @@
 import { STAGE_COLOR_TOKENS, type Stage, type StageColorToken } from '@/db/schema'
 
+// Namespaces the drag so two sortable lists on one page cannot accept each other's rows.
+export const STAGES_LIST_ID = 'stages'
+
 export type StageIndex = Map<string, Stage>
 
 export function indexStages(stages: Stage[]): StageIndex {
@@ -13,6 +16,11 @@ function isStageColorToken(color: string): color is StageColorToken {
 // Palette declared in src/styles/globals.css — see docs/reference/data-model.md.
 export function stageColorVar(color: string) {
   return `var(--stage-${isStageColorToken(color) ? color : 'slate'})`
+}
+
+// First unused token, so consecutive adds stay distinguishable; falls back once all ten are used.
+export function nextFreeStageColor(used: readonly string[]): StageColorToken {
+  return STAGE_COLOR_TOKENS.find((token) => !used.includes(token)) ?? 'slate'
 }
 
 export type FollowUpProgress = {
@@ -42,4 +50,16 @@ export function followUpProgress(
 // A transition to an empty queue, never the state itself — see docs/reference/kpis.md
 export function justClearedQueue(previousDue: number | undefined, dueCount: number | undefined) {
   return previousDue !== undefined && previousDue > 0 && dueCount === 0
+}
+
+// Archived stages hold no order, so they trail the active ones and a restored stage lands at the
+// end of the pipeline — see docs/reference/customization.md
+export function orderActiveFirst(ids: string[], archivedIds: ReadonlySet<string>) {
+  return [...ids.filter((id) => !archivedIds.has(id)), ...ids.filter((id) => archivedIds.has(id))]
+}
+
+export function countStages(stages: Stage[]) {
+  const active = stages.filter((stage) => !stage.isArchived).length
+
+  return { active, archived: stages.length - active }
 }

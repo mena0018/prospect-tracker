@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import { STAGE_COLOR_TOKENS, type Stage } from '@/db/schema'
-import { followUpProgress, indexStages, justClearedQueue, stageColorVar } from './stages-utils'
+import {
+  followUpProgress,
+  indexStages,
+  justClearedQueue,
+  countStages,
+  nextFreeStageColor,
+  orderActiveFirst,
+  stageColorVar
+} from './stages-utils'
 
 function makeStage(overrides: Partial<Stage> = {}): Stage {
   return {
@@ -118,5 +126,60 @@ describe('justClearedQueue', () => {
   it('stays silent until the counts have loaded', () => {
     expect(justClearedQueue(undefined, undefined)).toBe(false)
     expect(justClearedQueue(3, undefined)).toBe(false)
+  })
+})
+
+describe('nextFreeStageColor', () => {
+  it('returns the first palette token nobody uses', () => {
+    expect(nextFreeStageColor([])).toBe('slate')
+    expect(nextFreeStageColor(['slate', 'blue'])).toBe('teal')
+  })
+
+  it('ignores values outside the palette', () => {
+    expect(nextFreeStageColor(['#ff0000'])).toBe('slate')
+  })
+
+  it('falls back once every token is taken', () => {
+    expect(nextFreeStageColor([...STAGE_COLOR_TOKENS])).toBe('slate')
+  })
+})
+
+describe('orderActiveFirst', () => {
+  it('moves archived ids after the active ones', () => {
+    const ordered = orderActiveFirst(['a', 'archived', 'b'], new Set(['archived']))
+
+    expect(ordered).toEqual(['a', 'b', 'archived'])
+  })
+
+  it('keeps the active order the caller sent', () => {
+    const ordered = orderActiveFirst(['c', 'a', 'b'], new Set())
+
+    expect(ordered).toEqual(['c', 'a', 'b'])
+  })
+
+  it('keeps archived ids stable relative to each other', () => {
+    const ordered = orderActiveFirst(['x', 'a', 'y'], new Set(['x', 'y']))
+
+    expect(ordered).toEqual(['a', 'x', 'y'])
+  })
+})
+
+describe('countStages', () => {
+  it('splits active from archived', () => {
+    const stages = [
+      makeStage({ id: 'a', isArchived: false }),
+      makeStage({ id: 'b', isArchived: true }),
+      makeStage({ id: 'c', isArchived: false })
+    ]
+
+    expect(countStages(stages)).toEqual({ active: 2, archived: 1 })
+  })
+
+  it('reports zero archived when none are', () => {
+    expect(countStages([makeStage({ isArchived: false })])).toEqual({ active: 1, archived: 0 })
+  })
+
+  it('counts an empty pipeline as all zeroes', () => {
+    expect(countStages([])).toEqual({ active: 0, archived: 0 })
   })
 })

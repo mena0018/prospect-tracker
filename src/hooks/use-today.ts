@@ -60,6 +60,10 @@ function subscribe(listener: () => void) {
 
 const getServerSnapshot = () => today
 
+export function getToday() {
+  return today
+}
+
 export function useToday() {
   return useSyncExternalStore(subscribe, () => today, getServerSnapshot)
 }
