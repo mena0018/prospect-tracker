@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { APP_ROUTES } from '@/lib/routes'
-import { toSafeRedirect } from '@/modules/auth/auth-utils'
+import { toSafeRedirect } from '@/modules/auth/utils/identity'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
 
 function redirectTo(origin: string, path: string): Response {

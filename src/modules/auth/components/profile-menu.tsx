@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar } from '@/components/ui/avatar'
 import { m } from '@/i18n/paraglide/messages'
-import { toDisplayName, toInitials, toProfileSubtitle } from '@/modules/auth/auth-utils'
+import { toDisplayName, toInitials, toProfileSubtitle } from '@/modules/auth/utils/profile'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { API_ROUTES } from '@/lib/routes'
 

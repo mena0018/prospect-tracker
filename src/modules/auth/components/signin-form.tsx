@@ -1,7 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 
 import { useAppForm } from '@/components/form/form-hook'
-import { toFormErrorCode } from '@/modules/auth/auth-utils'
+import { toFormErrorCode } from '@/modules/auth/utils/error-code'
 import { toErrorMessage } from '@/lib/error'
 import { OAuthSection } from '@/modules/auth/components/oauth-section'
 import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
