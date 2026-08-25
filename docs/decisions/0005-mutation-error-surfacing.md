@@ -7,7 +7,7 @@
 ## Context
 
 `signin-form.tsx` / `signup-form.tsx` surface a failed submit as an inline
-`<FieldAlert>` fed by `form.state.errorMap.onSubmit` (see `auth-utils.ts`'s
+`<FieldAlert>` fed by `form.state.errorMap.onSubmit` (see `utils/error-code.ts`'s
 `toFormErrorCode`). `opportunity-sheet.tsx`'s create/update/delete flows
 surface a failed submit as a `sonner` toast with a **Retry** action
 (`use-error-toast.ts`, wired from `use-opportunity-mutations.ts`). The two

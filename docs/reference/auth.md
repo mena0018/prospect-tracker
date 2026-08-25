@@ -182,7 +182,7 @@ set. The Supabase redirect allowlist does not catch this: the URL Supabase sees
 is our own `/api/auth/callback`, and the off-origin hop is the second one, made
 by our code.
 
-`toSafeRedirect` (`src/modules/auth/auth-utils.ts`) keeps only same-origin
+`toSafeRedirect` (`src/modules/auth/utils/identity.ts`) keeps only same-origin
 relative paths. Three shapes are rejected:
 
 - absolute URLs (`https://evil.com`) and non-http schemes (`javascript:`)
