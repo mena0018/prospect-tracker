@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { asString, cn, formatDate, formatValue } from './utils'
+import { asString, cn, formatDate, formatValue, isServer } from './utils'
 
 describe('cn', () => {
   it('merges class names', () => {
@@ -65,5 +65,30 @@ describe('formatValue', () => {
     expect(formatValue(null)).toBe('—')
     expect(formatValue(undefined)).toBe('—')
     expect(formatValue(null, ' €')).toBe('—')
+  })
+})
+
+describe('isServer', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  // Vitest runs on the node environment, so `window` is absent unless a test stubs it.
+  it('reports the server when there is no window', () => {
+    expect(isServer()).toBe(true)
+  })
+
+  it('reports the browser once a window exists', () => {
+    vi.stubGlobal('window', {})
+    expect(isServer()).toBe(false)
+  })
+
+  // Read at call time, not at import time: the same module is bundled for both environments.
+  it('follows the environment it is called in rather than the one it was imported in', () => {
+    vi.stubGlobal('window', {})
+    expect(isServer()).toBe(false)
+
+    vi.unstubAllGlobals()
+    expect(isServer()).toBe(true)
   })
 })

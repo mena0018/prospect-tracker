@@ -13,23 +13,24 @@ import {
 import { ErrorState } from '@/components/error-state'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { isServer } from '@/lib/utils'
 import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/theme'
-import { fetchUser } from '@/modules/auth/auth-server'
 import type { AuthUser } from '@/modules/auth/auth-schema'
+import { getIdentity } from '@/modules/auth/auth-identity'
 import { getLocale, shouldRedirect } from '@/i18n/paraglide/runtime'
 import { CONFIG } from '@/lib/config'
 import appCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async (): Promise<{ user: AuthUser | null }> => {
-    if (typeof window !== 'undefined') {
+    if (!isServer()) {
       const decision = await shouldRedirect({ url: window.location.href })
       if (decision.redirectUrl) {
         throw redirect({ href: decision.redirectUrl.href })
       }
     }
 
-    const user = await fetchUser()
+    const user = await getIdentity()
     return { user }
   },
   head: () => ({
