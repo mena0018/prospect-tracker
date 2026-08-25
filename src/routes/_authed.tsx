@@ -12,13 +12,17 @@ const getSidebarState = createServerFn().handler(() => ({
 
 export const Route = createFileRoute('/_authed')({
   beforeLoad: async ({ context, location }) => {
-    if (!context.user) {
+    const user = context.user
+
+    if (!user) {
       throw redirect({ to: APP_ROUTES.login, search: { redirect: location.href } })
     }
-    if (!context.user.provisioned) {
-      await provisionUser()
-    }
-    return { user: context.user }
+
+    if (user.provisioned) return { user }
+
+    // provisionUser refreshes the token, so the next navigation reads the flipped claim.
+    await provisionUser()
+    return { user: { ...user, provisioned: true } }
   },
   loader: () => getSidebarState(),
   component: AuthedLayout
