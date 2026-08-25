@@ -18,18 +18,16 @@ import { getToday } from '@/hooks/use-today'
 export const Route = createFileRoute('/_authed/app/customize')({
   ssr: 'data-only',
 
-  loader: async ({ context: { queryClient } }) => {
-    // Only the data in the Promise.all blocks the page; these prefetchQueries loads in the background.
+  // Nothing is awaited, on the server either: pending queries are streamed to the client by
+  // setupRouterSsrQueryIntegration — see docs/reference/query-prefetching.md
+  loader: ({ context: { queryClient } }) => {
     queryClient.prefetchQuery(jobTypesQueryOptions())
     queryClient.prefetchQuery(jobTypeCountsQueryOptions())
     queryClient.prefetchQuery(experienceLevelsQueryOptions())
     queryClient.prefetchQuery(experienceLevelCountsQueryOptions())
-
-    await Promise.all([
-      queryClient.ensureQueryData(stagesQueryOptions()),
-      queryClient.ensureQueryData(dailyRateReferenceQueryOptions()),
-      queryClient.ensureQueryData(stageCountsQueryOptions(getToday()))
-    ])
+    queryClient.prefetchQuery(stagesQueryOptions())
+    queryClient.prefetchQuery(dailyRateReferenceQueryOptions())
+    queryClient.prefetchQuery(stageCountsQueryOptions(getToday()))
   },
 
   component: Customize,

@@ -20,6 +20,9 @@ export function getRouter() {
 
     // Default 1000ms leaves the dashboard blank — see docs/reference/loading-states.md
     defaultPendingMs: 150,
+    // Once shown, keep a skeleton long enough to read: without it a response landing just after
+    // defaultPendingMs flashes the skeleton for a few frames.
+    defaultPendingMinMs: 300,
     defaultPreload: 'intent',
     defaultNotFoundComponent: () => <NotFound />,
 
