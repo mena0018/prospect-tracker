@@ -196,10 +196,12 @@ test. `load-matches.ts` reloads a match on `age >= staleAge` **and** one of thre
 navigation is `cause: 'stay'` on a stable id, so no trigger fires and the age is never
 consulted. Declaring no `loaderDeps` is what already keeps the loader still.
 
-Measured in the browser: typing six characters issues three requests (`fetchUser`,
-`getOpportunitiesSummary`, `listOpportunities`) with and without the option, and
+Measured in the browser: typing six characters issues two requests
+(`getOpportunitiesSummary`, `getOpportunities`) with and without the option, and
 `getSidebarState` appears in neither — nor on paging, sorting, or a tab switch. A full page
-load resolves everything in SSR and issues no client server-fn call at all.
+load resolves everything in SSR and issues no client server-fn call at all. `fetchUser` used to
+show up in this list; the identity is now verified in the browser instead — see
+[`auth.md`](auth.md).
 
 If a `loaderDeps` is ever added here, or the loader starts reading something that changes,
 revisit this — the option would become load-bearing then.

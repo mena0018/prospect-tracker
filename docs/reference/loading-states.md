@@ -6,26 +6,31 @@ and why the obvious fix for the rest does not work.
 ## `defaultPendingMs` on the router
 
 TanStack Router waits `defaultPendingMs` (**1000ms by default**) before showing a route's
-`pendingComponent`, then keeps it up for at least `defaultPendingMinMs` (500ms). With a ~1.5s
-load that means a second of nothing, then a skeleton flash right before the content — the worst
-of both. `src/router.tsx` lowers it to **150ms**, low enough to feel immediate, high enough
-that cached navigations don't flicker.
+`pendingComponent`, then keeps it up for at least `defaultPendingMinMs` (500ms by default). With
+a ~1.5s load that means a second of nothing, then a skeleton flash right before the content — the
+worst of both. `src/router.tsx` lowers those values to **150ms** and **300ms** respectively: low
+enough to feel immediate, high enough that cached navigations do not flicker.
 
-This covers `/_authed/app`, whose `pendingComponent` renders `OpportunitiesPanelSkeleton`.
+This covers the route fallbacks for both `/_authed/app` and `/_authed/app/customize`. Their
+loaders never await their prefetches — on the server either, where pending queries are streamed
+to the client as they resolve — so cold query data is represented by the components' own
+`QueryGate` skeletons. Router pending durations do not apply to those: a `QueryGate` skeleton
+disappears as soon as its data arrives. See [`query-prefetching.md`](query-prefetching.md).
 
 ## Why `_authed` has no `pendingComponent`
 
-The remaining blank window is the parents' `beforeLoad`, which runs before any layout exists:
+The first-login window is the parents' `beforeLoad`, which runs before any layout exists:
 
-| Step                                                                     | Where                | Cost                                 |
-| ------------------------------------------------------------------------ | -------------------- | ------------------------------------ |
-| `fetchUser()` — `supabase.auth.getClaims()`                              | `__root.beforeLoad`  | local signature check, every request |
-| `provisionUser()` — insert user + stages + job types + experience levels | `_authed.beforeLoad` | one transaction, first login only    |
+| Step                                                                     | Where                | Cost                              |
+| ------------------------------------------------------------------------ | -------------------- | --------------------------------- |
+| identity — `supabase.auth.getClaims()`                                   | `__root.beforeLoad`  | local, no round-trip after SSR    |
+| `provisionUser()` — insert user + stages + job types + experience levels | `_authed.beforeLoad` | one transaction, first login only |
 
 `fetchUser` used to call `getUser()` and pay a network round-trip on every navigation — the
 search box's debounced keystrokes included. Verifying the signature locally took it from ~71 ms
-to ~3 ms (dev-local, same session), so the blank window below is now dominated by everything
-_but_ this row. See [`auth.md`](auth.md).
+to ~3 ms (dev-local, same session). DEV-53 then moved that verification into the browser
+altogether, so route-to-route navigation no longer waits for a server-function invocation at
+all. See [`auth.md`](auth.md).
 
 Giving `_authed` a `pendingComponent` that renders `AppShell` looks like the fix. **It crashes.**
 
