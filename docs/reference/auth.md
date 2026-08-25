@@ -35,7 +35,7 @@ here and must never be `VITE_`-prefixed.
 
 ## Session resolution & provisioning
 
-- **`fetchUser`** (`src/modules/auth/auth-server.ts`) runs in the root `beforeLoad`. Read-only:
+- **`getUserFromServer`** (`src/modules/auth/auth-server.ts`) runs in the root `beforeLoad`. Read-only:
   it verifies the token with `getClaims()` and exposes the identity — including a `provisioned`
   flag read from `user_metadata` — via router context. Why `getClaims()` and not `getUser()`:
   see below.
@@ -44,29 +44,55 @@ here and must never be `VITE_`-prefixed.
   Supabase `user_metadata`. The `_authed` `beforeLoad` calls it only when
   `context.user.provisioned` is false, so it runs once per account rather than on
   every protected load. The flag is written **after** the DB transaction commits,
-  so a failed provisioning is retried on the next load. It is an optimization
-  only, never an access decision (that stays signature-verified), and lives in
-  server-side `user_metadata` — not a client-forgeable cookie.
+  so a failed provisioning is retried on the next load. It is an optimization only, never an access
+  decision. That distinction is load-bearing: `user_metadata` is **writable by the user**
+  through `updateUser`, so a forged `provisioned: true` is possible — and harmless, because it
+  only skips an idempotent provisioning transaction. Never put an access decision in there.
 
   It then calls **`refreshSession()`**. `updateUser` writes the metadata but does not reissue
-  the access token, and `fetchUser` reads the flag out of the JWT's claims — so without the
-  refresh the token would keep carrying `provisioned: false` until it expired (an hour by
-  default), and every navigation in between would call `provisionUser` again. The transaction
-  is idempotent (`if (existing) return existing`), so this was never a correctness problem —
-  it was a wasted DB round-trip per navigation, which is exactly what the `getClaims()` switch
-  set out to remove.
+  the access token, and the identity is read out of the JWT's claims — so without the refresh the
+  token would keep carrying `provisioned: false` until it expired (an hour by default), and every
+  navigation in between would call `provisionUser` again. The `_authed` guard flips the flag on
+  the route context it returns, which carries the current navigation; the refreshed token is what
+  makes it stick for the next one. The transaction is idempotent (`if (existing) return
+existing`), so this was never a correctness problem — it was a wasted DB round-trip per
+  navigation.
 
 - Auth is re-checked **inside** every server function handler. Route guards
   (`beforeLoad`) protect the UI, not the data: server functions are independently
   reachable RPC endpoints.
 
+- **The identity is verified in the browser, not fetched from the server**
+  (`src/modules/auth/auth-user.ts`). The root `beforeLoad` re-runs on every navigation, so
+  resolving the identity through a server function put a serverless round-trip on the critical
+  path of every click — 142–437 ms in production for a signature check that costs under a
+  millisecond (DEV-53).
+
+  `getUser()` therefore calls `getClaims()` on the **browser** client, which verifies the
+  token locally with WebCrypto, so no application RPC goes out on a warm navigation. It is not
+  strictly offline: the first verification fetches the JWKS, and the SDK refreshes an expiring
+  token — both are amortised, neither sits on the click path. SSR has no browser crypto and no
+  session in memory, so the first document still resolves the identity server-side through
+  `getUserFromServer`; every navigation after that is local. Because there is no round-trip left, there
+  is **no identity cache** — no `staleTime`, no `gcTime`, and no invalidation on sign-in.
+
+  **This does not make remote revocation immediate.** `getClaims()` checks the signature and the
+  `exp` claim; it does not ask the Auth server whether the session still exists, so an access
+  token revoked elsewhere keeps verifying until it expires (one hour by default). What the
+  identity cache made worse was the _floor_, not the ceiling: it pinned a stale identity for the
+  lifetime of the document with no upper bound. The bound is now the access token's lifetime,
+  because the SDK refreshes the token roughly 90 seconds before expiry and a refresh against a
+  revoked session fails and clears it. Either way this is a UI-visibility question, not an access
+  one: per the bullet above, every server function re-checks auth on its own, so a stale identity
+  buys access to nothing — the shell stays up while its data requests fail.
+
 ## Why `getClaims()` and not `getUser()`
 
-`fetchUser` runs in the **root** `beforeLoad`, and `beforeLoad` is not cached. TanStack Router
-re-runs it on every navigation — including every debounced keystroke in the table's search box —
-and the router's own internals doc is explicit that it "is not a cache mechanism". `staleTime`
-does not apply: that is a **loader** option, and the loader path is the only one that consults
-staleness. So whatever `fetchUser` does, it does once per navigation.
+The identity is resolved from the **root** `beforeLoad`, which TanStack Router re-runs on every
+navigation — including every debounced keystroke in the table's search box. `beforeLoad` is not a
+cache mechanism, and the router's own internals doc is explicit about it; `staleTime` does not
+apply either, since that is a **loader** option. So whatever the guard does, it does once per
+navigation — which is why the work it does has to be cheap rather than merely cached.
 
 With `getUser()` that meant an HTTP round-trip to `/auth/v1/user` each time — a median of 71 ms,
 against 3 ms once verified locally (dev-local, same machine and session, so treat the ratio as
@@ -156,7 +182,7 @@ set. The Supabase redirect allowlist does not catch this: the URL Supabase sees
 is our own `/api/auth/callback`, and the off-origin hop is the second one, made
 by our code.
 
-`toSafeRedirect` (`src/modules/auth/auth-utils.ts`) keeps only same-origin
+`toSafeRedirect` (`src/modules/auth/utils/user.ts`) keeps only same-origin
 relative paths. Three shapes are rejected:
 
 - absolute URLs (`https://evil.com`) and non-http schemes (`javascript:`)

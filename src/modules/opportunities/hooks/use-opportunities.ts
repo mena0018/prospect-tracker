@@ -9,7 +9,7 @@ import type { GetOpportunitiesInput } from '@/modules/opportunities/opportunitie
 
 export const OPPORTUNITIES_QUERY_KEY = ['opportunities']
 
-const opportunitiesQueryOptions = (input: GetOpportunitiesInput) =>
+export const opportunitiesQueryOptions = (input: GetOpportunitiesInput) =>
   queryOptions({
     queryKey: [...OPPORTUNITIES_QUERY_KEY, 'page', input],
     queryFn: () => getOpportunities({ data: input }),
@@ -22,7 +22,7 @@ export function useOpportunities(input: GetOpportunitiesInput) {
   return useQuery(opportunitiesQueryOptions(input))
 }
 
-const summaryQueryOptions = (today: string, q: string, due: boolean) =>
+export const summaryQueryOptions = (today: string, q: string, due: boolean) =>
   queryOptions({
     queryKey: [...OPPORTUNITIES_QUERY_KEY, 'summary', today, q, due],
     queryFn: () => getOpportunitiesSummary({ data: { today, q, due } }),

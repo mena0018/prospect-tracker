@@ -1,10 +1,10 @@
 import { useRouter } from '@tanstack/react-router'
 
 import { useAppForm } from '@/components/form/form-hook'
-import { toFormErrorCode } from '@/modules/auth/auth-utils'
+import { toFormErrorCode } from '@/modules/auth/utils/error-code'
 import { toErrorMessage } from '@/lib/error'
 import { OAuthSection } from '@/modules/auth/components/oauth-section'
-import { useGoogleOAuth } from '@/modules/auth/use-google-oauth'
+import { useGoogleOAuth } from '@/modules/auth/hooks/use-google-oauth'
 import { FieldAlert, FieldGroup } from '@/components/ui/field'
 import { m } from '@/i18n/paraglide/messages'
 import { credentialsSchema } from '@/modules/auth/auth-schema'

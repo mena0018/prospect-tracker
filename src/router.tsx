@@ -8,7 +8,10 @@ import { routeTree } from './routeTree.gen'
 export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { retry: 1, staleTime: 30_000 },
+      queries: {
+        retry: 1,
+        staleTime: 30_000
+      },
       mutations: { retry: false }
     }
   })
@@ -20,6 +23,9 @@ export function getRouter() {
 
     // Default 1000ms leaves the dashboard blank — see docs/reference/loading-states.md
     defaultPendingMs: 150,
+    // Once shown, keep a skeleton long enough to avoid a flash — see docs/reference/loading-states.md
+    defaultPendingMinMs: 300,
+
     defaultPreload: 'intent',
     defaultNotFoundComponent: () => <NotFound />,
 

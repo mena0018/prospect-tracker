@@ -3,7 +3,9 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { db } from '@/db/client'
 import { credentialsSchema, signUpSchema } from '@/modules/auth/auth-schema'
-import { toAuthErrorCode } from '@/modules/auth/auth-utils'
+import { toAuthErrorCode } from '@/modules/auth/utils/error-code'
+import { readUser } from '@/modules/auth/utils/user'
+import type { AuthUser } from '@/modules/auth/auth-schema'
 import { DEFAULT_EXPERIENCE_LEVELS, DEFAULT_JOB_TYPES, DEFAULT_STAGES } from '@/db/defaults'
 import { experienceLevels, jobTypes, stages, users, type User } from '@/db/schema'
 import { type ErrorCode } from '@/lib/error'
@@ -11,36 +13,12 @@ import { APP_ROUTES } from '@/lib/routes'
 import { getSupabaseServerClient, requireUser } from '@/lib/supabase/server'
 import { asString } from '@/lib/utils'
 
-export type AuthUser = {
-  id: string
-  email: string
-  fullName: string | null
-  jobTitle: string | null
-  avatarUrl: string | null
-  provisioned: boolean
-}
-
-// `getClaims()` verifies locally; why that is enough here: docs/reference/auth.md
-export const fetchUser = createServerFn({ method: 'GET' }).handler(
+export const getUserFromServer = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthUser | null> => {
     const supabase = getSupabaseServerClient()
-    const { data, error } = await supabase.auth.getClaims()
+    const user = await readUser(supabase)
 
-    if (error || !data) return null
-
-    const { claims } = data
-    const email = asString(claims.email)
-
-    if (!email) return null
-
-    return {
-      id: claims.sub,
-      email,
-      fullName: asString(claims.user_metadata?.full_name),
-      jobTitle: asString(claims.user_metadata?.job_title),
-      avatarUrl: asString(claims.user_metadata?.avatar_url),
-      provisioned: claims.user_metadata?.provisioned === true
-    }
+    return user
   }
 )
 

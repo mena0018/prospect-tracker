@@ -93,13 +93,13 @@ So the discussion resumes at implementation, not at first principles:
 
 ### Code affected when resumed
 
-| File                                 | Change                                                                                                                    |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `auth-schema.ts`                     | drop `credentialsSchema`, `signUpSchema`, `signUpFormSchema`; add `otpRequestSchema`, `otpVerifySchema`                   |
-| `auth-server.ts`                     | drop `signInWithPassword`, `signUpWithPassword`; add `requestOtp`, `verifyOtp`. `fetchUser` and `provisionUser` unchanged |
-| `signin-form.tsx`, `signup-form.tsx` | merge into one two-step form; the `mode=signin\|signup` search param loses its purpose                                    |
-| `auth-utils.ts`                      | drop `invalid_credentials` / `weak_password`; add `otp_expired`, `otp_disabled`                                           |
-| `lib/error.ts`                       | `AUTH_INVALID_CREDENTIALS` → `AUTH_OTP_INVALID`, plus its i18n copy                                                       |
+| File                                 | Change                                                                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `auth-schema.ts`                     | drop `credentialsSchema`, `signUpSchema`, `signUpFormSchema`; add `otpRequestSchema`, `otpVerifySchema`                           |
+| `auth-server.ts`                     | drop `signInWithPassword`, `signUpWithPassword`; add `requestOtp`, `verifyOtp`. `getUserFromServer` and `provisionUser` unchanged |
+| `signin-form.tsx`, `signup-form.tsx` | merge into one two-step form; the `mode=signin\|signup` search param loses its purpose                                            |
+| `utils/error-code.ts`                | drop `invalid_credentials` / `weak_password`; add `otp_expired`, `otp_disabled`                                                   |
+| `lib/error.ts`                       | `AUTH_INVALID_CREDENTIALS` → `AUTH_OTP_INVALID`, plus its i18n copy                                                               |
 
 The OTP input comes from the shadcn registry (`input-otp`), per the no-hand-rolled-primitives
 rule in `CLAUDE.md`.

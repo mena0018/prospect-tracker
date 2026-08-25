@@ -35,7 +35,7 @@ not just a copy decision.
 
 A provider's vocabulary **stops at the boundary**. `auth-server.ts` is the only file that
 talks to GoTrue, so it is the only file that translates: `toAuthErrorCode()`
-(`src/modules/auth/auth-utils.ts`) maps a GoTrue code to an app `ErrorCode`, and everything
+(`src/modules/auth/utils/error-code.ts`) maps a GoTrue code to an app `ErrorCode`, and everything
 downstream — the RPC payload, the forms, `lib/error.ts` — speaks app codes only.
 
 Codes are grouped by **the action they leave the user**, not by their GoTrue identity:

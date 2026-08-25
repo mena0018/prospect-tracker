@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 
 import { m } from '@/i18n/paraglide/messages'
-import { toSafeRedirect } from '@/modules/auth/auth-utils'
+import { toSafeRedirect } from '@/modules/auth/utils/user'
 
 export const loginSearchSchema = z.object({
   // Drop off-origin redirects at the edge rather than at each navigate site
@@ -37,3 +37,12 @@ export const signUpFormSchema = signUpSchema
     error: () => m.validation_passwordsMismatch(),
     path: ['confirmPassword']
   })
+
+export type AuthUser = {
+  id: string
+  email: string
+  fullName: string | null
+  jobTitle: string | null
+  avatarUrl: string | null
+  provisioned: boolean
+}

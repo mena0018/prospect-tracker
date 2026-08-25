@@ -11,11 +11,13 @@ import { APP_ROUTES } from '@/lib/routes'
 
 export const Route = createFileRoute('/login')({
   validateSearch: loginSearchSchema,
+
   beforeLoad: ({ context, search }) => {
     if (context.user) {
       throw redirect({ to: search.redirect ?? APP_ROUTES.dashboard })
     }
   },
+
   component: LoginPage
 })
 

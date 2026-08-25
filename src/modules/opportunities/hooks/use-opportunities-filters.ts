@@ -2,6 +2,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 
 import { Route } from '@/routes/_authed/app.index'
 import { useTableSearch } from '@/shared/table/hooks/use-table-search'
+import { toDueOnly } from '@/modules/opportunities/utils/search-input'
 import type { StatusTab } from '@/modules/opportunities/utils/rows'
 import {
   OPPORTUNITIES_SEARCH_DEFAULTS,
@@ -21,8 +22,7 @@ export function useOpportunitiesFilters() {
       firstPage: OPPORTUNITIES_SEARCH_DEFAULTS.page
     })
 
-  // The due filter only scopes the active tab; archived rows are never due.
-  const isDueOnly = search.due && search.tab === 'active'
+  const isDueOnly = toDueOnly(search)
 
   // Raw in the URL, normalised for every consumer — see docs/reference/server-side-table.md
   const query = search.q.trim()
