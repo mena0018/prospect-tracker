@@ -1,6 +1,12 @@
 import { and, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
-import { opportunities, stages, STAGE_SYSTEM_KEY, type StageSystemKey } from '@/db/schema'
+import {
+  opportunities,
+  stages,
+  STAGE_SYSTEM_KEY,
+  TERMINAL_STAGE_KEYS,
+  type StageSystemKey
+} from '@/db/schema'
 import type {
   GetOpportunitiesInput,
   SortColumn,
@@ -13,11 +19,16 @@ export const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArch
 // Reaching either stage is itself the reply — see docs/reference/kpis.md
 const REPLIED: readonly StageSystemKey[] = [STAGE_SYSTEM_KEY.INTERVIEW, STAGE_SYSTEM_KEY.OFFER]
 
+// An outcome, not a step — nothing is owed to an opportunity already rejected or ghosted.
+export const isTerminal = sql`((${stages.systemKey} in ${TERMINAL_STAGE_KEYS}) is true)`
+
 export const inInterview = sql`${stages.systemKey} = ${STAGE_SYSTEM_KEY.INTERVIEW}`
 // `is not true`, not `not (...)`: a null system_key would drop the row — see docs/reference/kpis.md
 export const notSaved = sql`(${stages.systemKey} = ${STAGE_SYSTEM_KEY.SAVED}) is not true`
-export const hasReplied = sql`(${stages.systemKey} in ${REPLIED}) is true`
-export const awaitingReply = sql`(${stages.systemKey} in ${REPLIED}) is not true`
+// Terminal stages count as a reply: a rejection is an answer, and a ghosting is the answer
+// you get — see docs/reference/kpis.md
+export const hasReplied = sql`((${stages.systemKey} in ${REPLIED}) is true or ${isTerminal})`
+export const awaitingReply = sql`not ${hasReplied}`
 
 const dueDate = sql`coalesce(
   ${opportunities.nextReminderAt},
@@ -27,13 +38,19 @@ const dueDate = sql`coalesce(
 // The single definition of "due for follow-up" — the client reads this, it never recomputes.
 // See docs/reference/data-model.md
 export const isDueExpression = (today: string) =>
-  sql<boolean>`(not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date)`
+  sql<boolean>`(
+    not ${isArchivedRow}
+    and not ${isTerminal}
+    and ${dueDate} is not null
+    and ${dueDate} <= ${today}::date
+  )`
 
 // Deliberately disjoint from isDueExpression, and excludes rows created today.
 // See docs/reference/kpis.md
 export const isDoneTodayExpression = (today: string) =>
   sql<boolean>`(
     not ${isArchivedRow}
+    and not ${isTerminal}
     and ${opportunities.lastContactAt} = ${today}::date
     and ${opportunities.createdAt} < ${today}::date
     and not (${dueDate} is not null and ${dueDate} <= ${today}::date)

@@ -54,6 +54,13 @@ export type StageSystemKey = (typeof STAGE_SYSTEM_KEY)[keyof typeof STAGE_SYSTEM
 
 const STAGE_SYSTEM_KEYS = Object.values(STAGE_SYSTEM_KEY)
 
+// Outcomes, not steps: the opportunity is over, so it raises no follow-up and counts as a
+// reply whether or not its stage is archived — see docs/reference/kpis.md
+export const TERMINAL_STAGE_KEYS: readonly StageSystemKey[] = [
+  STAGE_SYSTEM_KEY.REJECTED,
+  STAGE_SYSTEM_KEY.GHOSTED
+]
+
 export const users = pgTable(
   'users',
   {

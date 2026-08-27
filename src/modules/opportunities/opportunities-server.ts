@@ -136,7 +136,7 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
           where ${notSaved}
         )`.mapWith(Number),
         replied: sql<number>`count(*) filter (
-          where ${notSaved} and (${hasReplied} or ${stages.isArchived})
+          where ${notSaved} and ${hasReplied}
         )`.mapWith(Number),
         activeCount: sql<number>`count(*) filter (
           where not ${isArchivedRow} and ${matches}

@@ -20,9 +20,30 @@ The "à relancer" rule they build on lives in
 | Taux de réponse        | Share of contacted opportunities that got any reply                 |
 
 "Awaiting a reply" excludes the interview and offer stages: reaching them _is_ the
-reply. The response rate counts an opportunity as replied when it reached interview,
-offer, or an archived stage (Refusé is a response; Ghosté, seeded archived, is
-counted as one too — a known rough edge).
+reply. It also excludes the **terminal** stages — Refusé and Ghosté — which the response
+rate counts as replied: a rejection is an answer, and a ghosting is the answer you get.
+
+That rule used to read "or an archived stage", which worked only for as long as Refusé
+happened to ship archived. Now that it ships active (see
+[data-model.md](data-model.md)), the two ideas are separated: `hasReplied` matches
+`TERMINAL_STAGE_KEYS` explicitly, so a user who archives a stage of their own no longer
+silently scores its rows as replies.
+
+## A terminal stage raises no follow-up
+
+`isDueExpression` and `isDoneTodayExpression` both open with `not isTerminal`
+([`opportunities-sql.ts`](../../src/modules/opportunities/opportunities-sql.ts)), so an
+opportunity sitting in Refusé or Ghosté never enters the follow-up queue and never counts
+towards the day's workload. Chasing a lead the user already marked as rejected is the one
+reminder the product must never send.
+
+This was free while both stages shipped archived — `not isArchivedRow` covered it. It is a
+rule of its own now that Refusé is an active stage, and it holds for a **user-archived**
+stage too, since the two conditions are independent.
+
+A reminder date already stored on such a row is left untouched rather than cleared: the
+suppression is a read-time rule, so moving the opportunity back out of Refusé restores its
+follow-up instead of having silently destroyed it.
 
 ## "Today" comes from the browser
 
@@ -63,6 +84,7 @@ Two kinds of stage follow from this:
 - **System stages** — the seven seeded ones (`saved`, `contacted`, `cv_sent`,
   `interview`, `offer`, `rejected`, `ghosted`). Renameable, recolourable,
   delay-configurable, hideable — but **not deletable**, because a KPI depends on each.
+  Two of them, `rejected` and `ghosted`, are also **terminal**: the opportunity is over.
 - **Free stages** — anything the user adds on top, with `system_key = null`. Fully
   editable and **neutral**: they count as contacted and as still awaiting a reply, but
   never as an interview, an offer, or the entry stage.
