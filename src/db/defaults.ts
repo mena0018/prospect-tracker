@@ -16,7 +16,8 @@ type DefaultStage = {
 // Per-stage from day one, so Personnaliser only has to write it — see docs/reference/data-model.md
 const DEFAULT_REMINDER_DELAY_DAYS = 7
 
-// Refusé/Ghosté are seeded archived so they stay out of the active kanban.
+// Refusé ships active: rejection is the common outcome and needs somewhere to go. Ghosté ships
+// archived — it is noticed weeks later, not moved into. See docs/reference/data-model.md
 export const DEFAULT_STAGES: readonly DefaultStage[] = [
   {
     name: 'Sauvegardé',
@@ -35,7 +36,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
     reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
   },
   {
-    name: 'CV Envoyé',
+    name: 'Dossier envoyé',
     systemKey: 'cv_sent',
     color: 'amber',
     position: 2,
@@ -51,7 +52,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
     reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
   },
   {
-    name: 'Offre',
+    name: 'Proposition',
     systemKey: 'offer',
     color: 'green',
     position: 4,
@@ -63,7 +64,7 @@ export const DEFAULT_STAGES: readonly DefaultStage[] = [
     systemKey: 'rejected',
     color: 'red',
     position: 5,
-    isArchived: true,
+    isArchived: false,
     reminderDelayDays: DEFAULT_REMINDER_DELAY_DAYS
   },
   {
