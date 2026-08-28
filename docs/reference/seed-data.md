@@ -49,11 +49,12 @@ producing meaningful numbers however long after writing the fixtures the seed ru
 | Aspect            | Coverage                                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------ |
 | Pagination        | 24 active-tab rows across page sizes 8 / 10 / 15                                                       |
-| Stages            | all 7 positions, including both archived ones (Refusé, Ghosté)                                         |
-| Archived tab      | 4 rows — 3 via an archived stage, 1 via the row's own `is_archived` flag                               |
+| Stages            | all 7 positions, including the two terminal ones (Refusé active, Ghosté archived)                      |
+| Archived tab      | 2 rows — 1 via the archived Ghosté stage, 1 via the row's own `is_archived` flag                       |
+| Terminal stages   | 2 active rows in Refusé, which must never appear in the follow-up queue                                |
 | Pinned            | 3 rows, to verify pinned-first ordering                                                                |
 | Due today KPI     | 3 rows with `next_reminder_at` today or in the past, plus rows due via stage delay                     |
-| Stale KPI         | rows contacted more than 7 days ago in a non-interview, non-offer stage                                |
+| Stale KPI         | rows contacted more than 7 days ago in a stage still awaiting a reply                                  |
 | Interviews KPI    | 4 active rows in stage position 3                                                                      |
 | Response rate KPI | a mix of contacted / replied / no-reply rows                                                           |
 | Nullable columns  | rows with null `esn` (7), `last_contact_at` (4), plus null `end_client`, `phone`, `offer_url`, `notes` |

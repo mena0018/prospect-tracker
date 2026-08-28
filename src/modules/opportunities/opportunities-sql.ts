@@ -1,6 +1,12 @@
 import { and, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
-import { opportunities, stages, STAGE_SYSTEM_KEY, type StageSystemKey } from '@/db/schema'
+import {
+  opportunities,
+  stages,
+  STAGE_SYSTEM_KEY,
+  TERMINAL_STAGE_KEYS,
+  type StageSystemKey
+} from '@/db/schema'
 import type {
   GetOpportunitiesInput,
   SortColumn,
@@ -10,14 +16,24 @@ import type {
 // A row is archived by its own flag or by sitting in an archived stage.
 export const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArchived})`
 
-// Reaching either stage is itself the reply — see docs/reference/kpis.md
-const REPLIED: readonly StageSystemKey[] = [STAGE_SYSTEM_KEY.INTERVIEW, STAGE_SYSTEM_KEY.OFFER]
+// A rejection is an answer; reaching an interview or a proposal proves one came. Ghosté is
+// the absence of one, so it is contacted-but-silent — see docs/reference/kpis.md
+const REPLIED: readonly StageSystemKey[] = [
+  STAGE_SYSTEM_KEY.INTERVIEW,
+  STAGE_SYSTEM_KEY.OFFER,
+  STAGE_SYSTEM_KEY.REJECTED
+]
+
+// An outcome, not a step — nothing is owed to an opportunity already rejected or ghosted.
+export const isTerminal = sql`((${stages.systemKey} in ${TERMINAL_STAGE_KEYS}) is true)`
 
 export const inInterview = sql`${stages.systemKey} = ${STAGE_SYSTEM_KEY.INTERVIEW}`
-// `is not true`, not `not (...)`: a null system_key would drop the row — see docs/reference/kpis.md
-export const notSaved = sql`(${stages.systemKey} = ${STAGE_SYSTEM_KEY.SAVED}) is not true`
-export const hasReplied = sql`(${stages.systemKey} in ${REPLIED}) is true`
-export const awaitingReply = sql`(${stages.systemKey} in ${REPLIED}) is not true`
+// Free stages are neutral on both sides of the ratio, so the denominator takes system stages
+// only — an opportunity parked in one has already passed through the seeded ones anyway.
+// See docs/reference/kpis.md
+export const isContacted = sql`(${stages.systemKey} is not null and ${stages.systemKey} <> ${STAGE_SYSTEM_KEY.SAVED})`
+export const hasReplied = sql`((${stages.systemKey} in ${REPLIED}) is true)`
+export const awaitingReply = sql`not ${hasReplied}`
 
 const dueDate = sql`coalesce(
   ${opportunities.nextReminderAt},
@@ -27,16 +43,22 @@ const dueDate = sql`coalesce(
 // The single definition of "due for follow-up" — the client reads this, it never recomputes.
 // See docs/reference/data-model.md
 export const isDueExpression = (today: string) =>
-  sql<boolean>`(not ${isArchivedRow} and ${dueDate} is not null and ${dueDate} <= ${today}::date)`
+  sql<boolean>`(
+    not ${isArchivedRow}
+    and not ${isTerminal}
+    and ${dueDate} is not null
+    and ${dueDate} <= ${today}::date
+  )`
 
-// Deliberately disjoint from isDueExpression, and excludes rows created today.
-// See docs/reference/kpis.md
+// Disjoint from isDueExpression by construction — it negates that same expression, so a row can
+// never land in both, and one leaving the due side lands here instead of vanishing from the day's
+// total. Archived rows stay out of both. Excludes rows created today. See docs/reference/kpis.md
 export const isDoneTodayExpression = (today: string) =>
   sql<boolean>`(
     not ${isArchivedRow}
     and ${opportunities.lastContactAt} = ${today}::date
     and ${opportunities.createdAt} < ${today}::date
-    and not (${dueDate} is not null and ${dueDate} <= ${today}::date)
+    and not ${isDueExpression(today)}
   )`
 
 export const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {

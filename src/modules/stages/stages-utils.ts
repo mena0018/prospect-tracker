@@ -58,6 +58,13 @@ export function orderActiveFirst(ids: string[], archivedIds: ReadonlySet<string>
   return [...ids.filter((id) => !archivedIds.has(id)), ...ids.filter((id) => archivedIds.has(id))]
 }
 
+// An archived stage is a column the user put away: it is not offered as a destination. The one
+// exception is the stage the edited opportunity already sits in — filtering it out would blank
+// the picker and silently move the row on save. See docs/reference/opportunity-form.md
+export function selectableStages(stages: Stage[], currentStageId: string | undefined) {
+  return stages.filter((stage) => !stage.isArchived || stage.id === currentStageId)
+}
+
 export function countStages(stages: Stage[]) {
   const active = stages.filter((stage) => !stage.isArchived).length
 

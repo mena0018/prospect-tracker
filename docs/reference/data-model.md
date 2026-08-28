@@ -59,7 +59,7 @@ archive). `reminder_delay_days` drives the computed "à relancer" state.
 | --------------------- | -------------------------------- | ------------------------------------------- |
 | `id`                  | uuid **PK**, `gen_random_uuid()` |                                             |
 | `user_id`             | uuid **FK → users.id**           | `on delete cascade`                         |
-| `name`                | text, not null                   | e.g. "CV Envoyé"                            |
+| `name`                | text, not null                   | e.g. "Dossier envoyé"                       |
 | `color`               | text, not null, **`slate`**      | fixed-palette token, DB `CHECK` enforced    |
 | `position`            | integer, not null                | kanban column order                         |
 | `system_key`          | text, nullable                   | stable identity; `null` = free stage        |
@@ -67,8 +67,21 @@ archive). `reminder_delay_days` drives the computed "à relancer" state.
 | `is_archived`         | boolean, not null, false         | Active/Archivée status                      |
 | `created_at`          | timestamptz, `now()`             |                                             |
 
-**Default seed** (`position` 0→6): Sauvegardé, Contacté, CV Envoyé, Entretien,
-Offre, Refusé, Ghosté. Refusé and Ghosté are seeded with `is_archived = true`.
+**Default seed** (`position` 0→6): Sauvegardé, Contacté, Dossier envoyé, Entretien,
+Proposition, Refusé, Ghosté. Only Ghosté is seeded with `is_archived = true`.
+
+The labels follow ESN vocabulary rather than employment vocabulary: a freelancer sends a
+_dossier de compétences_, not a CV, and receives a commercial _proposition_, not a job offer.
+
+**Refusé is seeded active.** Rejection is the most common outcome of an opportunity, so it
+needs a visible destination — seeded archived, the user had nowhere to move a dead lead and
+left it inflating the active pipeline. Ghosté stays archived because it is an outcome noticed
+weeks later rather than a step anyone deliberately moves work into; it is one click from
+Personnaliser for users who want the column.
+
+Both are **terminal stages** (`TERMINAL_STAGE_KEYS` in
+[`schema.ts`](../../src/db/schema.ts)), which is now what suppresses their follow-ups rather
+than the archived flag that used to stand in for it: [kpis.md](kpis.md).
 
 `system_key` splits stages in two. The seven seeded rows are **system stages**, each
 carrying one of `saved`, `contacted`, `cv_sent`, `interview`, `offer`, `rejected`,

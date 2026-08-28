@@ -12,17 +12,67 @@ The "à relancer" rule they build on lives in
 
 ## The four cards
 
-| Card                   | Counts                                                              |
-| ---------------------- | ------------------------------------------------------------------- |
-| À relancer aujourd'hui | Opportunities whose follow-up due date has been reached (see below) |
-| Sans réponse +7j       | Active, still awaiting a reply, last contacted more than 7 days ago |
-| Entretiens à venir     | Active opportunities sitting in the interview stage                 |
-| Taux de réponse        | Share of contacted opportunities that got any reply                 |
+| Card                   | Counts                                                                 |
+| ---------------------- | ---------------------------------------------------------------------- |
+| À relancer aujourd'hui | Opportunities whose follow-up due date has been reached (see below)    |
+| Sans réponse +7j       | Active, still awaiting a reply, last contacted more than 7 days ago    |
+| Entretiens à venir     | Active opportunities sitting in the interview stage                    |
+| Taux de réponse        | Share of contacted opportunities that got any reply, refusals included |
 
-"Awaiting a reply" excludes the interview and offer stages: reaching them _is_ the
-reply. The response rate counts an opportunity as replied when it reached interview,
-offer, or an archived stage (Refusé is a response; Ghosté, seeded archived, is
-counted as one too — a known rough edge).
+## What the response rate actually measures
+
+```
+taux de réponse = replied / contacted
+```
+
+- **`contacted`** (`isContacted`) — every **system** stage except Sauvegardé. Nobody was
+  contacted in the entry stage, so it would drag the ratio down for free.
+- **`replied`** (`hasReplied`) — Entretien, Proposition, **and Refusé**.
+
+**A rejection is a reply.** "Votre profil ne correspond pas" is an answer, and it is the most
+common one. The card used to count only Entretien and Proposition, which measured how far an
+opportunity _progressed_ — a conversion rate wearing a response rate's name. A freelancer
+reading 5% could not tell whether they were being ignored or turned down, which are two
+different problems with two different fixes.
+
+**Ghosté is not a reply**, it is the absence of one — so it sits in the denominator and stays
+out of the numerator. That asymmetry is the point of the card.
+
+**Free stages are neutral on both sides.** They used to count as contacted while never being
+able to count as replied, which silently pushed the rate down for anyone who added a stage of
+their own. An opportunity parked in "Entretien technique" has necessarily passed through the
+seeded stages already, so leaving it out of both sides changes nothing it can answer — and
+keeps the aggregate answerable, which is the same reason the KPIs key off `system_key` at all.
+
+The archived flag appears **nowhere** in this. It used to: the rule read "or an archived
+stage", which worked only for as long as Refusé happened to ship archived, and silently
+scored rows as replies for any stage the user archived themselves. Archiving is a display
+choice; `system_key` carries the meaning.
+
+### The known approximation
+
+A recruiter who replies without the opportunity moving stage is not counted. The rate
+therefore **under-reports**, and there is no way around it from the current schema: nothing
+records that a reply happened, so it can only be inferred from the stage. Making it exact
+needs an explicit `first_reply_at` on `opportunities` — a model change, deliberately out of
+scope here. The card now under-states the thing it names, where before it named one thing and
+measured another.
+
+## A terminal stage raises no follow-up
+
+`isDueExpression` and `isDoneTodayExpression` both open with `not isTerminal`
+([`opportunities-sql.ts`](../../src/modules/opportunities/opportunities-sql.ts)), so an
+opportunity sitting in Refusé or Ghosté never enters the follow-up queue and never counts
+towards the day's workload. Chasing a lead the user already marked as rejected is the one
+reminder the product must never send.
+
+This was free while both stages shipped archived — `not isArchivedRow` covered it. It is a
+rule of its own now that Refusé is an active stage, and it holds for a **user-archived**
+stage too, since the two conditions are independent.
+
+A reminder date already stored on such a row is left untouched rather than cleared: the
+suppression is a read-time rule, so moving the opportunity back out of Refusé restores its
+follow-up instead of having silently destroyed it.
 
 ## "Today" comes from the browser
 
@@ -40,9 +90,7 @@ table's `due` filter.
 day on its own — the date feeds React Query keys, so a new day changes the keys and
 everything refetches. How that is scheduled: [`today.md`](today.md).
 
-Opportunities still in the first stage (Sauvegardé) are excluded from the response
-rate entirely: nobody was contacted, so they would unfairly drag the ratio down.
-When no opportunity has been contacted, the rate is `null` and the card renders
+When no opportunity has been contacted, the response rate is `null` and the card renders
 `—` rather than a misleading `0%`.
 
 ## Why `system_key`, not names or positions
@@ -63,9 +111,10 @@ Two kinds of stage follow from this:
 - **System stages** — the seven seeded ones (`saved`, `contacted`, `cv_sent`,
   `interview`, `offer`, `rejected`, `ghosted`). Renameable, recolourable,
   delay-configurable, hideable — but **not deletable**, because a KPI depends on each.
+  Two of them, `rejected` and `ghosted`, are also **terminal**: the opportunity is over.
 - **Free stages** — anything the user adds on top, with `system_key = null`. Fully
-  editable and **neutral**: they count as contacted and as still awaiting a reply, but
-  never as an interview, an offer, or the entry stage.
+  editable and **neutral**: they stay out of the response rate on both sides, and out of
+  every other aggregate.
 
 That neutrality is what keeps the aggregates answerable. If "Entretien technique" and
 "Entretien RH" were both free stages, "how many interviews this month" would have no
@@ -124,9 +173,16 @@ advance twice as fast while the goalposts moved.
 
 Two consequences worth knowing:
 
-- **Due and done never overlap.** A row contacted today whose forced reminder is still in the
-  past stays _due_, not _done_: counting it on both sides inflated the day's total past the
-  number of real opportunities.
+- **Due and done never overlap**, by construction: `isDoneTodayExpression` ends with
+  `not isDueExpression(today)` rather than re-deriving the due date, so the two cannot drift
+  apart. A row contacted today whose forced reminder is still in the past stays _due_, not
+  _done_: counting it on both sides inflated the day's total past the number of real
+  opportunities.
+- **Moving a row to a terminal stage counts as done, not as vanished.** Following up and then
+  marking the opportunity Refusé takes it out of the due side; without this it left the total
+  too, so the day's workload silently shrank from `0/1` to nothing and the bar lost the work
+  the user had just done. Negating the due expression is what keeps that row on the done side.
+  An older terminal row that was not contacted today still counts on neither side.
 - **A row contacted twice in one day counts once.** `last_contact_at` is a date, not a log. An
   exact count needs a contact-history table, which belongs with the follow-up emails (DEV-23).
 - **Opportunities created today are excluded.** The creation form defaults `last_contact_at` to
