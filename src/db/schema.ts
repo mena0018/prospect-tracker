@@ -54,8 +54,9 @@ export type StageSystemKey = (typeof STAGE_SYSTEM_KEY)[keyof typeof STAGE_SYSTEM
 
 const STAGE_SYSTEM_KEYS = Object.values(STAGE_SYSTEM_KEY)
 
-// Outcomes, not steps: the opportunity is over, so it raises no follow-up and counts as a
-// reply whether or not its stage is archived — see docs/reference/kpis.md
+// Outcomes, not steps: the opportunity is over, so it raises no follow-up, whether or not its
+// stage is archived. Says nothing about whether a reply came — Refusé is one, Ghosté is the
+// absence of one; that split lives in the response rate. See docs/reference/kpis.md
 export const TERMINAL_STAGE_KEYS: readonly StageSystemKey[] = [
   STAGE_SYSTEM_KEY.REJECTED,
   STAGE_SYSTEM_KEY.GHOSTED
