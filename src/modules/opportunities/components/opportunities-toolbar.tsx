@@ -3,6 +3,8 @@ import { LayoutGroup } from 'motion/react'
 
 import { Button } from '@/components/ui/button'
 import { DebouncedInput } from '@/components/debounced-input'
+import { DisplayMenu } from '@/modules/opportunities/components/display-menu'
+import { FIELD_LABELS, hidableFieldsFor } from '@/modules/opportunities/utils/display-settings'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -49,14 +51,27 @@ function TabCount({ value, isSelected }: { value: number; isSelected: boolean })
 export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
   const {
     tab: statusTab,
+    view,
+    hiddenFields,
     search,
     isDueOnly,
     hasFilters,
     setTab,
     setSearch,
     setDueOnly,
+    setView,
+    toggleField,
     resetFilters
   } = useOpportunitiesFilters()
+
+  const labels = FIELD_LABELS()
+
+  // Only what the current view draws — hiding a field it does not render would do nothing.
+  const fields = hidableFieldsFor(view).map((id) => ({
+    id,
+    label: labels[id],
+    isVisible: !hiddenFields.includes(id)
+  }))
 
   return (
     <div className={TOOLBAR_LAYOUT}>
@@ -124,6 +139,12 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
           <FilterX />
           {m.table_resetFilters()}
         </Button>
+        <DisplayMenu
+          view={view}
+          onViewChange={setView}
+          fields={fields}
+          onToggleField={toggleField}
+        />
       </div>
     </div>
   )
@@ -138,6 +159,7 @@ export function OpportunitiesToolbarSkeleton() {
       <div className={SEARCH_LAYOUT}>
         <Skeleton className="h-9 grow @4xl:max-w-57.5" />
         <Skeleton className="h-9 w-21 flex-none" />
+        <Skeleton className="h-9 w-25 flex-none" />
       </div>
     </div>
   )

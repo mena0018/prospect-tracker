@@ -1,6 +1,7 @@
 import { toSortColumn } from '@/modules/opportunities/utils/display'
 import { parseSort, toPaginationState } from '@/shared/table/table-utils'
 import type {
+  GetBoardInput,
   GetOpportunitiesInput,
   OpportunitiesSearch
 } from '@/modules/opportunities/opportunities-schema'
@@ -28,6 +29,16 @@ export function toOpportunitiesInput(
     sortDesc: sorting[0]?.desc ?? false,
     page: pagination.pageIndex + 1,
     perPage: pagination.pageSize,
+    today
+  }
+}
+
+// Same filters as the table, minus the sort and the page the board has no use for.
+export function toBoardInput(search: OpportunitiesSearch, today: string): GetBoardInput {
+  return {
+    tab: search.tab,
+    q: search.q.trim(),
+    due: toDueOnly(search),
     today
   }
 }

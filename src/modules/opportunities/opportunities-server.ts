@@ -8,9 +8,11 @@ import { requireUser } from '@/lib/supabase/server'
 import {
   createOpportunitySchema,
   deleteOpportunitySchema,
+  getBoardSchema,
   getOpportunitiesSchema,
   opportunitiesSummarySchema,
   updateOpportunitySchema,
+  BOARD_ROW_LIMIT,
   STALE_THRESHOLD_DAYS
 } from '@/modules/opportunities/opportunities-schema'
 import {
@@ -93,6 +95,56 @@ export const getOpportunities = createServerFn({ method: 'GET' })
       total,
       page: servedPage,
       pageCount
+    }
+  })
+
+export type Board = {
+  rows: OpportunityDueFlags[]
+  total: number
+  // The board is capped, so it has to say when it is showing less than it counted.
+  isTruncated: boolean
+}
+
+// One flat list, grouped by stage on the client: a per-column query would multiply round trips
+// by the pipeline length and still need a client merge. See docs/reference/kanban-view.md
+export const getBoard = createServerFn({ method: 'GET' })
+  .validator(getBoardSchema)
+  .handler(async ({ data }): Promise<Board> => {
+    const { id: userId } = await requireUser()
+
+    const where = buildWhere(userId, data)
+
+    const [counted, rows] = await Promise.all([
+      db
+        .select({ total: sql<number>`count(*)`.mapWith(Number) })
+        .from(opportunities)
+        .innerJoin(stages, eq(stages.id, opportunities.stageId))
+        .where(where),
+      db
+        .select({
+          opportunity: opportunities,
+          isDue: isDueExpression(data.today),
+          isArchivedRow: sql<boolean>`${isArchivedRow}`
+        })
+        .from(opportunities)
+        .innerJoin(stages, eq(stages.id, opportunities.stageId))
+        .where(where)
+        // Order within a column is not persisted, so recency stands in for it — pinned first,
+        // matching the list. See docs/reference/kanban-view.md
+        .orderBy(desc(opportunities.isPinned), desc(opportunities.updatedAt))
+        .limit(BOARD_ROW_LIMIT)
+    ])
+
+    const total = counted[0]?.total ?? 0
+
+    return {
+      rows: rows.map(({ opportunity, isDue, isArchivedRow }) => ({
+        ...opportunity,
+        isDue,
+        isArchivedRow
+      })),
+      total,
+      isTruncated: total > rows.length
     }
   })
 

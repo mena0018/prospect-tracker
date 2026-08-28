@@ -17,6 +17,8 @@ const SORT_IDLE = 'text-muted-foreground/30'
 type Props<TData extends RowData> = {
   table: ReactTable<PaginatedTableFeatures, TData>
   gridTemplate: string
+  // The tracks themselves, fed to the class above as a variable — see opportunities-table.tsx
+  gridTracks: string
   isFetching: boolean
   emptyTitle: string
   emptyHint: string
@@ -31,6 +33,7 @@ type Props<TData extends RowData> = {
 export function DataTable<TData extends RowData>({
   table,
   gridTemplate,
+  gridTracks,
   isFetching,
   emptyTitle,
   emptyHint,
@@ -44,6 +47,7 @@ export function DataTable<TData extends RowData>({
   const rows = table.getRowModel().rows
   const headers = table.getHeaderGroups().flatMap((headerGroup) => headerGroup.headers)
   const isEmpty = rows.length === 0
+  const trackStyle = { '--table-columns': gridTracks } as React.CSSProperties
 
   return (
     <div
@@ -56,7 +60,7 @@ export function DataTable<TData extends RowData>({
       <table className={cn(TABLE_LAYOUT, isEmpty && 'h-full grid-rows-[auto_1fr]')}>
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-secondary sticky top-0 z-10 grid">
-          <tr className={cn(HEADER_ROW_LAYOUT, gridTemplate)}>
+          <tr style={trackStyle} className={cn(HEADER_ROW_LAYOUT, gridTemplate)}>
             {headers.map((header) => {
               const isSilent = header.column.id in silentColumns
               const isSorted = header.column.getIsSorted()
@@ -139,6 +143,7 @@ export function DataTable<TData extends RowData>({
                     onRowClick(row.original)
                   }
                 })}
+                style={trackStyle}
                 className={cn(
                   ROW_LAYOUT,
                   'hover:bg-accent/60 transition-colors',

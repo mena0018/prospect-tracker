@@ -5,6 +5,7 @@ import { CELL_LAYOUT, HEADER_ROW_LAYOUT, ROW_LAYOUT } from '@/shared/table/table
 
 type Props = {
   gridTemplate: string
+  gridTracks: string
   rowCount: number
   columnCount: number
   hasSilentColumn?: boolean
@@ -12,15 +13,18 @@ type Props = {
 
 export function DataTableSkeleton({
   gridTemplate,
+  gridTracks,
   rowCount,
   columnCount,
   hasSilentColumn = false
 }: Props) {
+  const trackStyle = { '--table-columns': gridTracks } as React.CSSProperties
+
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
         <div className="flex min-h-0 min-w-200 flex-1 flex-col">
-          <div className={cn(HEADER_ROW_LAYOUT, gridTemplate)}>
+          <div style={trackStyle} className={cn(HEADER_ROW_LAYOUT, gridTemplate)}>
             {hasSilentColumn && <div />}
             {Array.from({ length: columnCount }, (_, index) => (
               <div key={index} className="flex h-10 items-center px-3.5 py-2.5">
@@ -31,7 +35,7 @@ export function DataTableSkeleton({
 
           <div className="min-h-0 flex-1 overflow-hidden">
             {Array.from({ length: rowCount }, (_, index) => (
-              <div key={index} className={cn(ROW_LAYOUT, gridTemplate)}>
+              <div key={index} style={trackStyle} className={cn(ROW_LAYOUT, gridTemplate)}>
                 {hasSilentColumn && (
                   <div className="flex items-center justify-center">
                     <Skeleton className="size-3.5 rounded-sm" />
