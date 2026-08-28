@@ -29,7 +29,9 @@ CREATE TABLE "opportunity_contacts" (
 	CONSTRAINT "opportunity_contacts_opportunity_id_contact_id_pk" PRIMARY KEY("opportunity_id","contact_id")
 );
 --> statement-breakpoint
-DROP INDEX "opportunities_user_pinned_recruiter_idx";--> statement-breakpoint
+-- IF EXISTS: this index is declared in 0004 but is absent from some environments, and the
+-- trigram index on the same column is dropped by the column itself further down.
+DROP INDEX IF EXISTS "opportunities_user_pinned_recruiter_idx";--> statement-breakpoint
 ALTER TABLE "contacts" ADD CONSTRAINT "contacts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "opportunity_contacts" ADD CONSTRAINT "opportunity_contacts_opportunity_id_opportunities_id_fk" FOREIGN KEY ("opportunity_id") REFERENCES "public"."opportunities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "opportunity_contacts" ADD CONSTRAINT "opportunity_contacts_contact_id_contacts_id_fk" FOREIGN KEY ("contact_id") REFERENCES "public"."contacts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -200,7 +202,7 @@ CREATE INDEX IF NOT EXISTS "contacts_company_unaccent_trgm_idx" ON "contacts" US
 -- substring of the other. The French country code is therefore folded back to the national
 -- leading zero, which is the form users actually type when a call comes in.
 -- See docs/reference/contacts.md
-CREATE OR REPLACE FUNCTION digits_only(text) RETURNS text
+CREATE OR REPLACE FUNCTION public.digits_only(text) RETURNS text
   LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
   AS $$ SELECT regexp_replace(regexp_replace($1, '[^0-9]', '', 'g'), '^33', '0') $$;--> statement-breakpoint
 
@@ -208,10 +210,18 @@ CREATE OR REPLACE FUNCTION digits_only(text) RETURNS text
 -- concatenation is short, and a trigram match on it is exactly the "ends with 12 34" lookup.
 -- Per entry, not on the joined string: joining first would let one number's tail run into the
 -- next one's head and match a number nobody stored.
-CREATE OR REPLACE FUNCTION contact_phone_digits(text[]) RETURNS text
+-- Schema-qualified like 0006's immutable_unaccent: an index expression resolves the call with
+-- no search_path of its own, so a bare `digits_only(...)` fails at CREATE INDEX time.
+CREATE OR REPLACE FUNCTION public.contact_phone_digits(text[]) RETURNS text
   LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
-  AS $$ SELECT coalesce(string_agg(digits_only(entry), ' '), '') FROM unnest($1) AS entry $$;--> statement-breakpoint
+  AS $$ SELECT coalesce(string_agg(public.digits_only(entry), ' '), '') FROM unnest($1) AS entry $$;--> statement-breakpoint
 
-CREATE INDEX IF NOT EXISTS "contacts_phones_digits_trgm_idx" ON "contacts" USING gin (contact_phone_digits("phones") gin_trgm_ops);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "contacts_phones_digits_trgm_idx" ON "contacts" USING gin (public.contact_phone_digits("phones") gin_trgm_ops);--> statement-breakpoint
 
-CREATE INDEX IF NOT EXISTS "contacts_emails_unaccent_trgm_idx" ON "contacts" USING gin (immutable_unaccent(array_to_string("emails", ' ')) gin_trgm_ops);
+-- `array_to_string` is STABLE, not IMMUTABLE, so it cannot appear in an index expression.
+-- Same remedy as the phone digits above: wrap it in an IMMUTABLE function of our own.
+CREATE OR REPLACE FUNCTION public.contact_emails_text(text[]) RETURNS text
+  LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
+  AS $$ SELECT coalesce(string_agg(entry, ' '), '') FROM unnest($1) AS entry $$;--> statement-breakpoint
+
+CREATE INDEX IF NOT EXISTS "contacts_emails_unaccent_trgm_idx" ON "contacts" USING gin (immutable_unaccent(public.contact_emails_text("emails")) gin_trgm_ops);

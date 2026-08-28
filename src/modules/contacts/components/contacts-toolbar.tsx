@@ -20,8 +20,10 @@ import { relationshipLabel, toRelationshipFilter } from '@/modules/contacts/util
 const TOOLBAR_LAYOUT =
   'border-border-soft @container flex flex-none flex-wrap items-center justify-between gap-4 border-b px-4.5 py-3.75'
 const TITLE_LAYOUT = 'flex grow basis-60 items-center gap-3'
+// Wraps like the tracker's own toolbar: four controls on one row overflow a phone-width
+// container, and the last one (Nouveau contact) gets clipped.
 const SEARCH_LAYOUT =
-  'flex grow basis-100 items-center gap-2.5 justify-start @4xl:justify-end @4xl:basis-auto'
+  'flex grow basis-100 flex-wrap items-center gap-2.5 justify-start @4xl:flex-nowrap @4xl:justify-end @4xl:basis-auto'
 
 type Props = {
   total: number
@@ -42,7 +44,7 @@ export function ContactsToolbar({ total, onCreate }: Props) {
       </div>
 
       <div className={SEARCH_LAYOUT}>
-        <InputGroup className="bg-secondary h-9 grow @4xl:max-w-64">
+        <InputGroup className="bg-secondary h-9 grow basis-50 @4xl:max-w-64">
           <InputGroupAddon>
             <Search className="size-3.75" />
           </InputGroupAddon>

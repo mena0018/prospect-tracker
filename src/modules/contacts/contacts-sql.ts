@@ -58,9 +58,11 @@ export function contactSearchMatch(q: string) {
       ...TEXT_SEARCH_COLUMNS.map(
         (column) => sql`immutable_unaccent(${column}) ilike immutable_unaccent(${`%${term}%`})`
       ),
-      sql`immutable_unaccent(array_to_string(${contacts.emails}, ' ')) ilike immutable_unaccent(${`%${term}%`})`,
+      sql`immutable_unaccent(public.contact_emails_text(${contacts.emails})) ilike immutable_unaccent(${`%${term}%`})`,
       // Guarded: an empty digit string would match every contact holding any phone number.
-      ...(digits ? [sql`contact_phone_digits(${contacts.phones}) like ${`%${digits}%`}`] : [])
+      ...(digits
+        ? [sql`public.contact_phone_digits(${contacts.phones}) like ${`%${digits}%`}`]
+        : [])
     )
   }
 

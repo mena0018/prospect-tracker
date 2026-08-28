@@ -129,6 +129,19 @@ unidentified names.
 There is deliberately **no cohabitation** — after the migration the recruiter text does not
 exist anywhere, so the two representations cannot drift.
 
+### Index expressions need IMMUTABLE, schema-qualified functions
+
+Two traps cost a migration run each, both only visible against a real database:
+
+- An index expression resolves function names with **no `search_path` of its own**, so
+  `contact_phone_digits` calling a bare `digits_only(...)` fails at `CREATE INDEX` time. Every
+  function here is `public.`-qualified, in its definition and at every call site — including the
+  queries in `contacts-sql.ts`, which must match the indexed expression exactly or the planner
+  silently ignores the index.
+- `array_to_string` is **STABLE, not IMMUTABLE**, so it cannot appear in an index expression at
+  all. `contact_emails_text` wraps `unnest`/`string_agg` to get an IMMUTABLE equivalent, the same
+  remedy `0006` used for `unaccent`.
+
 ## RLS
 
 `contacts` follows the `0001` shape exactly: owner column, `authenticated` only, one policy per
