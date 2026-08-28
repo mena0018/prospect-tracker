@@ -15,6 +15,7 @@ import { TrackingSection } from '@/modules/opportunities/components/sheet/tracki
 import { useOpportunityForm } from '@/modules/opportunities/hooks/use-opportunity-form'
 import type { opportunityFormSchema } from '@/modules/opportunities/opportunities-schema'
 import type { OpportunityRow } from '@/modules/opportunities/utils/rows'
+import { selectableStages } from '@/modules/stages/stages-utils'
 import { Button } from '@/components/ui/button'
 
 const FORM_ID = 'opportunity-form'
@@ -41,13 +42,15 @@ export function OpportunitySheet({
   const isEdit = row !== null
   const [isConfirmingDiscard, setConfirmingDiscard] = useState(false)
 
+  const offered = selectableStages(stages, row?.stageId)
+
   const { form, discard } = useOpportunityForm({
     open,
     row,
     // Both come from the same stage — the one a new opportunity starts in. Picking another stage
     // re-derives the reminder from that stage's own delay.
-    fallbackStageId: stages[0]?.id ?? '',
-    reminderDelayDays: stages[0]?.reminderDelayDays ?? 0,
+    fallbackStageId: offered[0]?.id ?? '',
+    reminderDelayDays: offered[0]?.reminderDelayDays ?? 0,
     onSubmit
   })
 
@@ -86,7 +89,7 @@ export function OpportunitySheet({
         >
           <ContactSection form={form} />
           <MissionSection form={form} jobTypes={jobTypes} experienceLevels={experienceLevels} />
-          <TrackingSection form={form} stages={stages} />
+          <TrackingSection form={form} stages={offered} />
         </SheetFormBody>
 
         <SheetFormFooter

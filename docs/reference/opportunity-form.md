@@ -257,7 +257,7 @@ costing more than two dependencies would.
 
 ## Stage as a radio group, not a select
 
-`StagePicker` renders every stage as a pill. The pipeline is short, ordered and colour-coded,
+`StagePicker` renders every offered stage as a pill. The pipeline is short, ordered and colour-coded,
 so a dropdown would hide six options and drop the colour that the rest of the app uses to
 identify a stage. It exposes `role="radiogroup"` / `role="radio"`, so it stays keyboard- and
 screen-reader-addressable despite not being a native control.
@@ -266,6 +266,24 @@ The selected pill borrows the stage's own colour for its border and a 12% wash o
 rather than a generic "selected" treatment — the chip reads as _that stage_, matching how the
 table badges identify one. Those two values are inline styles because the colour comes from the
 row's `--stage-*` token at runtime, which no static class can express.
+
+### Archived stages are not offered
+
+Archiving a stage means putting the column away, so it stops being a destination: the picker
+lists active stages only ([`selectableStages`](../../src/modules/stages/stages-utils.ts)).
+Otherwise a stage the user had deliberately hidden — Ghosté, which ships archived — stayed one
+tap away in the form, and moving a row into it made that row vanish from the active tab as a
+side effect of the archived stage it now sat in.
+
+**One exception: the stage the edited opportunity is already in.** A row can sit in an archived
+stage (it is how the archived tab is populated), and removing that pill would leave the group
+with nothing selected — the form would then either block on a required field or, worse, save the
+row into a different stage the user never picked. So the current stage is always offered, and
+only on the row being edited.
+
+The same filtered list feeds the fallback for a **new** opportunity, which is the first offered
+stage rather than the first stage outright. Preselecting an id that the picker does not list
+would render an empty selection that the user cannot reproduce by clicking.
 
 ## Selects and null
 
