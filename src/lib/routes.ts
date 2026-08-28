@@ -2,6 +2,8 @@ export const APP_ROUTES = {
   home: '/',
   login: '/login',
   dashboard: '/app',
+  contacts: '/app/contacts',
+  contactDetail: '/app/contacts/$contactId',
   customize: '/app/customize'
 } as const
 

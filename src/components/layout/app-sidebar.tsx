@@ -1,4 +1,4 @@
-import { ListFilter } from 'lucide-react'
+import { ListFilter, Users } from 'lucide-react'
 import { Link, useMatchRoute } from '@tanstack/react-router'
 
 import { CustomizeIcon } from '@/components/icons/customize'
@@ -22,6 +22,7 @@ import {
 import { m } from '@/i18n/paraglide/messages'
 import { CONFIG } from '@/lib/config'
 import { APP_ROUTES } from '@/lib/routes'
+import { CONTACTS_SEARCH_DEFAULTS } from '@/modules/contacts/contacts-schema'
 import { OPPORTUNITIES_SEARCH_DEFAULTS } from '@/modules/opportunities/opportunities-schema'
 import { useStartFollowUps } from '@/modules/opportunities/hooks/use-start-follow-ups'
 import { StageBadge } from '@/modules/stages/components/stage-badge'
@@ -40,9 +41,12 @@ export function AppSidebar() {
     if (isMobile) setOpenMobile(false)
   }
 
-  // Exact match on the tracker: /app/customize would otherwise light both entries.
-  const isCustomize = useMatchRoute()({ to: APP_ROUTES.customize }) !== false
-  const isTracker = useMatchRoute()({ to: APP_ROUTES.dashboard }) !== false && !isCustomize
+  // Exact match on the tracker: a child route would otherwise light both entries.
+  const matchRoute = useMatchRoute()
+  const isCustomize = matchRoute({ to: APP_ROUTES.customize }) !== false
+  const isContacts = matchRoute({ to: APP_ROUTES.contacts, fuzzy: true }) !== false
+  const isTracker =
+    matchRoute({ to: APP_ROUTES.dashboard }) !== false && !isCustomize && !isContacts
 
   return (
     <Sidebar>
@@ -71,6 +75,16 @@ export function AppSidebar() {
               >
                 <ListFilter />
                 {m.nav_tracker()}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                isActive={isContacts}
+                onClick={closeDrawer}
+                render={<Link to={APP_ROUTES.contacts} search={CONTACTS_SEARCH_DEFAULTS} />}
+              >
+                <Users />
+                {m.nav_contacts()}
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
