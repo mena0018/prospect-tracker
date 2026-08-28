@@ -12,22 +12,51 @@ The "à relancer" rule they build on lives in
 
 ## The four cards
 
-| Card                   | Counts                                                              |
-| ---------------------- | ------------------------------------------------------------------- |
-| À relancer aujourd'hui | Opportunities whose follow-up due date has been reached (see below) |
-| Sans réponse +7j       | Active, still awaiting a reply, last contacted more than 7 days ago |
-| Entretiens à venir     | Active opportunities sitting in the interview stage                 |
-| Taux de réponse        | Share of contacted opportunities that got any reply                 |
+| Card                   | Counts                                                                 |
+| ---------------------- | ---------------------------------------------------------------------- |
+| À relancer aujourd'hui | Opportunities whose follow-up due date has been reached (see below)    |
+| Sans réponse +7j       | Active, still awaiting a reply, last contacted more than 7 days ago    |
+| Entretiens à venir     | Active opportunities sitting in the interview stage                    |
+| Taux de réponse        | Share of contacted opportunities that got any reply, refusals included |
 
-"Awaiting a reply" excludes the interview and offer stages: reaching them _is_ the
-reply. It also excludes the **terminal** stages — Refusé and Ghosté — which the response
-rate counts as replied: a rejection is an answer, and a ghosting is the answer you get.
+## What the response rate actually measures
 
-That rule used to read "or an archived stage", which worked only for as long as Refusé
-happened to ship archived. Now that it ships active (see
-[data-model.md](data-model.md)), the two ideas are separated: `hasReplied` matches
-`TERMINAL_STAGE_KEYS` explicitly, so a user who archives a stage of their own no longer
-silently scores its rows as replies.
+```
+taux de réponse = replied / contacted
+```
+
+- **`contacted`** (`isContacted`) — every **system** stage except Sauvegardé. Nobody was
+  contacted in the entry stage, so it would drag the ratio down for free.
+- **`replied`** (`hasReplied`) — Entretien, Proposition, **and Refusé**.
+
+**A rejection is a reply.** "Votre profil ne correspond pas" is an answer, and it is the most
+common one. The card used to count only Entretien and Proposition, which measured how far an
+opportunity _progressed_ — a conversion rate wearing a response rate's name. A freelancer
+reading 5% could not tell whether they were being ignored or turned down, which are two
+different problems with two different fixes.
+
+**Ghosté is not a reply**, it is the absence of one — so it sits in the denominator and stays
+out of the numerator. That asymmetry is the point of the card.
+
+**Free stages are neutral on both sides.** They used to count as contacted while never being
+able to count as replied, which silently pushed the rate down for anyone who added a stage of
+their own. An opportunity parked in "Entretien technique" has necessarily passed through the
+seeded stages already, so leaving it out of both sides changes nothing it can answer — and
+keeps the aggregate answerable, which is the same reason the KPIs key off `system_key` at all.
+
+The archived flag appears **nowhere** in this. It used to: the rule read "or an archived
+stage", which worked only for as long as Refusé happened to ship archived, and silently
+scored rows as replies for any stage the user archived themselves. Archiving is a display
+choice; `system_key` carries the meaning.
+
+### The known approximation
+
+A recruiter who replies without the opportunity moving stage is not counted. The rate
+therefore **under-reports**, and there is no way around it from the current schema: nothing
+records that a reply happened, so it can only be inferred from the stage. Making it exact
+needs an explicit `first_reply_at` on `opportunities` — a model change, deliberately out of
+scope here. The card now under-states the thing it names, where before it named one thing and
+measured another.
 
 ## A terminal stage raises no follow-up
 
@@ -61,9 +90,7 @@ table's `due` filter.
 day on its own — the date feeds React Query keys, so a new day changes the keys and
 everything refetches. How that is scheduled: [`today.md`](today.md).
 
-Opportunities still in the first stage (Sauvegardé) are excluded from the response
-rate entirely: nobody was contacted, so they would unfairly drag the ratio down.
-When no opportunity has been contacted, the rate is `null` and the card renders
+When no opportunity has been contacted, the response rate is `null` and the card renders
 `—` rather than a misleading `0%`.
 
 ## Why `system_key`, not names or positions
@@ -86,8 +113,8 @@ Two kinds of stage follow from this:
   delay-configurable, hideable — but **not deletable**, because a KPI depends on each.
   Two of them, `rejected` and `ghosted`, are also **terminal**: the opportunity is over.
 - **Free stages** — anything the user adds on top, with `system_key = null`. Fully
-  editable and **neutral**: they count as contacted and as still awaiting a reply, but
-  never as an interview, an offer, or the entry stage.
+  editable and **neutral**: they stay out of the response rate on both sides, and out of
+  every other aggregate.
 
 That neutrality is what keeps the aggregates answerable. If "Entretien technique" and
 "Entretien RH" were both free stages, "how many interviews this month" would have no

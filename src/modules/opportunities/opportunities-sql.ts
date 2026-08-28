@@ -16,18 +16,23 @@ import type {
 // A row is archived by its own flag or by sitting in an archived stage.
 export const isArchivedRow = sql`(${opportunities.isArchived} or ${stages.isArchived})`
 
-// Reaching either stage is itself the reply — see docs/reference/kpis.md
-const REPLIED: readonly StageSystemKey[] = [STAGE_SYSTEM_KEY.INTERVIEW, STAGE_SYSTEM_KEY.OFFER]
+// A rejection is an answer; reaching an interview or a proposal proves one came. Ghosté is
+// the absence of one, so it is contacted-but-silent — see docs/reference/kpis.md
+const REPLIED: readonly StageSystemKey[] = [
+  STAGE_SYSTEM_KEY.INTERVIEW,
+  STAGE_SYSTEM_KEY.OFFER,
+  STAGE_SYSTEM_KEY.REJECTED
+]
 
 // An outcome, not a step — nothing is owed to an opportunity already rejected or ghosted.
 export const isTerminal = sql`((${stages.systemKey} in ${TERMINAL_STAGE_KEYS}) is true)`
 
 export const inInterview = sql`${stages.systemKey} = ${STAGE_SYSTEM_KEY.INTERVIEW}`
-// `is not true`, not `not (...)`: a null system_key would drop the row — see docs/reference/kpis.md
-export const notSaved = sql`(${stages.systemKey} = ${STAGE_SYSTEM_KEY.SAVED}) is not true`
-// Terminal stages count as a reply: a rejection is an answer, and a ghosting is the answer
-// you get — see docs/reference/kpis.md
-export const hasReplied = sql`((${stages.systemKey} in ${REPLIED}) is true or ${isTerminal})`
+// Free stages are neutral on both sides of the ratio, so the denominator takes system stages
+// only — an opportunity parked in one has already passed through the seeded ones anyway.
+// See docs/reference/kpis.md
+export const isContacted = sql`(${stages.systemKey} is not null and ${stages.systemKey} <> ${STAGE_SYSTEM_KEY.SAVED})`
+export const hasReplied = sql`((${stages.systemKey} in ${REPLIED}) is true)`
 export const awaitingReply = sql`not ${hasReplied}`
 
 const dueDate = sql`coalesce(

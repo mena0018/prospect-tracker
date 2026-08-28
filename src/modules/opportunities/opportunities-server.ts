@@ -18,7 +18,8 @@ import {
   buildWhere,
   hasReplied,
   inInterview,
-  notSaved,
+  isContacted,
+  isTerminal,
   rescheduledReminder,
   isArchivedRow,
   isDueExpression,
@@ -125,6 +126,8 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
         dueToday: sql<number>`count(*) filter (where ${isDue})`.mapWith(Number),
         stale: sql<number>`count(*) filter (
           where not ${isArchivedRow}
+            and not ${isTerminal}
+            and ${isContacted}
             and ${awaitingReply}
             and ${opportunities.lastContactAt} is not null
             and (${today}::date - ${opportunities.lastContactAt}) > ${STALE_THRESHOLD_DAYS}
@@ -133,10 +136,10 @@ export const getOpportunitiesSummary = createServerFn({ method: 'GET' })
           where not ${isArchivedRow} and ${inInterview}
         )`.mapWith(Number),
         contacted: sql<number>`count(*) filter (
-          where ${notSaved}
+          where ${isContacted}
         )`.mapWith(Number),
         replied: sql<number>`count(*) filter (
-          where ${notSaved} and ${hasReplied}
+          where ${isContacted} and ${hasReplied}
         )`.mapWith(Number),
         activeCount: sql<number>`count(*) filter (
           where not ${isArchivedRow} and ${matches}
