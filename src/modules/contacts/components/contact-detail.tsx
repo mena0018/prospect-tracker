@@ -90,6 +90,8 @@ function ContactHeader({ contact, onEdit, onDelete }: HeaderProps) {
           variant="outline"
           size="icon-sm"
           aria-label={m.contact_detailBack()}
+          // The render prop makes this an <a>, so Base UI must not treat it as a native button.
+          nativeButton={false}
           render={<Link to={APP_ROUTES.contacts} search={CONTACTS_SEARCH_DEFAULTS} />}
           className="text-secondary-foreground flex-none rounded-lg"
         >
