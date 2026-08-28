@@ -3,6 +3,8 @@ import { LayoutGroup } from 'motion/react'
 
 import { Button } from '@/components/ui/button'
 import { DebouncedInput } from '@/components/debounced-input'
+import { DisplayMenu } from '@/modules/opportunities/components/display-menu'
+import { COLUMN_LABELS, HIDABLE_COLUMNS } from '@/modules/opportunities/utils/display-settings'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -49,14 +51,26 @@ function TabCount({ value, isSelected }: { value: number; isSelected: boolean })
 export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
   const {
     tab: statusTab,
+    view,
+    hiddenColumns,
     search,
     isDueOnly,
     hasFilters,
     setTab,
     setSearch,
     setDueOnly,
+    setView,
+    toggleColumn,
     resetFilters
   } = useOpportunitiesFilters()
+
+  const labels = COLUMN_LABELS()
+
+  const columns = HIDABLE_COLUMNS.map((id) => ({
+    id,
+    label: labels[id],
+    isVisible: !hiddenColumns.includes(id)
+  }))
 
   return (
     <div className={TOOLBAR_LAYOUT}>
@@ -124,6 +138,12 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
           <FilterX />
           {m.table_resetFilters()}
         </Button>
+        <DisplayMenu
+          view={view}
+          onViewChange={setView}
+          columns={columns}
+          onToggleColumn={toggleColumn}
+        />
       </div>
     </div>
   )
@@ -138,6 +158,7 @@ export function OpportunitiesToolbarSkeleton() {
       <div className={SEARCH_LAYOUT}>
         <Skeleton className="h-9 grow @4xl:max-w-57.5" />
         <Skeleton className="h-9 w-21 flex-none" />
+        <Skeleton className="h-9 w-25 flex-none" />
       </div>
     </div>
   )
