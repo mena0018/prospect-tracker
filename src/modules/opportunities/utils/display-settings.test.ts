@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  hidableFieldsFor,
+  HIDABLE_FIELDS,
   isView,
-  parseHiddenColumns,
-  serializeHiddenColumns,
-  toggleHiddenColumn
+  parseHiddenFields,
+  serializeHiddenFields,
+  toggleHiddenField
 } from '@/modules/opportunities/utils/display-settings'
 
 describe('isView', () => {
@@ -15,33 +17,48 @@ describe('isView', () => {
   })
 })
 
-describe('parseHiddenColumns', () => {
-  it('drops anything that is not a hidable column', () => {
-    expect(parseHiddenColumns('esn,recruiter,nonsense,location')).toEqual(['esn', 'location'])
+describe('hidableFieldsFor', () => {
+  it('offers every field in list view', () => {
+    expect(hidableFieldsFor('list')).toEqual(HIDABLE_FIELDS)
+  })
+
+  // The card draws no location, so offering it would toggle nothing on screen.
+  it('drops the location in kanban, which the card does not draw', () => {
+    expect(hidableFieldsFor('kanban')).not.toContain('location')
+  })
+
+  it('offers only fields the shared vocabulary knows', () => {
+    expect(hidableFieldsFor('kanban').every((f) => HIDABLE_FIELDS.includes(f))).toBe(true)
+  })
+})
+
+describe('parseHiddenFields', () => {
+  it('drops anything that is not a hidable field', () => {
+    expect(parseHiddenFields('esn,recruiter,nonsense,location')).toEqual(['esn', 'location'])
   })
 
   it('reads an empty string as nothing hidden', () => {
-    expect(parseHiddenColumns('')).toEqual([])
+    expect(parseHiddenFields('')).toEqual([])
   })
 })
 
-describe('serializeHiddenColumns', () => {
+describe('serializeHiddenFields', () => {
   // Canonical order, so two ways of hiding the same pair produce one URL.
-  it('writes the columns in their declared order', () => {
-    expect(serializeHiddenColumns(['location', 'esn'])).toBe('esn,location')
+  it('writes the fields in their declared order', () => {
+    expect(serializeHiddenFields(['location', 'esn'])).toBe('esn,location')
   })
 
-  it('writes nothing when no column is hidden', () => {
-    expect(serializeHiddenColumns([])).toBe('')
+  it('writes nothing when no field is hidden', () => {
+    expect(serializeHiddenFields([])).toBe('')
   })
 })
 
-describe('toggleHiddenColumn', () => {
-  it('hides a visible column', () => {
-    expect(toggleHiddenColumn([], 'esn')).toEqual(['esn'])
+describe('toggleHiddenField', () => {
+  it('hides a visible field', () => {
+    expect(toggleHiddenField([], 'esn')).toEqual(['esn'])
   })
 
   it('shows a hidden one again', () => {
-    expect(toggleHiddenColumn(['esn', 'location'], 'esn')).toEqual(['location'])
+    expect(toggleHiddenField(['esn', 'location'], 'esn')).toEqual(['location'])
   })
 })

@@ -15,12 +15,14 @@ import { LiveRegion } from '@/shared/sortable/components/live-region'
 import { useBoardColumn, useBoardDnd } from '@/shared/board/hooks/use-board-dnd'
 import { useMoveAnnouncer } from '@/shared/board/hooks/use-move-announcer'
 import type { Stage } from '@/db/schema'
+import type { HidableField } from '@/modules/opportunities/utils/display-settings'
 import type { OpportunityRow } from '@/modules/opportunities/utils/rows'
 
 type Props = {
   rows: OpportunityRow[]
   stages: Stage[]
   today: string
+  hiddenFields: readonly HidableField[]
   dailyRateReference: number
   isFetching: boolean
   isTruncated: boolean
@@ -36,6 +38,7 @@ export function OpportunitiesBoard({
   rows,
   stages,
   today,
+  hiddenFields,
   dailyRateReference,
   isFetching,
   isTruncated,
@@ -88,6 +91,7 @@ export function OpportunitiesBoard({
             column={column}
             stages={stages}
             today={today}
+            hiddenFields={hiddenFields}
             dailyRateReference={dailyRateReference}
             onOpen={onOpen}
             onTogglePin={onTogglePin}
@@ -103,6 +107,7 @@ type ColumnProps = {
   column: BoardColumn
   stages: Stage[]
   today: string
+  hiddenFields: readonly HidableField[]
   dailyRateReference: number
   onOpen: (row: OpportunityRow) => void
   onTogglePin: (row: OpportunityRow) => void
@@ -113,6 +118,7 @@ function BoardColumnView({
   column,
   stages,
   today,
+  hiddenFields,
   dailyRateReference,
   onOpen,
   onTogglePin,
@@ -148,6 +154,7 @@ function BoardColumnView({
               row={row}
               stages={stages}
               today={today}
+              hiddenFields={hiddenFields}
               dailyRateReference={dailyRateReference}
               onOpen={() => onOpen(row)}
               onTogglePin={() => onTogglePin(row)}

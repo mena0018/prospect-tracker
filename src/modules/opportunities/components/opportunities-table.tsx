@@ -84,8 +84,7 @@ export function OpportunitiesTable({
   emptyTitle,
   emptyHint
 }: Props) {
-  const { sorting, pagination, hiddenColumns, setSorting, setPagination } =
-    useOpportunitiesFilters()
+  const { sorting, pagination, hiddenFields, setSorting, setPagination } = useOpportunitiesFilters()
 
   const paginationLabels = {
     range: m.table_rangeLabel,
@@ -192,7 +191,7 @@ export function OpportunitiesTable({
   // The accessor key is not the id: only an explicit `id` lands on the column def, which is what
   // both the visibility filter and the track lookup match on.
   const visibleColumns = columns.filter(
-    (column) => !hiddenColumns.some((hidden) => hidden === column.id)
+    (column) => !hiddenFields.some((hidden) => hidden === column.id)
   )
 
   const table = useTable({

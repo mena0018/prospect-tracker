@@ -13,17 +13,17 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { m } from '@/i18n/paraglide/messages'
-import { isView, type HidableColumn } from '@/modules/opportunities/utils/display-settings'
+import { isView, type HidableField } from '@/modules/opportunities/utils/display-settings'
 import type { View } from '@/modules/opportunities/opportunities-schema'
 
 type Props = {
   view: View
   onViewChange: (view: View) => void
-  columns: { id: HidableColumn; label: string; isVisible: boolean }[]
-  onToggleColumn: (id: HidableColumn) => void
+  fields: { id: HidableField; label: string; isVisible: boolean }[]
+  onToggleField: (id: HidableField) => void
 }
 
-export function DisplayMenu({ view, onViewChange, columns, onToggleColumn }: Props) {
+export function DisplayMenu({ view, onViewChange, fields, onToggleField }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -58,27 +58,23 @@ export function DisplayMenu({ view, onViewChange, columns, onToggleColumn }: Pro
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 
-        {/* Kanban has no columns to hide — the settings would name nothing on screen. */}
-        {view === 'list' && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="flex items-center gap-1.75">
-                <Columns3 className="size-3.5" />
-                {m.display_columnsGroupLabel()}
-              </DropdownMenuLabel>
-              {columns.map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  checked={column.isVisible}
-                  onCheckedChange={() => onToggleColumn(column.id)}
-                >
-                  {column.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuGroup>
-          </>
-        )}
+        {/* Both views: the table hides columns, the board hides lines on its cards. */}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex items-center gap-1.75">
+            <Columns3 className="size-3.5" />
+            {view === 'kanban' ? m.display_fieldsGroupLabel() : m.display_columnsGroupLabel()}
+          </DropdownMenuLabel>
+          {fields.map((field) => (
+            <DropdownMenuCheckboxItem
+              key={field.id}
+              checked={field.isVisible}
+              onCheckedChange={() => onToggleField(field.id)}
+            >
+              {field.label}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

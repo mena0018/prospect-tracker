@@ -369,5 +369,6 @@
   "board_today": "Today",
   "board_yesterday": "Yesterday",
   "board_daysAgo": "{days}d ago",
-  "board_monthsAgo": "{months}mo ago"
+  "board_monthsAgo": "{months}mo ago",
+  "display_fieldsGroupLabel": "Visible fields"
 }

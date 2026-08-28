@@ -4,8 +4,8 @@ import { m } from '@/i18n/paraglide/messages'
 import { toNumeric, toOptionalText } from '@/modules/opportunities/utils/form-values'
 import { tableSearchSchema } from '@/shared/table/table-schema'
 import {
-  parseHiddenColumns,
-  serializeHiddenColumns
+  parseHiddenFields,
+  serializeHiddenFields
 } from '@/modules/opportunities/utils/display-settings'
 
 // See docs/reference/data-model.md for the nullable + optional rule
@@ -161,10 +161,10 @@ export const OPPORTUNITIES_SEARCH_DEFAULTS = {
 export const opportunitiesSearchSchema = z.object({
   tab: z.enum(['active', 'archived']).catch(OPPORTUNITIES_SEARCH_DEFAULTS.tab),
   view: z.enum(VIEWS).catch(OPPORTUNITIES_SEARCH_DEFAULTS.view),
-  // Normalised in the schema, like `sort`: an unknown column never survives into the URL.
+  // Normalised in the schema, like `sort`: an unknown field never survives into the URL.
   hidden: z
     .string()
-    .transform((value) => serializeHiddenColumns(parseHiddenColumns(value)))
+    .transform((value) => serializeHiddenFields(parseHiddenFields(value)))
     .catch(OPPORTUNITIES_SEARCH_DEFAULTS.hidden),
   q: z.string().catch(OPPORTUNITIES_SEARCH_DEFAULTS.q),
   due: z.boolean().catch(OPPORTUNITIES_SEARCH_DEFAULTS.due),

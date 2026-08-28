@@ -4,7 +4,7 @@ import { LayoutGroup } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { DebouncedInput } from '@/components/debounced-input'
 import { DisplayMenu } from '@/modules/opportunities/components/display-menu'
-import { COLUMN_LABELS, HIDABLE_COLUMNS } from '@/modules/opportunities/utils/display-settings'
+import { FIELD_LABELS, hidableFieldsFor } from '@/modules/opportunities/utils/display-settings'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -52,7 +52,7 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
   const {
     tab: statusTab,
     view,
-    hiddenColumns,
+    hiddenFields,
     search,
     isDueOnly,
     hasFilters,
@@ -60,16 +60,17 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
     setSearch,
     setDueOnly,
     setView,
-    toggleColumn,
+    toggleField,
     resetFilters
   } = useOpportunitiesFilters()
 
-  const labels = COLUMN_LABELS()
+  const labels = FIELD_LABELS()
 
-  const columns = HIDABLE_COLUMNS.map((id) => ({
+  // Only what the current view draws — hiding a field it does not render would do nothing.
+  const fields = hidableFieldsFor(view).map((id) => ({
     id,
     label: labels[id],
-    isVisible: !hiddenColumns.includes(id)
+    isVisible: !hiddenFields.includes(id)
   }))
 
   return (
@@ -141,8 +142,8 @@ export function OpportunitiesToolbar({ activeCount, archivedCount }: Props) {
         <DisplayMenu
           view={view}
           onViewChange={setView}
-          columns={columns}
-          onToggleColumn={toggleColumn}
+          fields={fields}
+          onToggleField={toggleField}
         />
       </div>
     </div>

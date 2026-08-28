@@ -76,17 +76,22 @@ board snaps back to the exact counts it had, with an error toast.
 `onSettled` invalidates the whole opportunities key rather than the board's own: a stage change can
 move a row between the active and archived tabs and shifts the sidebar's stage counts.
 
-## Column visibility (list view)
+## Field visibility
 
-The Display menu also carries which table columns are visible, stored as `hidden=esn,location`.
+The Display menu also carries which fields are visible, stored as `hidden=esn,location`.
+
+**One vocabulary for both views.** `hidden=esn` means the same thing whichever view is on screen,
+so switching between them keeps the choice instead of resetting it. Each view then declares which
+of those fields it actually draws, and the menu offers only those — the card carries no location,
+so hiding it there would toggle nothing.
 
 It stores the **hidden** columns rather than the visible ones, so an untouched setting writes
 nothing to the URL and a column added later appears without a migration. The value is normalised in
 the schema the way `sort` is — an unknown column never survives into the URL — and serialised in a
 canonical order, so two ways of hiding the same pair produce one link.
 
-The recruiter and the stage cannot be hidden: one names the row, the other is what the table is
-about.
+The recruiter and the stage cannot be hidden in either view: one names the row, the other is what
+the view is about.
 
 Hiding a column drops its **grid track** as well as its cells. The track list is therefore built
 from the visible columns and passed as a CSS variable, not as an interpolated `grid-cols-[…]`

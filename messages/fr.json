@@ -387,5 +387,6 @@
   "board_today": "Aujourd'hui",
   "board_yesterday": "Hier",
   "board_daysAgo": "Il y a {days} j",
-  "board_monthsAgo": "Il y a {months} mois"
+  "board_monthsAgo": "Il y a {months} mois",
+  "display_fieldsGroupLabel": "Infos affichées"
 }

@@ -4,10 +4,10 @@ import { Route } from '@/routes/_authed/app.index'
 import { useTableSearch } from '@/shared/table/hooks/use-table-search'
 import { toDueOnly } from '@/modules/opportunities/utils/search-input'
 import {
-  parseHiddenColumns,
-  serializeHiddenColumns,
-  toggleHiddenColumn,
-  type HidableColumn
+  parseHiddenFields,
+  serializeHiddenFields,
+  toggleHiddenField,
+  type HidableField
 } from '@/modules/opportunities/utils/display-settings'
 import type { StatusTab } from '@/modules/opportunities/utils/rows'
 import {
@@ -34,12 +34,12 @@ export function useOpportunitiesFilters() {
   // Raw in the URL, normalised for every consumer — see docs/reference/server-side-table.md
   const query = search.q.trim()
 
-  const hiddenColumns = parseHiddenColumns(search.hidden)
+  const hiddenFields = parseHiddenFields(search.hidden)
 
   return {
     tab: search.tab,
     view: search.view,
-    hiddenColumns,
+    hiddenFields,
     search: search.q,
     query,
     isDueOnly,
@@ -54,8 +54,8 @@ export function useOpportunitiesFilters() {
     setView: (view: View) => {
       void navigate({ search: (previous) => ({ ...previous, view }), replace: true })
     },
-    toggleColumn: (column: HidableColumn) => {
-      const hidden = serializeHiddenColumns(toggleHiddenColumn(hiddenColumns, column))
+    toggleField: (field: HidableField) => {
+      const hidden = serializeHiddenFields(toggleHiddenField(hiddenFields, field))
       void navigate({ search: (previous) => ({ ...previous, hidden }), replace: true })
     },
     setSorting,

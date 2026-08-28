@@ -32,6 +32,7 @@ import { useStages } from '@/modules/stages/hooks/use-stages'
 import { useToday } from '@/hooks/use-today'
 import { useDailyRateReference } from '@/modules/customization/hooks/use-daily-rate-reference'
 import type { View } from '@/modules/opportunities/opportunities-schema'
+import type { HidableField } from '@/modules/opportunities/utils/display-settings'
 
 const PANEL_LAYOUT = 'flex h-full min-h-0 flex-col'
 const PANEL_CARD_LAYOUT =
@@ -40,7 +41,7 @@ const PANEL_CARD_LAYOUT =
 const BOARD_SKELETON_CARDS = 3
 
 export function OpportunitiesPanel() {
-  const { hasFilters, pagination, query, isDueOnly, view } = useOpportunitiesFilters()
+  const { hasFilters, pagination, query, isDueOnly, view, hiddenFields } = useOpportunitiesFilters()
 
   const stagesQuery = useStages()
   const dailyRateQuery = useDailyRateReference()
@@ -62,6 +63,7 @@ export function OpportunitiesPanel() {
       <div className={PANEL_CARD_LAYOUT}>
         {view === 'kanban' ? (
           <BoardView
+            hiddenFields={hiddenFields}
             summaryQuery={summaryQuery}
             stagesQuery={stagesQuery}
             dailyRateQuery={dailyRateQuery}
@@ -138,9 +140,10 @@ function BoardView({
   summaryQuery,
   stagesQuery,
   dailyRateQuery,
+  hiddenFields,
   emptyTitle,
   emptyHint
-}: ViewProps) {
+}: ViewProps & { hiddenFields: readonly HidableField[] }) {
   const today = useToday()
   const input = useBoardInput()
   const boardQuery = useBoard(input)
@@ -162,6 +165,7 @@ function BoardView({
             rows={toRows(board.rows, indexStages(stages))}
             stages={stages}
             today={today}
+            hiddenFields={hiddenFields}
             dailyRateReference={dailyRate.dailyRateReference}
             isFetching={boardQuery.isFetching}
             isTruncated={board.isTruncated}
