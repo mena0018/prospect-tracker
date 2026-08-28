@@ -50,15 +50,15 @@ export const isDueExpression = (today: string) =>
     and ${dueDate} <= ${today}::date
   )`
 
-// Deliberately disjoint from isDueExpression, and excludes rows created today.
-// See docs/reference/kpis.md
+// Disjoint from isDueExpression by construction — it negates that same expression, so a row can
+// never land in both, and one leaving the due side lands here instead of vanishing from the day's
+// total. Archived rows stay out of both. Excludes rows created today. See docs/reference/kpis.md
 export const isDoneTodayExpression = (today: string) =>
   sql<boolean>`(
     not ${isArchivedRow}
-    and not ${isTerminal}
     and ${opportunities.lastContactAt} = ${today}::date
     and ${opportunities.createdAt} < ${today}::date
-    and not (${dueDate} is not null and ${dueDate} <= ${today}::date)
+    and not ${isDueExpression(today)}
   )`
 
 export const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {

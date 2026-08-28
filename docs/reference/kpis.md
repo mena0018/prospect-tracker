@@ -173,9 +173,16 @@ advance twice as fast while the goalposts moved.
 
 Two consequences worth knowing:
 
-- **Due and done never overlap.** A row contacted today whose forced reminder is still in the
-  past stays _due_, not _done_: counting it on both sides inflated the day's total past the
-  number of real opportunities.
+- **Due and done never overlap**, by construction: `isDoneTodayExpression` ends with
+  `not isDueExpression(today)` rather than re-deriving the due date, so the two cannot drift
+  apart. A row contacted today whose forced reminder is still in the past stays _due_, not
+  _done_: counting it on both sides inflated the day's total past the number of real
+  opportunities.
+- **Moving a row to a terminal stage counts as done, not as vanished.** Following up and then
+  marking the opportunity Refusé takes it out of the due side; without this it left the total
+  too, so the day's workload silently shrank from `0/1` to nothing and the bar lost the work
+  the user had just done. Negating the due expression is what keeps that row on the done side.
+  An older terminal row that was not contacted today still counts on neither side.
 - **A row contacted twice in one day counts once.** `last_contact_at` is a date, not a log. An
   exact count needs a contact-history table, which belongs with the follow-up emails (DEV-23).
 - **Opportunities created today are excluded.** The creation form defaults `last_contact_at` to
