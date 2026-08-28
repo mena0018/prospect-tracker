@@ -37,11 +37,31 @@ A card's position inside its column is not persisted, and the board is explicit 
 
 Anything else would promise an ordering the next reload would not keep.
 
-## Dragging is an addition, never a replacement
+## The whole card is the drag source
 
-The same rule as the sortable lists, for the same reason: each card carries a grip **and** a menu
-whose entries move it to any other column. A mouse-only board would regress the keyboard path that
-Customize already ships.
+Unlike the sortable rows, a card carries **no grip**. Atlassian's own design guidelines put it this
+way: _"if an entity is draggable, make the whole entity draggable. If the entity has other
+interactive parts like buttons or dropdowns, make only the drag handle icon the draggable part."_
+
+The sortable rows take the second half of that sentence, because a stage row is built out of
+`CommittedInput`, `StageColorPicker` and a menu — there is barely any row left to grab, and
+`elementFromPoint` cannot hit-test around them reliably.
+
+A card is the opposite: it is mostly text, with two small controls in one corner. So it takes the
+first half. `canDrag` rejects a drag whose starting point lands on a control, which keeps pressing
+the pin or opening the menu from lifting the card. One subtlety: the card is itself a
+`role="button"`, so `closest()` finds _it_ from anywhere inside — the guard only counts a control
+that is not the card.
+
+The cost of dropping the grip is that nothing on the card announces it can be dragged, so the card
+says it another way: a `grab` cursor, and a hover state that lifts it a pixel with a deeper shadow.
+
+## Dragging is still an addition, never a replacement
+
+The same rule as the sortable lists, for the same reason: every card carries a menu whose entries
+move it to any other column. A mouse-only board would regress the keyboard path that Customize
+already ships. The card is a focusable `role="button"` that opens the panel on Enter or Space, and
+the menu beside it carries the moves.
 
 The menu lists every active stage except the card's own, which is not a destination. A card in the
 only active stage therefore renders no menu at all, rather than an empty one.

@@ -14,5 +14,7 @@ export const COLUMN_HEADER_LAYOUT =
 export const COLUMN_SCROLLER_LAYOUT =
   'flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-2.5 pb-2.5'
 
+// A named shadow, not an arbitrary one: `hover:shadow-md` has to win over the resting shadow, and
+// twMerge keeps both when their utility shapes differ.
 export const CARD_LAYOUT =
-  'group/card border-border bg-card relative flex flex-col gap-2 rounded-lg border p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors'
+  'group/card border-border bg-card relative flex flex-col gap-2 rounded-lg border p-3 text-left shadow-xs'

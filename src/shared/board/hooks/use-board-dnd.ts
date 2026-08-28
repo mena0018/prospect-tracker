@@ -69,9 +69,12 @@ export function useBoardDnd({ boardId, onMove }: Options) {
   )
 }
 
+// A drag that starts on a control is that control's, not the card's: pressing the pin or opening
+// the menu must not pick the card up. See docs/reference/board-mechanism.md
+const INTERACTIVE = 'button, a, input, select, textarea, [role="button"], [role="menuitem"]'
+
 export function useBoardCard(boardId: string, cardId: string, columnId: string, label: string) {
   const ref = useRef<HTMLDivElement>(null)
-  const handleRef = useRef<HTMLButtonElement>(null)
   const [isDragging, setIsDragging] = useState(false)
 
   // Read at drag time, not captured: a move re-renders every card in both columns, and depending
@@ -81,15 +84,23 @@ export function useBoardCard(boardId: string, cardId: string, columnId: string, 
 
   useEffect(() => {
     const element = ref.current
-    const handle = handleRef.current
-    if (!element || !handle) return
+    if (!element) return
 
     const data = { boardId, cardId, columnId }
 
     return combine(
       draggable({
         element,
-        dragHandle: handle,
+        // The whole card is the handle — it carries no inputs, so there is nothing to hit-test
+        // around except its own controls, which this excludes.
+        canDrag: ({ input }) => {
+          const target = document.elementFromPoint(input.clientX, input.clientY)
+          const control = target?.closest(INTERACTIVE)
+
+          // The card is itself a `role="button"`, so `closest` finds it from anywhere inside and
+          // would block every drag. Only a control *below* the card counts.
+          return !control || control === element
+        },
         getInitialData: () => data,
         onGenerateDragPreview: ({ nativeSetDragImage }) => {
           setCustomNativeDragPreview({
@@ -119,7 +130,7 @@ export function useBoardCard(boardId: string, cardId: string, columnId: string, 
     )
   }, [boardId, cardId, columnId])
 
-  return { ref, handleRef, isDragging }
+  return { ref, isDragging }
 }
 
 export function useBoardColumn(boardId: string, columnId: string) {
