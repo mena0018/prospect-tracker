@@ -40,7 +40,7 @@ CREATE INDEX "opportunity_contacts_opportunity_position_idx" ON "opportunity_con
 -- Backfill --------------------------------------------------------------------
 -- One contact per distinct recruiter name per user. Distinct is case- and accent-insensitive
 -- so "Thomas Vasseur" and "thomas vasseur" collapse into one relationship, and the surviving
--- spelling is the one that appears most often (ties broken by the earliest opportunity).
+-- spelling is the one from the earliest opportunity.
 --
 -- The name is split on the LAST space, so "Jean-Pierre Le Goff" keeps "Le Goff" together, and a
 -- single-word entry becomes a last name alone rather than landing in both columns.
@@ -50,7 +50,10 @@ WITH named AS (
     "id" AS opportunity_id,
     "esn",
     "created_at",
-    btrim("recruiter") AS recruiter
+    -- Internal runs of whitespace are collapsed here, so "John  Doe" and "John Doe" are one
+    -- person. Leaving them apart would split the group but not the split name, and the join
+    -- below would then match one opportunity to both contacts.
+    btrim(regexp_replace("recruiter", '\s+', ' ', 'g')) AS recruiter
   FROM "opportunities"
   WHERE btrim(coalesce("recruiter", '')) <> ''
 ),
@@ -64,38 +67,43 @@ grouped AS (
   FROM named
   GROUP BY "user_id", lower(immutable_unaccent(recruiter))
 ),
+-- Split once, reused by both the insert and the join, so the two can never disagree.
+split AS (
+  SELECT
+    "user_id",
+    recruiter_key,
+    company,
+    CASE WHEN strpos(recruiter, ' ') > 0
+      THEN nullif(btrim(substr(recruiter, 1, length(recruiter) - strpos(reverse(recruiter), ' '))), '')
+    END AS first_name,
+    CASE WHEN strpos(recruiter, ' ') > 0
+      THEN nullif(btrim(substr(recruiter, length(recruiter) - strpos(reverse(recruiter), ' ') + 2)), '')
+      ELSE recruiter
+    END AS last_name
+  FROM grouped
+),
 created AS (
   INSERT INTO "contacts" ("user_id", "first_name", "last_name", "company", "relationship")
   SELECT
     "user_id",
-    CASE WHEN strpos(recruiter, ' ') > 0
-      THEN nullif(btrim(substr(recruiter, 1, length(recruiter) - strpos(reverse(recruiter), ' '))), '')
-    END,
-    CASE WHEN strpos(recruiter, ' ') > 0
-      THEN nullif(btrim(substr(recruiter, length(recruiter) - strpos(reverse(recruiter), ' ') + 2)), '')
-      ELSE recruiter
-    END,
+    first_name,
+    last_name,
     company,
     -- Every migrated name came from the recruiter field, which is what an ESN manager is.
     'esn_manager'
-  FROM grouped
+  FROM split
   RETURNING "id", "user_id", "first_name", "last_name"
 )
 INSERT INTO "opportunity_contacts" ("opportunity_id", "contact_id", "position")
 SELECT named.opportunity_id, created."id", 0
 FROM named
-JOIN grouped
-  ON grouped."user_id" = named."user_id"
- AND grouped.recruiter_key = lower(immutable_unaccent(named.recruiter))
+JOIN split
+  ON split."user_id" = named."user_id"
+ AND split.recruiter_key = lower(immutable_unaccent(named.recruiter))
 JOIN created
-  ON created."user_id" = grouped."user_id"
- AND created."first_name" IS NOT DISTINCT FROM CASE WHEN strpos(grouped.recruiter, ' ') > 0
-       THEN nullif(btrim(substr(grouped.recruiter, 1, length(grouped.recruiter) - strpos(reverse(grouped.recruiter), ' '))), '')
-     END
- AND created."last_name" IS NOT DISTINCT FROM CASE WHEN strpos(grouped.recruiter, ' ') > 0
-       THEN nullif(btrim(substr(grouped.recruiter, length(grouped.recruiter) - strpos(reverse(grouped.recruiter), ' ') + 2)), '')
-       ELSE grouped.recruiter
-     END;--> statement-breakpoint
+  ON created."user_id" = split."user_id"
+ AND created."first_name" IS NOT DISTINCT FROM split.first_name
+ AND created."last_name" IS NOT DISTINCT FROM split.last_name;--> statement-breakpoint
 
 -- The text field disappears entirely: no cohabitation between two ways of storing a recruiter.
 ALTER TABLE "opportunities" DROP COLUMN "recruiter";--> statement-breakpoint
@@ -145,16 +153,30 @@ CREATE POLICY "opportunity_contacts_insert_own" ON "opportunity_contacts"
     )
   );--> statement-breakpoint
 
+-- Both sides on both clauses: checking only the contact would let a user repoint one of their
+-- own contacts at somebody else's opportunity by editing opportunity_id.
 CREATE POLICY "opportunity_contacts_update_own" ON "opportunity_contacts"
   FOR UPDATE TO authenticated
-  USING (EXISTS (
-    SELECT 1 FROM "contacts" c
-    WHERE c."id" = "contact_id" AND c."user_id" = (SELECT auth.uid())
-  ))
-  WITH CHECK (EXISTS (
-    SELECT 1 FROM "contacts" c
-    WHERE c."id" = "contact_id" AND c."user_id" = (SELECT auth.uid())
-  ));--> statement-breakpoint
+  USING (
+    EXISTS (
+      SELECT 1 FROM "contacts" c
+      WHERE c."id" = "contact_id" AND c."user_id" = (SELECT auth.uid())
+    )
+    AND EXISTS (
+      SELECT 1 FROM "opportunities" o
+      WHERE o."id" = "opportunity_id" AND o."user_id" = (SELECT auth.uid())
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM "contacts" c
+      WHERE c."id" = "contact_id" AND c."user_id" = (SELECT auth.uid())
+    )
+    AND EXISTS (
+      SELECT 1 FROM "opportunities" o
+      WHERE o."id" = "opportunity_id" AND o."user_id" = (SELECT auth.uid())
+    )
+  );--> statement-breakpoint
 
 CREATE POLICY "opportunity_contacts_delete_own" ON "opportunity_contacts"
   FOR DELETE TO authenticated
