@@ -8,6 +8,7 @@ import {
   SheetFormHeader
 } from '@/components/sheet-form'
 import type { ExperienceLevel, JobType, Stage } from '@/db/schema'
+import type { LinkedContact } from '@/modules/contacts/contacts-types'
 import { m } from '@/i18n/paraglide/messages'
 import { ContactSection } from '@/modules/opportunities/components/sheet/contact-section'
 import { MissionSection } from '@/modules/opportunities/components/sheet/mission-section'
@@ -27,6 +28,9 @@ type Props = {
   stages: Stage[]
   jobTypes: JobType[]
   experienceLevels: ExperienceLevel[]
+  // Every contact the picker has resolved this session, so ids can be rendered as names.
+  knownContacts: LinkedContact[]
+  onCreateContact: () => void
   onSubmit: (values: ReturnType<typeof opportunityFormSchema.parse>) => Promise<void>
 }
 
@@ -37,6 +41,8 @@ export function OpportunitySheet({
   stages,
   jobTypes,
   experienceLevels,
+  knownContacts,
+  onCreateContact,
   onSubmit
 }: Props) {
   const isEdit = row !== null
@@ -87,7 +93,19 @@ export function OpportunitySheet({
             form.handleSubmit().catch(() => {})
           }}
         >
-          <ContactSection form={form} />
+          <form.Subscribe selector={(state) => state.values.contactIds}>
+            {(contactIds) => (
+              <ContactSection
+                form={form}
+                // Order follows the form's own list, not the lookup's — position is meaning.
+                linkedContacts={contactIds.flatMap((id) => {
+                  const contact = knownContacts.find((entry) => entry.id === id)
+                  return contact ? [contact] : []
+                })}
+                onCreateContact={onCreateContact}
+              />
+            )}
+          </form.Subscribe>
           <MissionSection form={form} jobTypes={jobTypes} experienceLevels={experienceLevels} />
           <TrackingSection form={form} stages={offered} />
         </SheetFormBody>

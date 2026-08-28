@@ -1,10 +1,13 @@
 import type { Opportunity, Stage } from '@/db/schema'
+import type { LinkedContact } from '@/modules/contacts/contacts-types'
 import type { StageIndex } from '@/modules/stages/stages-utils'
 
 // Computed by SQL, never recomputed here — see docs/reference/data-model.md
 export type OpportunityDueFlags = Opportunity & {
   isDue: boolean
   isArchivedRow: boolean
+  // Ordered by position: the first is the contact who pitched — see docs/reference/contacts.md
+  contacts: LinkedContact[]
 }
 
 export type OpportunityRow = OpportunityDueFlags & {
