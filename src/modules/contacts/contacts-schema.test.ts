@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { m } from '@/i18n/paraglide/messages'
-import { contactFormSchema, updateContactSchema } from './contacts-schema'
+import { contactFormSchema, createContactSchema, updateContactSchema } from './contacts-schema'
 import { toContactFormValues } from './utils/form-values'
 
 const parse = (overrides: Partial<ReturnType<typeof toContactFormValues>> = {}) =>
@@ -85,5 +85,28 @@ describe('updateContactSchema', () => {
     const result = updateContactSchema.safeParse({ id, firstName: null, lastName: 'Vasseur' })
 
     expect(result.success).toBe(true)
+  })
+
+  // The patch goes straight into the UPDATE, so a defaulted key would wipe stored reachability.
+  it('omits absent keys instead of defaulting them', () => {
+    const result = updateContactSchema.parse({ id })
+
+    expect(result).toEqual({ id })
+  })
+
+  it('keeps explicitly sent list values', () => {
+    const result = updateContactSchema.parse({ id, emails: ['t@v.co'], relationship: 'end_client' })
+
+    expect(result).toMatchObject({ emails: ['t@v.co'], relationship: 'end_client' })
+  })
+
+  it('still rejects an invalid email inside a patch', () => {
+    expect(updateContactSchema.safeParse({ id, emails: ['nope'] }).success).toBe(false)
+  })
+
+  it('defaults the lists on create, where the row is new', () => {
+    const result = createContactSchema.parse({ lastName: 'Vasseur' })
+
+    expect(result).toMatchObject({ emails: [], phones: [], relationship: 'other' })
   })
 })

@@ -14,16 +14,18 @@ export const ContactSection = withForm({
   props: {
     // Resolved records for the ids the form holds — the field renders names, not uuids.
     linkedContacts: [] as LinkedContact[],
-    onCreateContact: () => {}
+    onCreateContact: () => {},
+    // Linking is owned by the sheet: it both remembers the record and writes the id.
+    onLinkContact: (_contact: LinkedContact) => {}
   },
-  render: function Render({ form, linkedContacts, onCreateContact }) {
+  render: function Render({ form, linkedContacts, onCreateContact, onLinkContact }) {
     return (
       <SheetFormSection title={m.contact_sectionContacts()}>
         <form.AppField name="contactIds">
           {(field) => (
             <LinkedContactsField
               contacts={linkedContacts}
-              onLink={(contact) => field.handleChange([...field.state.value, contact.id])}
+              onLink={onLinkContact}
               onUnlink={(contactId) =>
                 field.handleChange(field.state.value.filter((id) => id !== contactId))
               }

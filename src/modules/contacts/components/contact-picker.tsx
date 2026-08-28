@@ -23,7 +23,7 @@ export function ContactPicker({ linkedIds, onPick, onCreateNew }: Props) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
 
-  const { data, isFetching } = useContactSearch(query.trim())
+  const { data, isFetching, isStale } = useContactSearch(query.trim())
   const results = (data ?? []).filter((contact) => !linkedIds.includes(contact.id))
 
   const pick = (contact: LinkedContact) => {
@@ -59,9 +59,11 @@ export function ContactPicker({ linkedIds, onPick, onCreateNew }: Props) {
               placeholder={m.contact_linkPlaceholder()}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => {
-                // Enter takes the first hit — the whole point of the picker.
+                // Enter takes the first hit — the whole point of the picker. Never while the
+                // list still shows the previous query's results, or Enter links the wrong person.
                 if (event.key !== 'Enter') return
                 event.preventDefault()
+                if (isStale) return
                 const first = results[0]
                 if (first) pick(first)
               }}

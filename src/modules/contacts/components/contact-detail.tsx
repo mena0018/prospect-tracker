@@ -59,8 +59,10 @@ export function ContactDetail({ contactId }: Props) {
               name={contactDisplayName(detail.contact)}
               isPending={editor.isDeleting}
               onConfirm={() => {
-                void editor.confirmDelete().then(() => {
-                  // The record no longer exists, so staying on its page would 404 on refetch.
+                void editor.confirmDelete().then((deleted) => {
+                  // Only once it is really gone: staying would 404 on refetch, but leaving after
+                  // a failure would hide the error behind a navigation.
+                  if (!deleted) return
                   void navigate({ to: APP_ROUTES.contacts, search: CONTACTS_SEARCH_DEFAULTS })
                 })
               }}

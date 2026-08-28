@@ -1,5 +1,6 @@
-import { createContext, use, useState, type PropsWithChildren } from 'react'
+import { createContext, use, useCallback, useRef, useState, type PropsWithChildren } from 'react'
 
+import type { LinkedContact } from '@/modules/contacts/contacts-types'
 import { ContactSheet } from '@/modules/contacts/components/contact-sheet'
 import { useContactEditor } from '@/modules/contacts/hooks/use-contact-editor'
 import { useKnownContacts } from '@/modules/contacts/hooks/use-known-contacts'
@@ -21,6 +22,12 @@ export function OpportunityEditorProvider({ children }: PropsWithChildren) {
   // The row being edited already carries its linked contacts; the picker adds the rest.
   const { knownContacts, remember } = useKnownContacts(editor.editor?.row?.contacts ?? [])
   const contactEditor = useContactEditor()
+  // Set while the opportunity sheet is open, so a contact created from it is linked, not merely
+  // created — see docs/reference/contacts.md
+  const linkRef = useRef<((contact: LinkedContact) => void) | null>(null)
+  const registerLinker = useCallback((link: ((contact: LinkedContact) => void) | null) => {
+    linkRef.current = link
+  }, [])
   const { data: stages } = useStages()
   const { data: jobTypes } = useJobTypes()
   const { data: experienceLevels } = useExperienceLevels()
@@ -48,6 +55,8 @@ export function OpportunityEditorProvider({ children }: PropsWithChildren) {
           experienceLevels={experienceLevels ?? []}
           knownContacts={knownContacts}
           onCreateContact={contactEditor.openCreate}
+          onRememberContact={remember}
+          registerLinker={registerLinker}
           onSubmit={editor.submit}
         />
       ) : null}
@@ -59,7 +68,12 @@ export function OpportunityEditorProvider({ children }: PropsWithChildren) {
         }}
         contact={contactEditor.editor?.contact ?? null}
         onSubmit={async (values) => {
-          remember(await contactEditor.submit(values))
+          const isCreate = contactEditor.editor?.contact == null
+          const saved = await contactEditor.submit(values)
+          // A contact created from the opportunity sheet is linked straight away; editing an
+          // existing one only refreshes what the form renders.
+          if (isCreate && linkRef.current) linkRef.current(saved)
+          else remember(saved)
         }}
       />
 

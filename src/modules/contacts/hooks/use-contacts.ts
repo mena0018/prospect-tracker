@@ -29,11 +29,15 @@ export function useContact(id: string) {
 }
 
 // The link picker: enabled only once something is typed, so opening the sheet costs nothing.
+// Previous results are kept so the list does not blink between keystrokes, but they belong to
+// the old query — `isStale` lets the caller refuse to act on them. See docs/reference/contacts.md
 export function useContactSearch(q: string) {
-  return useQuery({
+  const query = useQuery({
     queryKey: [...CONTACTS_QUERY_KEY, 'search', q],
     queryFn: () => searchContacts({ data: { q, limit: 8 } }),
     enabled: q.length > 0,
     placeholderData: (previous) => previous
   })
+
+  return { ...query, isStale: query.isPlaceholderData }
 }

@@ -114,9 +114,18 @@ export const contactFormSchema = z
 
 export const createContactSchema = contactFieldsSchema
 
+// `.partial()` alone is not enough: a key carrying `.default()` still materialises that default
+// when omitted, so an id-only patch would arrive as `{ emails: [], phones: [], relationship:
+// 'other' }` and wipe stored reachability. See docs/reference/contacts.md
+const patchFields = contactFields.partial().extend({
+  emails: emailList.unwrap().optional(),
+  phones: phoneList.unwrap().optional(),
+  relationship: z.enum(CONTACT_RELATIONSHIPS).optional()
+})
+
 // A patch may omit every name, but it must not blank out all three at once.
 export const updateContactSchema = z
-  .object({ id: z.uuid(), ...contactFields.partial().shape })
+  .object({ id: z.uuid(), ...patchFields.shape })
   .refine(
     (values) =>
       values.firstName === undefined &&

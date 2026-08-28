@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
@@ -31,6 +31,10 @@ type Props = {
   // Every contact the picker has resolved this session, so ids can be rendered as names.
   knownContacts: LinkedContact[]
   onCreateContact: () => void
+  onRememberContact: (contact: LinkedContact) => void
+  // A contact created from this sheet must land in the form; the contact sheet lives outside it,
+  // so the provider is handed a way to push one back in. See docs/reference/contacts.md
+  registerLinker: (link: ((contact: LinkedContact) => void) | null) => void
   onSubmit: (values: ReturnType<typeof opportunityFormSchema.parse>) => Promise<void>
 }
 
@@ -43,6 +47,8 @@ export function OpportunitySheet({
   experienceLevels,
   knownContacts,
   onCreateContact,
+  onRememberContact,
+  registerLinker,
   onSubmit
 }: Props) {
   const isEdit = row !== null
@@ -58,6 +64,20 @@ export function OpportunitySheet({
     fallbackStageId: offered[0]?.id ?? '',
     reminderDelayDays: offered[0]?.reminderDelayDays ?? 0,
     onSubmit
+  })
+
+  // Linking is the same gesture whether the contact came from the picker or was just created.
+  const link = (contact: LinkedContact) => {
+    onRememberContact(contact)
+    const current = form.state.values.contactIds
+    if (current.includes(contact.id)) return
+    form.setFieldValue('contactIds', [...current, contact.id])
+  }
+
+  useEffect(() => {
+    if (!open) return
+    registerLinker(link)
+    return () => registerLinker(null)
   })
 
   const requestClose = () => {
@@ -103,6 +123,7 @@ export function OpportunitySheet({
                   return contact ? [contact] : []
                 })}
                 onCreateContact={onCreateContact}
+                onLinkContact={link}
               />
             )}
           </form.Subscribe>

@@ -53,6 +53,13 @@ carrying a refinement. The identity rule is therefore a standalone predicate, ap
 create schema whole, and to the patch only when it actually touches one of the three names —
 a patch setting `city` must not be rejected for saying nothing about the name.
 
+`.partial()` is also not enough on its own: a key carrying `.default()` still materialises that
+default when omitted, so `{ id }` alone parsed to `{ emails: [], phones: [], relationship:
+'other' }` and `updateContact` handed that straight to the `UPDATE` — a patch touching only the
+city wiped every stored email and phone. The patch schema therefore re-declares those three keys
+as plain optionals, while create keeps its defaults, where they are correct because the row is
+new.
+
 ## Searching by phone number — the incoming call
 
 A phone number is typed and stored in whatever shape each person prefers: `+33 6 12 34 56 78`,
@@ -108,6 +115,13 @@ single-word entry becomes a **last name alone**. Splitting on the first space wi
 `substr(name, strpos(name, ' ') + 1)` was tried and is wrong: `strpos` returns 0 when there is
 no space, `substr(name, 1)` hands back the whole string, and `Vanessa` lands in both columns.
 
+Internal whitespace is collapsed **before** grouping, and the split runs once in its own CTE
+that both the insert and the join read. Skipping either lets `John  Doe` and `John Doe` form two
+groups that split to the same `('John', 'Doe')`: the join then matches each opportunity to both
+contacts and writes two position-0 links. Replayed on a copy of production carrying that exact
+pair, the earlier shape produced 80 links for 78 opportunities; the current one produces 78,
+with no opportunity holding more than one link.
+
 Verified on a copy of production before running for real: 76 named opportunities → 52 contacts
 and 76 links, zero names lost, every per-contact opportunity count preserved, no duplicated or
 unidentified names.
@@ -119,8 +133,10 @@ exist anywhere, so the two representations cannot drift.
 
 `contacts` follows the `0001` shape exactly: owner column, `authenticated` only, one policy per
 operation. `opportunity_contacts` carries no owner column of its own, so its policies check
-ownership through the contact, and the INSERT policy checks the **opportunity side too** — a
-crafted payload must not link one account's opportunity to another's contact. The server
+ownership through the contact, and the INSERT **and UPDATE** policies check the **opportunity
+side too**, on both `USING` and `WITH CHECK` — a crafted payload must not link one account's
+opportunity to another's contact, and an UPDATE that only validated the contact would let a user
+repoint their own contact at somebody else's opportunity by editing `opportunity_id`. The server
 functions repeat that check because Drizzle bypasses RLS entirely; see
 [`data-access-security.md`](data-access-security.md).
 

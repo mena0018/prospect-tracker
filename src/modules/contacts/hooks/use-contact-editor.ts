@@ -33,15 +33,19 @@ export function useContactEditor() {
     [create, editor, update]
   )
 
+  // Reports whether the row is really gone: the caller navigates away on success, and a failed
+  // delete must leave the user on the record — the toast is the only other feedback.
   const confirmDelete = useCallback(async () => {
-    if (!deleting) return
+    if (!deleting) return false
 
     try {
       await remove.mutateAsync(deleting.id)
       setDeleting(null)
       setEditor(null)
+      return true
     } catch {
       // Handled by the mutation's onError.
+      return false
     }
   }, [deleting, remove])
 
