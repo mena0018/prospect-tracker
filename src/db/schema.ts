@@ -201,9 +201,15 @@ export const opportunityContacts = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.opportunityId, table.contactId] }),
+    // Position 0 means "the contact who pitched", so it must identify exactly one row, and a
+    // negative rank has no meaning — see docs/reference/contacts.md
+    check('opportunity_contacts_position_positive', sql`${table.position} >= 0`),
+    uniqueIndex('opportunity_contacts_opportunity_position_key').on(
+      table.opportunityId,
+      table.position
+    ),
     // Reading a contact's own opportunities drives this direction — see docs/reference/contacts.md
-    index('opportunity_contacts_contact_idx').on(table.contactId),
-    index('opportunity_contacts_opportunity_position_idx').on(table.opportunityId, table.position)
+    index('opportunity_contacts_contact_idx').on(table.contactId)
   ]
 )
 

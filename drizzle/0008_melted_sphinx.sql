@@ -44,8 +44,12 @@ CREATE INDEX "opportunity_contacts_opportunity_position_idx" ON "opportunity_con
 -- so "Thomas Vasseur" and "thomas vasseur" collapse into one relationship, and the surviving
 -- spelling is the one from the earliest opportunity.
 --
--- The name is split on the LAST space, so "Jean-Pierre Le Goff" keeps "Le Goff" together, and a
--- single-word entry becomes a last name alone rather than landing in both columns.
+-- The name is split on the LAST space: a single-word entry becomes a last name alone rather than
+-- landing in both columns. This is a heuristic, not a parser — a particle is not detected, so
+-- "Jean-Pierre Le Goff" yields first="Jean-Pierre Le", last="Goff". The displayed name is
+-- unaffected (the two are concatenated back), only the split is approximate, and the user can
+-- fix it on the contact record. Splitting on the FIRST space is worse: it breaks every compound
+-- first name.
 WITH named AS (
   SELECT
     "user_id",
