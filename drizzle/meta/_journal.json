@@ -57,6 +57,20 @@
       "when": 1787162067205,
       "tag": "0007_stages_system_key",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787863552268,
+      "tag": "0008_melted_sphinx",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787987450620,
+      "tag": "0009_bent_bill_hollister",
+      "breakpoints": true
     }
   ]
 }

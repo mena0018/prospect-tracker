@@ -1,8 +1,10 @@
 import { m } from '@/i18n/paraglide/messages'
+import { contactDisplayName, primaryContact } from '@/modules/contacts/utils/display'
 import { CONFIG } from '@/lib/config'
 import { formatValue } from '@/lib/utils'
 import { NOTES_MAX_LENGTH, SORT_COLUMNS } from '@/modules/opportunities/opportunities-schema'
 import type { SortColumn } from '@/modules/opportunities/opportunities-schema'
+import type { OpportunityRow } from '@/modules/opportunities/utils/rows'
 
 export function toSortColumn(value: string): SortColumn | null {
   return SORT_COLUMNS.find((column) => column === value) ?? null
@@ -44,4 +46,18 @@ export function notesRemainingTone(remaining: number) {
   }
 
   return remaining <= NOTES_MAX_LENGTH * NOTES_WARNING_RATIO ? 'text-warning' : undefined
+}
+
+// Whatever identifies an opportunity in prose: the contact who pitched it, else the mission or
+// the ESN. An opportunity can carry no contact at all, so this never assumes one.
+export function opportunityLabel(row: OpportunityRow) {
+  const contact = primaryContact(row.contacts)
+
+  return (
+    (contact && contactDisplayName(contact)) ||
+    row.need ||
+    row.esn ||
+    row.endClient ||
+    m.opportunity_untitled()
+  )
 }

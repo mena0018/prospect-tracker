@@ -1,6 +1,8 @@
 import { withForm } from '@/components/form/form-hook'
 import { SheetFormSection } from '@/components/sheet-form'
 import { m } from '@/i18n/paraglide/messages'
+import type { LinkedContact } from '@/modules/contacts/contacts-types'
+import { LinkedContactsField } from '@/modules/contacts/components/linked-contacts-field'
 import {
   EMPTY_FORM_VALUES,
   FULL_WIDTH,
@@ -9,33 +11,30 @@ import {
 
 export const ContactSection = withForm({
   defaultValues: EMPTY_FORM_VALUES,
-  render: function Render({ form }) {
+  props: {
+    // Resolved records for the ids the form holds — the field renders names, not uuids.
+    linkedContacts: [] as LinkedContact[],
+    onCreateContact: () => {},
+    // Linking is owned by the sheet: it both remembers the record and writes the id.
+    onLinkContact: (_contact: LinkedContact) => {}
+  },
+  render: function Render({ form, linkedContacts, onCreateContact, onLinkContact }) {
     return (
-      <SheetFormSection>
+      <SheetFormSection title={m.contact_sectionContacts()}>
+        <form.AppField name="contactIds">
+          {(field) => (
+            <LinkedContactsField
+              contacts={linkedContacts}
+              onLink={onLinkContact}
+              onUnlink={(contactId) =>
+                field.handleChange(field.state.value.filter((id) => id !== contactId))
+              }
+              onCreateNew={onCreateContact}
+            />
+          )}
+        </form.AppField>
+
         <div className={GRID}>
-          <form.AppField name="recruiter">
-            {(field) => (
-              <field.TextInputField
-                size="form"
-                label={m.opportunity_recruiterLabel()}
-                placeholder={m.opportunity_recruiterPlaceholder()}
-                required
-              />
-            )}
-          </form.AppField>
-
-          <form.AppField name="phone">
-            {(field) => (
-              <field.TextInputField
-                size="form"
-                label={m.opportunity_phoneLabel()}
-                placeholder={m.opportunity_phonePlaceholder()}
-                type="tel"
-                tabular
-              />
-            )}
-          </form.AppField>
-
           <form.AppField name="esn">
             {(field) => (
               <field.TextInputField
@@ -52,6 +51,18 @@ export const ContactSection = withForm({
                 size="form"
                 label={m.opportunity_endClientLabel()}
                 placeholder={m.opportunity_endClientPlaceholder()}
+              />
+            )}
+          </form.AppField>
+
+          <form.AppField name="phone">
+            {(field) => (
+              <field.TextInputField
+                size="form"
+                label={m.opportunity_phoneLabel()}
+                placeholder={m.opportunity_phonePlaceholder()}
+                type="tel"
+                tabular
               />
             )}
           </form.AppField>

@@ -13,11 +13,8 @@ export const opportunityFieldsSchema = z.object({
   stageId: z.uuid({ error: () => m.validation_stageRequired() }),
   jobTypeId: z.uuid().nullable().optional(),
   experienceId: z.uuid().nullable().optional(),
-  recruiter: z
-    .string()
-    .trim()
-    .min(1, { error: () => m.validation_recruiterRequired() })
-    .max(200, { error: () => m.validation_recruiterTooLong() }),
+  // Written to the join table in the same transaction as the row — see docs/reference/contacts.md
+  contactIds: z.array(z.uuid()).max(20).optional(),
   esn: nullableText,
   endClient: nullableText,
   need: nullableText,
@@ -63,7 +60,9 @@ export type OpportunityFormValues = {
   stageId: string
   jobTypeId: string | null
   experienceId: string | null
-  recruiter: string
+  // Ids only: the sheet links contacts through their own server fn, and the list is written
+  // alongside the opportunity on save — see docs/reference/contacts.md
+  contactIds: string[]
   esn: string
   endClient: string
   need: string
@@ -123,7 +122,7 @@ export const PAGE_SIZES: readonly number[] = [8, 10, 15] as const
 // Whitelist, not a hint: the value reaches an ORDER BY.
 export const SORT_COLUMNS = [
   'lastContactAt',
-  'recruiter',
+  'contact',
   'esn',
   'endClient',
   'dailyRate',

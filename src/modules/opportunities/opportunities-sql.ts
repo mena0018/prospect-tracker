@@ -1,7 +1,9 @@
 import { and, eq, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
 
 import {
+  contacts,
   opportunities,
+  opportunityContacts,
   stages,
   STAGE_SYSTEM_KEY,
   TERMINAL_STAGE_KEYS,
@@ -61,9 +63,23 @@ export const isDoneTodayExpression = (today: string) =>
     and not ${isDueExpression(today)}
   )`
 
-export const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
+// The contact who pitched: position 0 on the link. Correlated rather than joined, so an
+// opportunity with no contact still returns its row — see docs/reference/contacts.md
+const primaryContactName = sql`(
+  select coalesce(
+    nullif(btrim(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName})), ''),
+    ${contacts.company}
+  )
+  from ${opportunityContacts}
+  join ${contacts} on ${contacts.id} = ${opportunityContacts.contactId}
+  where ${opportunityContacts.opportunityId} = ${opportunities.id}
+  order by ${opportunityContacts.position}, ${opportunityContacts.createdAt}
+  limit 1
+)`
+
+export const SORT_EXPRESSIONS: Record<SortColumn, SQL | AnyColumn> = {
   lastContactAt: opportunities.lastContactAt,
-  recruiter: opportunities.recruiter,
+  contact: primaryContactName,
   esn: opportunities.esn,
   endClient: opportunities.endClient,
   dailyRate: opportunities.dailyRate,
@@ -72,13 +88,23 @@ export const SORT_EXPRESSIONS: Record<SortColumn, AnyColumn> = {
 }
 
 const SEARCH_COLUMNS = [
-  opportunities.recruiter,
   opportunities.esn,
   opportunities.endClient,
   opportunities.need,
   opportunities.location,
   stages.name
 ]
+
+// Searching by recruiter name still works, it just reads the linked contacts now — ANY of them,
+// not only the primary one, and the company too, since a nameless contact is shown under it.
+// See docs/reference/contacts.md
+const matchesSomeContact = (term: string) => sql`exists (
+  select 1 from ${opportunityContacts}
+  join ${contacts} on ${contacts.id} = ${opportunityContacts.contactId}
+  where ${opportunityContacts.opportunityId} = ${opportunities.id}
+    and immutable_unaccent(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName}, ${contacts.company}))
+        ilike immutable_unaccent(${'%' + term + '%'})
+)`
 
 // Terms AND-ed, columns OR-ed, both sides unaccented — see docs/reference/server-side-table.md
 export function searchMatch(q: string) {
@@ -90,7 +116,8 @@ export function searchMatch(q: string) {
       // Unaccenting the column, not just the term, is what keeps the expression indexes in play.
       ...SEARCH_COLUMNS.map(
         (column) => sql`immutable_unaccent(${column}) ilike immutable_unaccent(${`%${term}%`})`
-      )
+      ),
+      matchesSomeContact(term)
     )
 
   return and(...terms.map(matchesSomeColumn)) ?? null
