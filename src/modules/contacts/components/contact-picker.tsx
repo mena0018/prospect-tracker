@@ -6,7 +6,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Spinner } from '@/components/ui/spinner'
 import { m } from '@/i18n/paraglide/messages'
-import { cn } from '@/lib/utils'
 import { ContactIdentity } from '@/modules/contacts/components/contact-identity'
 import { useContactSearch } from '@/modules/contacts/hooks/use-contacts'
 import type { LinkedContact } from '@/modules/contacts/contacts-types'
@@ -24,7 +23,9 @@ export function ContactPicker({ linkedIds, onPick, onCreateNew }: Props) {
   const [query, setQuery] = useState('')
 
   const { data, isFetching, isStale } = useContactSearch(query.trim())
-  const results = (data ?? []).filter((contact) => !linkedIds.includes(contact.id))
+  // Stale results belong to the previous query. Dropping them here covers every path at once —
+  // Enter, click and keyboard — so none can link the person the user just stopped searching for.
+  const results = isStale ? [] : (data ?? []).filter((contact) => !linkedIds.includes(contact.id))
 
   const pick = (contact: LinkedContact) => {
     onPick(contact)
@@ -59,11 +60,10 @@ export function ContactPicker({ linkedIds, onPick, onCreateNew }: Props) {
               placeholder={m.contact_linkPlaceholder()}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => {
-                // Enter takes the first hit — the whole point of the picker. Never while the
-                // list still shows the previous query's results, or Enter links the wrong person.
+                // Enter takes the first hit — the whole point of the picker. `results` is empty
+                // while the previous query's rows are still showing, so this cannot fire on them.
                 if (event.key !== 'Enter') return
                 event.preventDefault()
-                if (isStale) return
                 const first = results[0]
                 if (first) pick(first)
               }}
@@ -73,17 +73,15 @@ export function ContactPicker({ linkedIds, onPick, onCreateNew }: Props) {
 
         <div className="max-h-64 overflow-y-auto p-1">
           {results.map((contact) => (
-            <button
+            <Button
               key={contact.id}
               type="button"
+              variant="ghost"
               onClick={() => pick(contact)}
-              className={cn(
-                'hover:bg-accent focus-visible:ring-ring flex w-full items-center rounded-lg px-2 py-1.5 text-left',
-                'focus-visible:ring-2 focus-visible:outline-none'
-              )}
+              className="h-auto w-full justify-start px-2 py-1.5 text-left font-normal"
             >
               <ContactIdentity contact={contact} />
-            </button>
+            </Button>
           ))}
 
           {query.trim() && results.length === 0 && !isFetching ? (
