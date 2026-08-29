@@ -66,7 +66,10 @@ export const isDoneTodayExpression = (today: string) =>
 // The contact who pitched: position 0 on the link. Correlated rather than joined, so an
 // opportunity with no contact still returns its row — see docs/reference/contacts.md
 const primaryContactName = sql`(
-  select btrim(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName}))
+  select coalesce(
+    nullif(btrim(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName})), ''),
+    ${contacts.company}
+  )
   from ${opportunityContacts}
   join ${contacts} on ${contacts.id} = ${opportunityContacts.contactId}
   where ${opportunityContacts.opportunityId} = ${opportunities.id}
@@ -93,12 +96,13 @@ const SEARCH_COLUMNS = [
 ]
 
 // Searching by recruiter name still works, it just reads the linked contacts now — ANY of them,
-// not only the primary one. See docs/reference/contacts.md
+// not only the primary one, and the company too, since a nameless contact is shown under it.
+// See docs/reference/contacts.md
 const matchesSomeContact = (term: string) => sql`exists (
   select 1 from ${opportunityContacts}
   join ${contacts} on ${contacts.id} = ${opportunityContacts.contactId}
   where ${opportunityContacts.opportunityId} = ${opportunities.id}
-    and immutable_unaccent(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName}))
+    and immutable_unaccent(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName}, ${contacts.company}))
         ilike immutable_unaccent(${'%' + term + '%'})
 )`
 

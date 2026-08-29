@@ -18,8 +18,13 @@ export const lastExchange = sql<string | null>`(
   where ${opportunityContacts.contactId} = ${contacts.id}
 )`
 
+// Mirrors `contactDisplayName`: a contact with no name is shown, and therefore sorted, under its
+// company — sorting on last_name alone would scatter those rows under an empty key.
+// See docs/reference/contacts.md
+const displayName = sql`coalesce(nullif(btrim(concat_ws(' ', ${contacts.firstName}, ${contacts.lastName})), ''), ${contacts.company})`
+
 export const SORT_EXPRESSIONS: Record<ContactSortColumn, SQL> = {
-  name: sql`${contacts.lastName}`,
+  name: displayName,
   company: sql`${contacts.company}`,
   relationship: sql`${contacts.relationship}`,
   lastExchange,
