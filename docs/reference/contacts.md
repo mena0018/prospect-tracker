@@ -53,12 +53,36 @@ carrying a refinement. The identity rule is therefore a standalone predicate, ap
 create schema whole, and to the patch only when it actually touches one of the three names —
 a patch setting `city` must not be rejected for saying nothing about the name.
 
+**The identity rule cannot live on the patch schema.** A patch carries only what changed, so
+`{ firstName: null }` says nothing about the stored last name or company — rejecting it there
+would refuse a legitimate edit. `updateContactSchema` therefore carries no identity refinement;
+`isIdentified` is exported and the server applies it to the **merged** row, inside the same
+transaction that reads it, mirroring the `contacts_identified` check constraint that would
+otherwise surface as a 500.
+
 `.partial()` is also not enough on its own: a key carrying `.default()` still materialises that
 default when omitted, so `{ id }` alone parsed to `{ emails: [], phones: [], relationship:
 'other' }` and `updateContact` handed that straight to the `UPDATE` — a patch touching only the
 city wiped every stored email and phone. The patch schema therefore re-declares those three keys
 as plain optionals, while create keeps its defaults, where they are correct because the row is
 new.
+
+### Sorting and searching follow the displayed identity
+
+A contact with no name is displayed under its company (`contactDisplayName`). The SQL has to
+agree, or those rows sort under an empty key and cannot be found: the contacts list sorts on
+`coalesce(nullif(btrim(first || ' ' || last), ''), company)`, the tracker's Contact column reads
+the same expression, and its search matches the company too. Three places, one rule — change one
+and the others must follow.
+
+### The link table's ordering invariants
+
+`position = 0` means "the contact who pitched", so it must identify exactly one row: migration
+`0009` adds a unique index on `(opportunity_id, position)` and a `position >= 0` check. The
+payload is guarded on the same axis — `contactIds` refuses a repeated id, which would otherwise
+collide on the join table's primary key and surface as a 500 rather than a field error. The
+server rewrites the whole list (delete then insert, one transaction), so the unique index never
+trips on a reorder.
 
 ## Searching by phone number — the incoming call
 
@@ -110,10 +134,16 @@ Distinctness is case- and accent-insensitive per user, so `Thomas Vasseur` and
 one on the earliest opportunity, and the ESN carried by that same opportunity becomes the
 contact's company — the best guess available from the data at hand.
 
-Names split on the **last** space, so `Jean-Pierre Le Goff` keeps `Le Goff` together. A
-single-word entry becomes a **last name alone**. Splitting on the first space with
-`substr(name, strpos(name, ' ') + 1)` was tried and is wrong: `strpos` returns 0 when there is
-no space, `substr(name, 1)` hands back the whole string, and `Vanessa` lands in both columns.
+Names split on the **last** space, and a single-word entry becomes a **last name alone**.
+Splitting on the first space with `substr(name, strpos(name, ' ') + 1)` was tried and is wrong:
+`strpos` returns 0 when there is no space, `substr(name, 1)` hands back the whole string, and
+`Vanessa` lands in both columns.
+
+This is a heuristic, not a name parser, and it does not detect particles: `Jean-Pierre Le Goff`
+splits to `first = "Jean-Pierre Le"`, `last = "Goff"`. The **displayed** name is unaffected —
+the two halves are concatenated back — so the cost is limited to sorting and to the structured
+value, which the user can correct on the record. No split-on-space rule gets both a compound
+first name and a particle right; splitting on the first space would break far more rows.
 
 Internal whitespace is collapsed **before** grouping, and the split runs once in its own CTE
 that both the insert and the join read. Skipping either lets `John  Doe` and `John Doe` form two

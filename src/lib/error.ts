@@ -7,6 +7,8 @@ const ERROR_MESSAGES = {
   VALIDATION: m.error_validation,
   CONFLICT: m.error_conflict,
   STAGE_SYSTEM_LOCKED: m.error_stageSystemLocked,
+  // Same wording as the form-level rule: the patch is only rejected once merged with the row.
+  CONTACT_IDENTITY_REQUIRED: m.validation_contactIdentityRequired,
   RATE_LIMITED: m.error_rateLimited,
   SERVER: m.error_server,
   AUTH_EMAIL_TAKEN: m.error_authEmailTaken,

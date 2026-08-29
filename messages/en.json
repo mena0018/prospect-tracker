@@ -417,6 +417,7 @@
   "table_colContact": "Contact",
   "validation_phoneTooLong": "Phone number too long (30 max).",
   "validation_linkedinInvalid": "Invalid LinkedIn URL.",
+  "validation_contactDuplicateLink": "This contact is already linked to this opportunity.",
   "validation_contactIdentityRequired": "Enter at least a name or a company.",
   "opportunity_untitled": "This opportunity",
   "contact_openRow": "Open {name}'s record"

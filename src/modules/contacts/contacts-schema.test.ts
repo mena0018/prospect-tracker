@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { m } from '@/i18n/paraglide/messages'
-import { contactFormSchema, createContactSchema, updateContactSchema } from './contacts-schema'
+import {
+  contactFormSchema,
+  createContactSchema,
+  isIdentified,
+  setOpportunityContactsSchema,
+  updateContactSchema
+} from './contacts-schema'
 import { toContactFormValues } from './utils/form-values'
 
 const parse = (overrides: Partial<ReturnType<typeof toContactFormValues>> = {}) =>
@@ -70,7 +76,9 @@ describe('updateContactSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('rejects a patch blanking every name at once', () => {
+  // Identity is no longer decided here: the patch alone cannot tell whether the stored row keeps
+  // a name. `isIdentified` carries the rule, and the server applies it to the merged row.
+  it('leaves the identity rule to the server, even when the patch blanks all three', () => {
     const result = updateContactSchema.safeParse({
       id,
       firstName: null,
@@ -78,7 +86,7 @@ describe('updateContactSchema', () => {
       company: null
     })
 
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
   })
 
   it('accepts a patch that keeps one name', () => {
@@ -108,5 +116,56 @@ describe('updateContactSchema', () => {
     const result = createContactSchema.parse({ lastName: 'Vasseur' })
 
     expect(result).toMatchObject({ emails: [], phones: [], relationship: 'other' })
+  })
+
+  // The stored row may still carry a name the patch says nothing about, so the identity rule
+  // cannot live here — the server applies it to the merged row instead.
+  it('accepts blanking one name, since the others are unknown at this point', () => {
+    expect(updateContactSchema.safeParse({ id, firstName: null }).success).toBe(true)
+  })
+})
+
+// What the server checks after merging the patch into the stored row.
+describe('isIdentified', () => {
+  it('accepts a row keeping any one of the three', () => {
+    expect(isIdentified({ firstName: null, lastName: 'Vasseur', company: null })).toBe(true)
+    expect(isIdentified({ firstName: null, lastName: null, company: 'Astek' })).toBe(true)
+  })
+
+  it('rejects a row that has none of them', () => {
+    expect(isIdentified({ firstName: null, lastName: null, company: null })).toBe(false)
+  })
+
+  // The merge is what makes a blanking patch safe or not.
+  it('is decided on the merged row, not the patch', () => {
+    const stored = { firstName: 'Thomas', lastName: 'Vasseur', company: null }
+
+    expect(isIdentified({ ...stored, firstName: null })).toBe(true)
+    expect(isIdentified({ ...stored, firstName: null, lastName: null })).toBe(false)
+  })
+})
+
+describe('setOpportunityContactsSchema', () => {
+  const opportunityId = '11111111-1111-4111-8111-111111111111'
+  const first = '22222222-2222-4222-8222-222222222222'
+  const second = '33333333-3333-4333-8333-333333333333'
+
+  it('accepts a list of distinct contacts', () => {
+    const result = setOpportunityContactsSchema.safeParse({
+      opportunityId,
+      contactIds: [first, second]
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  // Same id twice collides on the join table's primary key: a field error, not a 500.
+  it('rejects the same contact twice', () => {
+    const result = setOpportunityContactsSchema.safeParse({
+      opportunityId,
+      contactIds: [first, first]
+    })
+
+    expect(result.success).toBe(false)
   })
 })

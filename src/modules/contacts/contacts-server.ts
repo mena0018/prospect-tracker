@@ -10,6 +10,7 @@ import {
   createContactSchema,
   deleteContactSchema,
   getContactsSchema,
+  isIdentified,
   searchContactsSchema,
   setOpportunityContactsSchema,
   updateContactSchema
@@ -178,16 +179,30 @@ export const updateContact = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, ...fields } }): Promise<Contact> => {
     const { id: userId } = await requireUser()
 
-    // Drizzle bypasses RLS. See docs/reference/data-access-security.md.
-    const [updated] = await db
-      .update(contacts)
-      .set({ ...fields, updatedAt: new Date() })
-      .where(and(eq(contacts.id, id), eq(contacts.userId, userId)))
-      .returning()
+    return db.transaction(async (tx) => {
+      // Drizzle bypasses RLS. See docs/reference/data-access-security.md.
+      const [current] = await tx
+        .select()
+        .from(contacts)
+        .where(and(eq(contacts.id, id), eq(contacts.userId, userId)))
 
-    if (!updated) throw appError('NOT_FOUND')
+      if (!current) throw appError('NOT_FOUND')
 
-    return updated
+      // The identity rule applies to the row the patch produces, not to the patch: blanking one
+      // name is fine while another survives. Mirrors the `contacts_identified` check constraint,
+      // which would otherwise surface as a 500. See docs/reference/contacts.md
+      if (!isIdentified({ ...current, ...fields })) throw appError('CONTACT_IDENTITY_REQUIRED')
+
+      const [updated] = await tx
+        .update(contacts)
+        .set({ ...fields, updatedAt: new Date() })
+        .where(and(eq(contacts.id, id), eq(contacts.userId, userId)))
+        .returning()
+
+      if (!updated) throw appError('NOT_FOUND')
+
+      return updated
+    })
   })
 
 // Deleting a contact deletes no opportunity: the cascade runs on the join table only.

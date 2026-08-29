@@ -53,7 +53,7 @@ const contactFields = z.object({
 
 // Mirrors the `contacts_identified` check constraint: a contact with none of the three is
 // unaddressable, and the DB would reject it anyway — better as a field error than a 500.
-const isIdentified = (values: {
+export const isIdentified = (values: {
   firstName?: string | null
   lastName?: string | null
   company?: string | null
@@ -123,18 +123,10 @@ const patchFields = contactFields.partial().extend({
   relationship: z.enum(CONTACT_RELATIONSHIPS).optional()
 })
 
-// A patch may omit every name, but it must not blank out all three at once.
-export const updateContactSchema = z
-  .object({ id: z.uuid(), ...patchFields.shape })
-  .refine(
-    (values) =>
-      values.firstName === undefined &&
-      values.lastName === undefined &&
-      values.company === undefined
-        ? true
-        : isIdentified(values),
-    IDENTITY_ERROR
-  )
+// No identity rule here: a patch carries only the fields it changes, so `{ firstName: null }`
+// says nothing about the stored last name or company. Whether the contact stays identified can
+// only be decided against the merged row, which the server does. See docs/reference/contacts.md
+export const updateContactSchema = z.object({ id: z.uuid(), ...patchFields.shape })
 
 export const deleteContactSchema = z.object({ id: z.uuid() })
 
@@ -204,7 +196,14 @@ export const unlinkContactSchema = linkContactSchema
 // The whole list in one write: reordering and unlinking are the same operation to the server.
 export const setOpportunityContactsSchema = z.object({
   opportunityId: z.uuid(),
-  contactIds: z.array(z.uuid()).max(20)
+  // Unique: the same contact twice would collide on the join table's primary key, turning a
+  // bad payload into a 500 instead of a field error.
+  contactIds: z
+    .array(z.uuid())
+    .max(20)
+    .refine((ids) => new Set(ids).size === ids.length, {
+      error: () => m.validation_contactDuplicateLink()
+    })
 })
 
 export type SetOpportunityContactsInput = z.infer<typeof setOpportunityContactsSchema>

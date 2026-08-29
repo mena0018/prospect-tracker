@@ -435,6 +435,7 @@
   "table_colContact": "Contact",
   "validation_phoneTooLong": "Numéro trop long (30 max).",
   "validation_linkedinInvalid": "Lien LinkedIn invalide.",
+  "validation_contactDuplicateLink": "Ce contact est déjà lié à cette opportunité.",
   "validation_contactIdentityRequired": "Indiquez au moins un nom ou une société.",
   "opportunity_untitled": "Cette opportunité",
   "contact_openRow": "Ouvrir la fiche de {name}"
